@@ -185,6 +185,8 @@ def _board_modal_layer(scene_value: Scene) -> HTML(DungeonEvent):
       text{""}
     case character_select{preview_hero}:
       text{""}
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll}:
+      text{""}
     case boosters{reward, reveal_index, return_to}:
       text{""}
     case ultimate_preview{fx}:

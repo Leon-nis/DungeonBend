@@ -1,0 +1,7 @@
+1. Registrar os passos decididos para os ajustes do deckbuilder neste arquivo.
+2. Remover a coluna ID das listas DECK e ARMAZEM.
+3. Renomear a coluna META para TIER nas duas listas.
+4. Exibir tier de monstros na coluna TIER.
+5. Exibir "nulo" na coluna TIER para equipamentos e consumiveis.
+6. Ajustar o layout/CSS das linhas para refletir a nova estrutura das colunas.
+7. Gerar o build para validar a integracao.

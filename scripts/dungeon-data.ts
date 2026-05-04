@@ -21,6 +21,8 @@ export type RawMonster = {
   id: string;
   name: string;
   sprite: string;
+  class: string;
+  tier: number;
   gold_drop: number;
   hp_by_level: number[];
 };
@@ -211,6 +213,19 @@ function potionNameKey(id: string): string {
 
 function boosterNameKey(id: string): string {
   return `booster.${id}.name`;
+}
+
+function renderMonsterClass(value: string, label: string): string {
+  switch (value) {
+    case "normal":
+      return "monster_normal{}";
+    case "champion":
+      return "monster_champion{}";
+    case "boss":
+      return "monster_boss{}";
+    default:
+      fail(`${label} must be one of: normal, champion, boss`);
+  }
 }
 
 function fail(message: string): never {
@@ -473,6 +488,11 @@ export function getGameDataErrors(data: GameData): string[] {
     pushCardId(monster?.id, "monster", `monsters[${index}].id`);
     addStringError(errors, monster?.name, `monsters[${index}].name`);
     addStringError(errors, monster?.sprite, `monsters[${index}].sprite`);
+    addStringError(errors, monster?.class, `monsters[${index}].class`);
+    if (typeof monster?.class === "string" && !["normal", "champion", "boss"].includes(monster.class)) {
+      errors.push(`monsters[${index}].class must be one of: normal, champion, boss`);
+    }
+    addPositiveIntError(errors, monster?.tier, `monsters[${index}].tier`);
     addPositiveIntError(errors, monster?.gold_drop, `monsters[${index}].gold_drop`);
     const hpByLevel = requireArray<number>(errors, monster?.hp_by_level, `monsters[${index}].hp_by_level`);
     if (hpByLevel.length === 0) {
@@ -882,13 +902,15 @@ export function renderConfigModule(data: GameData): string {
     const monsterId = validateString(monster.id, `monsters[${index}].id`);
     const monsterName = requireContent(data, monsterNameKey(monsterId));
     validateString(monster.sprite, `monsters[${index}].sprite`);
+    const monsterClass = renderMonsterClass(validateString(monster.class, `monsters[${index}].class`), `monsters[${index}].class`);
+    const monsterTier = validatePositiveInt(monster.tier, `monsters[${index}].tier`);
     validatePositiveInt(monster.gold_drop, `monsters[${index}].gold_drop`);
     const hpLevels = monster.hp_by_level.map((value, levelIndex) =>
       String(validatePositiveInt(value, `monsters[${index}].hp_by_level[${levelIndex}]`))
     );
     const renderedHpLevels = renderTypedListHelpers(`generated_monster_${index}_hp_levels`, "U32", hpLevels);
     helperDefs.push(...renderedHpLevels.defs);
-    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${monster.gold_drop}, ${renderedHpLevels.expr}}`;
+    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${monsterClass}, ${monsterTier}, ${monster.gold_drop}, ${renderedHpLevels.expr}}`;
   });
 
   const swordDefs = data.weapons.map((weapon, index) => {
@@ -991,6 +1013,7 @@ export function renderConfigModule(data: GameData): string {
     "import Dungeon/Config as Config",
     "import Dungeon/HeroDef as HeroDef",
     "import Dungeon/Upgrade as Upgrade",
+    "import Dungeon/MonsterClass as MonsterClass",
     "import Dungeon/MonsterDef as MonsterDef",
     "import Dungeon/SwordDef as SwordDef",
     "import Dungeon/PotionDef as PotionDef",

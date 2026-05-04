@@ -3,6 +3,7 @@ import Dungeon/HeroDef as HeroDef
 import Dungeon/Upgrade as Upgrade
 import Dungeon/HeroProfile as HeroProfile
 import Dungeon/Meta as Meta
+import Dungeon/MonsterClass as MonsterClass
 import Dungeon/MonsterDef as MonsterDef
 import Dungeon/PackDef as PackDef
 
@@ -73,15 +74,18 @@ assert hero_profile_shape:
 # "Gold is the primary soft currency used for player progression."
 # Gold lives in Meta.gold as a U32.
 assert meta_holds_gold:
-  meta{0, 0, 100, [], [], []} == meta{0, 0, 100, [], [], []} :: Meta
+  meta{0, 0, 100, [], [], [], []} == meta{0, 0, 100, [], [], [], []} :: Meta
 
 # "Gold is earned during runs, mainly by defeating monsters and
 # collecting their drops." MonsterDef.gold_drop is the amount
 # awarded per kill. Concrete example: a 5-gold monster.
 assert monster_def_carries_gold_drop:
-  monster_def{"slime", "assets/slime.png", 5, [1]}
-    == monster_def{"slime", "assets/slime.png", 5, [1]}
+  monster_def{"slime", "assets/slime.png", monster_normal{}, 2, 5, [1]}
+    == monster_def{"slime", "assets/slime.png", monster_normal{}, 2, 5, [1]}
     :: MonsterDef
+
+assert monster_class_exists:
+  monster_champion{} == monster_champion{} :: MonsterClass
 
 # "Gold is used to purchase booster packs and other progression-
 # related elements." PackDef.price is the gold cost.

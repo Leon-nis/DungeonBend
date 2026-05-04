@@ -31,8 +31,14 @@ type HeroPresentation {
   }
 }
 
+type MonsterClass {
+  monster_normal{}
+  monster_champion{}
+  monster_boss{}
+}
+
 type MonsterDef {
-  monster_def{name: String, sprite: String, gold_drop: U32, hp_levels: List(U32)}
+  monster_def{name: String, sprite: String, class_kind: MonsterClass, tier: U32, gold_drop: U32, hp_levels: List(U32)}
 }
 
 type SwordDef {
@@ -155,6 +161,7 @@ type Meta {
     selection_confirmed: U32,
     gold: U32,
     bonus_deck: List(DeckEntry),
+    selected_deck: List(DeckEntry),
     pack_inventory: List(PackInventoryEntry),
     hero_profiles: List(HeroProfile)
   }
@@ -204,9 +211,21 @@ type BoosterReturn {
   booster_return_character_select{preview_hero: U32}
 }
 
+type DeckbuilderSelection {
+  no_deckbuilder_selection{}
+  deckbuilder_selection{card: CardRef}
+}
+
 type Scene {
   setup{}
   character_select{preview_hero: U32}
+  deckbuilder{
+    draft_deck: List(DeckEntry),
+    deck_selection: DeckbuilderSelection,
+    stash_selection: DeckbuilderSelection,
+    deck_scroll: U32,
+    stash_scroll: U32
+  }
   boosters{reward: PackReward, reveal_index: U32, return_to: BoosterReturn}
   ultimate_preview{fx: UltimatePreviewFx}
   ultimate_cinematic{run: Run, ticks_remaining: U32}
@@ -297,6 +316,20 @@ type DungeonEvent {
   upgrade{}
   open_character_select{}
   close_character_select{}
+  open_deckbuilder{}
+  close_deckbuilder{}
+  save_deckbuilder{}
+  deckbuilder_toggle_list{}
+  deckbuilder_select_deck{card: CardRef}
+  deckbuilder_select_stash{card: CardRef}
+  deckbuilder_scroll_deck_up{}
+  deckbuilder_scroll_deck_down{}
+  deckbuilder_scroll_stash_up{}
+  deckbuilder_scroll_stash_down{}
+  deckbuilder_add_one{}
+  deckbuilder_add_all{}
+  deckbuilder_remove_one{}
+  deckbuilder_remove_all{}
   open_ultimate_preview{}
   close_ultimate_preview{}
   preview_character{ref: U32}

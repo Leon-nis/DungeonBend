@@ -23,8 +23,10 @@ import Dungeon/profile_helpers/default_hero_profiles as default_hero_profiles
 import Dungeon/profile_helpers/meta_gold as meta_gold
 import Dungeon/profile_helpers/meta_bonus_deck as meta_bonus_deck
 import Dungeon/profile_helpers/meta_pack_inventory as meta_pack_inventory
+import Dungeon/profile_helpers/default_selected_deck as default_selected_deck
 import Dungeon/profile_helpers/set_meta_gold as set_meta_gold
 import Dungeon/profile_helpers/set_meta_bonus_deck as set_meta_bonus_deck
+import Dungeon/profile_helpers/set_meta_selected_deck as set_meta_selected_deck
 import Dungeon/profile_helpers/set_meta_pack_inventory as set_meta_pack_inventory
 import Dungeon/profile_helpers/update_profile as update_profile
 
@@ -39,23 +41,128 @@ def _parse_sections(parts: List(String)) -> DungeonEvent:
       no_save{}
 
 def _parse_sections_head(head: String, rest: List(String)) -> DungeonEvent:
-  match String/eq(head, "v5"):
+  match String/eq(head, "v6"):
     case true{}:
-      _parse_v5_sections(rest)
+      _parse_v6_sections(rest)
     case false{}:
-      match String/eq(head, "v4"):
+      match String/eq(head, "v5"):
         case true{}:
-          no_save{}
+          _parse_v5_sections(rest)
         case false{}:
-          match String/eq(head, "v3"):
+          match String/eq(head, "v4"):
             case true{}:
-              _parse_v3_sections(rest)
+              no_save{}
             case false{}:
-              match String/eq(head, "v2"):
+              match String/eq(head, "v3"):
                 case true{}:
-                  _parse_v2_sections(rest)
+                  _parse_v3_sections(rest)
                 case false{}:
-                  _parse_legacy_sections(head, rest)
+                  match String/eq(head, "v2"):
+                    case true{}:
+                      _parse_v2_sections(rest)
+                    case false{}:
+                      _parse_legacy_sections(head, rest)
+
+def _parse_v6_sections(parts: List(String)) -> DungeonEvent:
+  match parts:
+    case selected_str<>rest:
+      match rest:
+        case confirmed_str<>rest1:
+          match rest1:
+            case gold_str<>rest2:
+              match rest2:
+                case bonus_monster_str<>rest3:
+                  match rest3:
+                    case bonus_sword_str<>rest4:
+                      match rest4:
+                        case bonus_potion_str<>rest5:
+                          match rest5:
+                            case selected_monster_str<>rest6:
+                              match rest6:
+                                case selected_sword_str<>rest7:
+                                  match rest7:
+                                    case selected_potion_str<>rest8:
+                                      match rest8:
+                                        case pack_str<>rest9:
+                                          match rest9:
+                                            case profiles_str<>rest10:
+                                              match rest10:
+                                                case next_seed_str<>rest11:
+                                                  match rest11:
+                                                    case scene_kind_str<>rest12:
+                                                      match rest12:
+                                                        case run_core_str<>rest13:
+                                                          match rest13:
+                                                            case run_weapon_str<>rest14:
+                                                              match rest14:
+                                                                case run_board_str<>rest15:
+                                                                  match rest15:
+                                                                    case run_blueprint_str<>rest16:
+                                                                      match rest16:
+                                                                        case run_counts_str<>rest17:
+                                                                          match rest17:
+                                                                            case []:
+                                                                              _parse_v6(
+                                                                                config(),
+                                                                                String/to_u32(selected_str),
+                                                                                String/to_u32(confirmed_str),
+                                                                                String/to_u32(gold_str),
+                                                                                String/split(bonus_monster_str, ','),
+                                                                                String/split(bonus_sword_str, ','),
+                                                                                String/split(bonus_potion_str, ','),
+                                                                                String/split(selected_monster_str, ','),
+                                                                                String/split(selected_sword_str, ','),
+                                                                                String/split(selected_potion_str, ','),
+                                                                                String/split(pack_str, ','),
+                                                                                String/split(profiles_str, ';'),
+                                                                                String/to_u32(next_seed_str),
+                                                                                _parse_saved_scene_v4(
+                                                                                  String/to_u32(scene_kind_str),
+                                                                                  run_core_str,
+                                                                                  run_weapon_str,
+                                                                                  run_board_str,
+                                                                                  run_blueprint_str,
+                                                                                  run_counts_str
+                                                                                )
+                                                                              )
+                                                                            case _:
+                                                                              no_save{}
+                                                                        case _:
+                                                                          no_save{}
+                                                                    case _:
+                                                                      no_save{}
+                                                                case _:
+                                                                  no_save{}
+                                                            case _:
+                                                              no_save{}
+                                                        case _:
+                                                          no_save{}
+                                                    case _:
+                                                      no_save{}
+                                                case _:
+                                                  no_save{}
+                                            case _:
+                                              no_save{}
+                                        case _:
+                                          no_save{}
+                                    case _:
+                                      no_save{}
+                                case _:
+                                  no_save{}
+                            case _:
+                              no_save{}
+                        case _:
+                          no_save{}
+                    case _:
+                      no_save{}
+                case _:
+                  no_save{}
+            case _:
+              no_save{}
+        case _:
+          no_save{}
+    case _:
+      no_save{}
 
 def _parse_v5_sections(parts: List(String)) -> DungeonEvent:
   match parts:
@@ -349,17 +456,19 @@ def _parse_profile(config_value: Config, hl_maybe: Maybe(U32), gold_maybe: Maybe
 def _load_legacy_profile(config_value: Config, hero_level: U32, gold: U32, monster_counts: List(String), sword_counts: List(String), potion_counts: List(String), pack_counts: List(String), saved_scene: SavedScene) -> DungeonEvent:
   match config_value:
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level}:
+      bonus_deck = _merge_bonus_sections(
+        _parse_monster_bonus(monsters, monster_counts, 0),
+        _parse_sword_bonus(swords, sword_counts, 0),
+        _parse_potion_bonus(potions, potion_counts, 0)
+      );
       loaded{
         update_profile(
           meta{
             0,
             1,
             gold,
-            _merge_bonus_sections(
-              _parse_monster_bonus(monsters, monster_counts, 0),
-              _parse_sword_bonus(swords, sword_counts, 0),
-              _parse_potion_bonus(potions, potion_counts, 0)
-            ),
+            bonus_deck,
+            default_selected_deck(config_value, bonus_deck),
             _parse_pack_inventory(booster_packs, pack_counts, 0),
             default_hero_profiles(config_value)
           },
@@ -370,9 +479,19 @@ def _load_legacy_profile(config_value: Config, hero_level: U32, gold: U32, monst
         initial_seed()
       }
 
-def _parse_v4(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe: Maybe(U32), gold_maybe: Maybe(U32), monster_counts: List(String), sword_counts: List(String), potion_counts: List(String), pack_counts: List(String), profile_parts: List(String), next_seed_maybe: Maybe(U32), saved_scene: SavedScene) -> DungeonEvent:
+def _parse_v6(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe: Maybe(U32), gold_maybe: Maybe(U32), bonus_monster_counts: List(String), bonus_sword_counts: List(String), bonus_potion_counts: List(String), selected_monster_counts: List(String), selected_sword_counts: List(String), selected_potion_counts: List(String), pack_counts: List(String), profile_parts: List(String), next_seed_maybe: Maybe(U32), saved_scene: SavedScene) -> DungeonEvent:
   match config_value gold_maybe:
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} some{gold}:
+      bonus_deck = _merge_bonus_sections(
+        _parse_monster_bonus(monsters, bonus_monster_counts, 0),
+        _parse_sword_bonus(swords, bonus_sword_counts, 0),
+        _parse_potion_bonus(potions, bonus_potion_counts, 0)
+      );
+      selected_deck = _merge_bonus_sections(
+        _parse_monster_bonus(monsters, selected_monster_counts, 0),
+        _parse_sword_bonus(swords, selected_sword_counts, 0),
+        _parse_potion_bonus(potions, selected_potion_counts, 0)
+      );
       loaded{
         _parse_v3_profiles_list(
           heroes,
@@ -381,11 +500,37 @@ def _parse_v4(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe:
             _selected_hero_value(config_value, selected_maybe),
             _selection_confirmed_value(confirmed_maybe),
             gold,
-            _merge_bonus_sections(
-              _parse_monster_bonus(monsters, monster_counts, 0),
-              _parse_sword_bonus(swords, sword_counts, 0),
-              _parse_potion_bonus(potions, potion_counts, 0)
-            ),
+            bonus_deck,
+            selected_deck,
+            _parse_pack_inventory(booster_packs, pack_counts, 0),
+            default_hero_profiles(config_value)
+          },
+          0
+        ),
+        saved_scene,
+        _saved_next_seed_value(next_seed_maybe)
+      }
+    case _:
+      no_save{}
+
+def _parse_v4(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe: Maybe(U32), gold_maybe: Maybe(U32), monster_counts: List(String), sword_counts: List(String), potion_counts: List(String), pack_counts: List(String), profile_parts: List(String), next_seed_maybe: Maybe(U32), saved_scene: SavedScene) -> DungeonEvent:
+  match config_value gold_maybe:
+    case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} some{gold}:
+      bonus_deck = _merge_bonus_sections(
+        _parse_monster_bonus(monsters, monster_counts, 0),
+        _parse_sword_bonus(swords, sword_counts, 0),
+        _parse_potion_bonus(potions, potion_counts, 0)
+      );
+      loaded{
+        _parse_v3_profiles_list(
+          heroes,
+          profile_parts,
+          meta{
+            _selected_hero_value(config_value, selected_maybe),
+            _selection_confirmed_value(confirmed_maybe),
+            gold,
+            bonus_deck,
+            default_selected_deck(config_value, bonus_deck),
             _parse_pack_inventory(booster_packs, pack_counts, 0),
             default_hero_profiles(config_value)
           },
@@ -400,6 +545,11 @@ def _parse_v4(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe:
 def _parse_v3(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe: Maybe(U32), gold_maybe: Maybe(U32), monster_counts: List(String), sword_counts: List(String), potion_counts: List(String), pack_counts: List(String), profile_parts: List(String), saved_scene: SavedScene) -> DungeonEvent:
   match config_value gold_maybe:
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} some{gold}:
+      bonus_deck = _merge_bonus_sections(
+        _parse_monster_bonus(monsters, monster_counts, 0),
+        _parse_sword_bonus(swords, sword_counts, 0),
+        _parse_potion_bonus(potions, potion_counts, 0)
+      );
       loaded{
         _parse_v3_profiles_list(
           heroes,
@@ -408,11 +558,8 @@ def _parse_v3(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe:
             _selected_hero_value(config_value, selected_maybe),
             _selection_confirmed_value(confirmed_maybe),
             gold,
-            _merge_bonus_sections(
-              _parse_monster_bonus(monsters, monster_counts, 0),
-              _parse_sword_bonus(swords, sword_counts, 0),
-              _parse_potion_bonus(potions, potion_counts, 0)
-            ),
+            bonus_deck,
+            default_selected_deck(config_value, bonus_deck),
             _parse_pack_inventory(booster_packs, pack_counts, 0),
             default_hero_profiles(config_value)
           },
@@ -441,6 +588,7 @@ def _parse_v2(config_value: Config, selected_maybe: Maybe(U32), confirmed_maybe:
             _selection_confirmed_value(confirmed_maybe),
             0,
             [],
+            default_selected_deck(config_value, []),
             [],
             default_hero_profiles(config_value)
           },
@@ -605,6 +753,7 @@ def _migrate_v2_profile_data(monsters: List(MonsterDef), swords: List(SwordDef),
   next_inventory = _parse_pack_inventory(booster_packs, pack_counts, 0);
   next_meta = set_meta_gold(meta_state, meta_gold(meta_state) + gold);
   next_meta = set_meta_bonus_deck(next_meta, merge_deck_entries(meta_bonus_deck(next_meta), next_bonus));
+  next_meta = set_meta_selected_deck(next_meta, default_selected_deck(config(), meta_bonus_deck(next_meta)));
   next_meta = set_meta_pack_inventory(next_meta, _merge_pack_inventories(meta_pack_inventory(next_meta), next_inventory));
   update_profile(next_meta, hero_ref, hero_profile{_migrated_unlock_value(hero_ref, selected_ref, hero_level), hero_level})
 
@@ -695,7 +844,7 @@ def _parse_monster_bonus(monsters: List(MonsterDef), counts: List(String), idx: 
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
       _monster_bonus_entry(
         _count_from_head(counts),
         idx,

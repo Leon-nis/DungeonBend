@@ -53,7 +53,7 @@ def _monster_name_from_list(monsters: List(MonsterDef), ref: U32) -> String:
   match monsters:
     case []:
       Content.fallback_monster_name()
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
       match ref:
         case 0:
           name
@@ -72,7 +72,7 @@ def _monster_sprite_from_list(monsters: List(MonsterDef), ref: U32) -> String:
   match monsters:
     case []:
       ""
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
       match ref:
         case 0:
           sprite
@@ -239,7 +239,7 @@ def _monster_hp_from_list(monsters: List(MonsterDef), ref: U32) -> U32:
   match monsters:
     case []:
       1
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
       match ref:
         case 0:
           _first_hp(hp_levels)
@@ -272,7 +272,7 @@ def _monster_hp_range_from_list(monsters: List(MonsterDef), ref: U32) -> String:
   match monsters:
     case []:
       "1 - 1"
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
       match ref:
         case 0:
           U32/show(_first_hp(hp_levels)) ++ " - " ++ U32/show(_last_hp(hp_levels, 1))

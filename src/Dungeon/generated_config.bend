@@ -1,6 +1,7 @@
 import Dungeon/Config as Config
 import Dungeon/HeroDef as HeroDef
 import Dungeon/Upgrade as Upgrade
+import Dungeon/MonsterClass as MonsterClass
 import Dungeon/MonsterDef as MonsterDef
 import Dungeon/SwordDef as SwordDef
 import Dungeon/PotionDef as PotionDef
@@ -82,10 +83,10 @@ def generated_config_heroes_chunk_0() -> List(HeroDef):
 
 def generated_config_monsters_chunk_0() -> List(MonsterDef):
   [
-    monster_def{"Rat", "assets/enemy-rat.png", 3, generated_monster_0_hp_levels_chunk_0()},
-    monster_def{"Spider", "assets/enemy-spider.png", 4, generated_monster_1_hp_levels_chunk_0()},
-    monster_def{"Venom Spider", "assets/enemy-spider2.png", 5, generated_monster_2_hp_levels_chunk_0()},
-    monster_def{"Orc", "assets/enemy-orc.png", 6, generated_monster_3_hp_levels_chunk_0()}
+    monster_def{"Rat", "assets/enemy-rat.png", monster_normal{}, 3, 3, generated_monster_0_hp_levels_chunk_0()},
+    monster_def{"Spider", "assets/enemy-spider.png", monster_normal{}, 4, 4, generated_monster_1_hp_levels_chunk_0()},
+    monster_def{"Venom Spider", "assets/enemy-spider2.png", monster_normal{}, 5, 5, generated_monster_2_hp_levels_chunk_0()},
+    monster_def{"Orc", "assets/enemy-orc.png", monster_normal{}, 6, 6, generated_monster_3_hp_levels_chunk_0()}
   ]
 
 def generated_config_swords_chunk_0() -> List(SwordDef):
@@ -104,7 +105,7 @@ def generated_config_potions_chunk_0() -> List(PotionDef):
 
 def generated_config_base_deck_chunk_0() -> List(DeckEntry):
   [
-    monster_entry{0, 6},
+    monster_entry{0, 7},
     monster_entry{1, 3},
     monster_entry{2, 3},
     monster_entry{3, 3},

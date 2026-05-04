@@ -151,7 +151,7 @@ def monster_gold(monsters: List(MonsterDef), idx: U32) -> U32:
   match monsters:
     case []:
       0
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
       match idx:
         case 0:
           gold_drop
@@ -233,7 +233,7 @@ def _monster_hp(monsters: List(MonsterDef), idx: U32, level: U32) -> U32:
   match monsters:
     case []:
       1
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
       match idx:
         case 0:
           _nth_u32(hp_levels, level - 1, 1)

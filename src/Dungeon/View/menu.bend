@@ -26,7 +26,7 @@ import Dungeon/View/selectors/hero_level_progress_text as hero_level_progress_te
 import Dungeon/View/selectors/hero_level_ratio_text as hero_level_ratio_text
 import Dungeon/View/selectors/hero_menu_level_text as hero_menu_level_text
 import Dungeon/View/selectors/hero_menu_max_hp_text as hero_menu_max_hp_text
-import Dungeon/View/selectors/start_enabled as start_enabled
+import Dungeon/View/selectors/menu_start_enabled as menu_start_enabled
 import Dungeon/View/selectors/menu_upgrade_visible as menu_upgrade_visible
 import Dungeon/View/selectors/character_upgrade_maxed as character_upgrade_maxed
 import Dungeon/View/selectors/character_upgrade_enabled as character_upgrade_enabled
@@ -113,7 +113,7 @@ def _menu_actions_layout(meta_state: Meta) -> HTML(DungeonEvent):
           {_menu_deck_button()}
         </div>
         <div class="menu-actions__slot">
-          {_menu_start_button()}
+          {_menu_start_button(meta_state)}
         </div>
       </div>
     </section>,
@@ -438,14 +438,14 @@ def _menu_upgrade_overlay(meta_state: Meta, hero_value: HeroDef, profile: HeroPr
     case _:
       text{""}
 
-def _menu_start_button() -> HTML(DungeonEvent):
+def _menu_start_button(meta_state: Meta) -> HTML(DungeonEvent):
   <div class="menu-play-btn-wrap menu-play-btn-wrap--full">
     {button_primary(
       DungeonEvent,
       start{},
       large{},
       Content.ui_menu_start(),
-      _full_button_overrides(start_enabled(setup{}))
+      _full_button_overrides(menu_start_enabled(meta_state))
     )}
   </div>
 
@@ -463,10 +463,10 @@ def _menu_deck_button() -> HTML(DungeonEvent):
   <div class="menu-club-btn-wrap menu-club-btn-wrap--full">
     {button_secondary(
       DungeonEvent,
-      ignore{},
+      open_deckbuilder{},
       medium{},
       "DUNGEON DECK",
-      _full_button_overrides(0)
+      _full_button_overrides(1)
     )}
   </div>
 

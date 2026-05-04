@@ -5,6 +5,78 @@ import Dungeon/HeroProfile as HeroProfile
 import Dungeon/Meta as Meta
 import Dungeon/Config as Config
 import Dungeon/hero_helpers/hero_starts_unlocked as hero_starts_unlocked
+import Dungeon/Deck/counts_pick/merge_deck_entries as merge_deck_entries
+import Dungeon/Deck/counts_pick/remove_hero_card as remove_hero_card
+
+def deckbuilder_target_count() -> U32:
+  20
+
+def default_selected_deck(config_value: Config, bonus_deck: List(DeckEntry)) -> List(DeckEntry):
+  _default_selected_deck_entries(config_value, bonus_deck, deckbuilder_target_count())
+
+def _default_selected_deck_entries(config_value: Config, bonus_deck: List(DeckEntry), remaining: U32) -> List(DeckEntry):
+  _take_deck_entries(_default_selected_deck_source(config_value, bonus_deck), remaining)
+
+def _default_selected_deck_source(config_value: Config, bonus_deck: List(DeckEntry)) -> List(DeckEntry):
+  match config_value:
+    case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level}:
+      remove_hero_card(merge_deck_entries(deck, bonus_deck))
+
+def _take_deck_entries(entries: List(DeckEntry), remaining: U32) -> List(DeckEntry):
+  match entries:
+    case []:
+      []
+    case entry<>rest:
+      _take_deck_entries_with_remaining(remaining, entry, rest)
+
+def _take_deck_entries_with_remaining(remaining: U32, entry: DeckEntry, rest: List(DeckEntry)) -> List(DeckEntry):
+  match remaining:
+    case 0:
+      []
+    case _:
+      _take_deck_entry(entry, rest, remaining)
+
+def _take_deck_entry(entry: DeckEntry, rest: List(DeckEntry), remaining: U32) -> List(DeckEntry):
+  match entry:
+    case monster_entry{ref, count}:
+      _take_monster_entry(ref, count, rest, remaining)
+    case sword_entry{ref, count}:
+      _take_sword_entry(ref, count, rest, remaining)
+    case potion_entry{ref, count}:
+      _take_potion_entry(ref, count, rest, remaining)
+    case hero_entry{count}:
+      _take_deck_entries(rest, remaining)
+
+def _take_monster_entry(ref: U32, count: U32, rest: List(DeckEntry), remaining: U32) -> List(DeckEntry):
+  taken = _take_count(count, remaining);
+  match taken:
+    case 0:
+      _take_deck_entries(rest, remaining)
+    case _:
+      monster_entry{ref, taken}<>_take_deck_entries(rest, remaining - taken)
+
+def _take_sword_entry(ref: U32, count: U32, rest: List(DeckEntry), remaining: U32) -> List(DeckEntry):
+  taken = _take_count(count, remaining);
+  match taken:
+    case 0:
+      _take_deck_entries(rest, remaining)
+    case _:
+      sword_entry{ref, taken}<>_take_deck_entries(rest, remaining - taken)
+
+def _take_potion_entry(ref: U32, count: U32, rest: List(DeckEntry), remaining: U32) -> List(DeckEntry):
+  taken = _take_count(count, remaining);
+  match taken:
+    case 0:
+      _take_deck_entries(rest, remaining)
+    case _:
+      potion_entry{ref, taken}<>_take_deck_entries(rest, remaining - taken)
+
+def _take_count(count: U32, remaining: U32) -> U32:
+  match count < remaining:
+    case 1:
+      count
+    case _:
+      remaining
 
 def default_hero_profile() -> HeroProfile:
   hero_profile{0, 0}
@@ -33,32 +105,37 @@ def _default_hero_profiles_from_list(heroes: List(HeroDef), hero_ref: U32) -> Li
 
 def selected_hero(meta_state: Meta) -> U32:
   match meta_state:
-    case meta{selected_hero_ref, selection_confirmed, gold, bonus_deck, pack_inventory, hero_profiles}:
+    case meta{selected_hero_ref, selection_confirmed, gold, bonus_deck, selected_deck, pack_inventory, hero_profiles}:
       selected_hero_ref
 
 def selection_confirmed(meta_state: Meta) -> U32:
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, hero_profiles}:
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, hero_profiles}:
       confirmed
 
 def hero_profiles(meta_state: Meta) -> List(HeroProfile):
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
       profiles
 
 def meta_gold(meta_state: Meta) -> U32:
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
       gold
 
 def meta_bonus_deck(meta_state: Meta) -> List(DeckEntry):
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
       bonus_deck
+
+def meta_selected_deck(meta_state: Meta) -> List(DeckEntry):
+  match meta_state:
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      selected_deck
 
 def meta_pack_inventory(meta_state: Meta) -> List(PackInventoryEntry):
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
       pack_inventory
 
 def profile_for_hero(meta_state: Meta, hero_ref: U32) -> HeroProfile:
@@ -80,8 +157,8 @@ def active_profile(meta_state: Meta) -> HeroProfile:
 
 def update_profile(meta_state: Meta, hero_ref: U32, next_profile: HeroProfile) -> Meta:
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
-      meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, _update_profile_list(profiles, hero_ref, next_profile)}
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, _update_profile_list(profiles, hero_ref, next_profile)}
 
 def _update_profile_list(profiles: List(HeroProfile), hero_ref: U32, next_profile: HeroProfile) -> List(HeroProfile):
   match profiles:
@@ -106,28 +183,33 @@ def _update_profile_missing(hero_ref: U32, next_profile: HeroProfile, current_re
 
 def set_selected_hero(meta_state: Meta, hero_ref: U32) -> Meta:
   match meta_state:
-    case meta{current_selected, confirmed, gold, bonus_deck, pack_inventory, profiles}:
-      meta{hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}
+    case meta{current_selected, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      meta{hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}
 
 def set_selection_confirmed(meta_state: Meta, confirmed: U32) -> Meta:
   match meta_state:
-    case meta{selected_hero_ref, current_confirmed, gold, bonus_deck, pack_inventory, profiles}:
-      meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}
+    case meta{selected_hero_ref, current_confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}
 
 def set_meta_gold(meta_state: Meta, next_gold: U32) -> Meta:
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
-      meta{selected_hero_ref, confirmed, next_gold, bonus_deck, pack_inventory, profiles}
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      meta{selected_hero_ref, confirmed, next_gold, bonus_deck, selected_deck, pack_inventory, profiles}
 
 def set_meta_bonus_deck(meta_state: Meta, next_bonus_deck: List(DeckEntry)) -> Meta:
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
-      meta{selected_hero_ref, confirmed, gold, next_bonus_deck, pack_inventory, profiles}
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      meta{selected_hero_ref, confirmed, gold, next_bonus_deck, selected_deck, pack_inventory, profiles}
+
+def set_meta_selected_deck(meta_state: Meta, next_selected_deck: List(DeckEntry)) -> Meta:
+  match meta_state:
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      meta{selected_hero_ref, confirmed, gold, bonus_deck, next_selected_deck, pack_inventory, profiles}
 
 def set_meta_pack_inventory(meta_state: Meta, next_pack_inventory: List(PackInventoryEntry)) -> Meta:
   match meta_state:
-    case meta{selected_hero_ref, confirmed, gold, bonus_deck, pack_inventory, profiles}:
-      meta{selected_hero_ref, confirmed, gold, bonus_deck, next_pack_inventory, profiles}
+    case meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, pack_inventory, profiles}:
+      meta{selected_hero_ref, confirmed, gold, bonus_deck, selected_deck, next_pack_inventory, profiles}
 
 def profile_unlocked(profile: HeroProfile) -> U32:
   match profile:
