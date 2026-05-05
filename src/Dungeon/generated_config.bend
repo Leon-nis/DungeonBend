@@ -2,6 +2,8 @@ import Dungeon/Config as Config
 import Dungeon/HeroDef as HeroDef
 import Dungeon/Upgrade as Upgrade
 import Dungeon/MonsterClass as MonsterClass
+import Dungeon/CardRarity as CardRarity
+import Dungeon/LootRarity as LootRarity
 import Dungeon/MonsterDef as MonsterDef
 import Dungeon/SwordDef as SwordDef
 import Dungeon/PotionDef as PotionDef
@@ -199,24 +201,24 @@ def generated_config_heroes_chunk_0() -> List(HeroDef):
 
 def generated_config_monsters_chunk_0() -> List(MonsterDef):
   [
-    monster_def{"Rat", "assets/enemy-rat.png", monster_normal{}, 3, generated_monster_0_gold_levels_chunk_0(), generated_monster_0_hp_levels_chunk_0()},
-    monster_def{"Spider", "assets/enemy-spider.png", monster_normal{}, 4, generated_monster_1_gold_levels_chunk_0(), generated_monster_1_hp_levels_chunk_0()},
-    monster_def{"Venom Spider", "assets/enemy-spider2.png", monster_normal{}, 5, generated_monster_2_gold_levels_chunk_0(), generated_monster_2_hp_levels_chunk_0()},
-    monster_def{"Orc", "assets/enemy-orc.png", monster_normal{}, 6, generated_monster_3_gold_levels_chunk_0(), generated_monster_3_hp_levels_chunk_0()}
+    monster_def{"Rat", "assets/enemy-rat.png", monster_normal{}, 3, card_rarity_monster{}, generated_monster_0_gold_levels_chunk_0(), generated_monster_0_hp_levels_chunk_0()},
+    monster_def{"Spider", "assets/enemy-spider.png", monster_normal{}, 4, card_rarity_monster{}, generated_monster_1_gold_levels_chunk_0(), generated_monster_1_hp_levels_chunk_0()},
+    monster_def{"Venom Spider", "assets/enemy-spider2.png", monster_normal{}, 5, card_rarity_monster{}, generated_monster_2_gold_levels_chunk_0(), generated_monster_2_hp_levels_chunk_0()},
+    monster_def{"Orc", "assets/enemy-orc.png", monster_normal{}, 6, card_rarity_monster{}, generated_monster_3_gold_levels_chunk_0(), generated_monster_3_hp_levels_chunk_0()}
   ]
 
 def generated_config_swords_chunk_0() -> List(SwordDef):
   [
-    sword_def{"Sword A", "assets/item-sword.png", 5},
-    sword_def{"Sword S", "assets/item-sword.png", 7},
-    sword_def{"Sword S+", "assets/item-sword.png", 9}
+    sword_def{"Sword A", "assets/item-sword.png", card_rarity_equipment{loot_common{}}, 5},
+    sword_def{"Sword S", "assets/item-sword.png", card_rarity_equipment{loot_uncommon{}}, 7},
+    sword_def{"Sword S+", "assets/item-sword.png", card_rarity_equipment{loot_epic{}}, 9}
   ]
 
 def generated_config_potions_chunk_0() -> List(PotionDef):
   [
-    potion_def{"Health Potion", "assets/item-potion.png", 3},
-    potion_def{"Big Health Potion", "assets/item-potion.png", 7},
-    potion_def{"Giant Health Potion", "assets/item-potion.png", 12}
+    potion_def{"Health Potion", "assets/item-potion.png", card_rarity_consumable{loot_common{}}, 3},
+    potion_def{"Big Health Potion", "assets/item-potion.png", card_rarity_consumable{loot_uncommon{}}, 7},
+    potion_def{"Giant Health Potion", "assets/item-potion.png", card_rarity_consumable{loot_rare{}}, 12}
   ]
 
 def generated_config_base_deck_chunk_0() -> List(DeckEntry):

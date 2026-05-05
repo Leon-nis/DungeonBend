@@ -4,6 +4,7 @@
     "name": "Rat",
     "sprite": "assets/enemy-rat.png",
     "class": "normal",
+    "rarity": "monster",
     "tier": 3,
     "gold_by_level": [
       3,
@@ -45,6 +46,7 @@
     "name": "Spider",
     "sprite": "assets/enemy-spider.png",
     "class": "normal",
+    "rarity": "monster",
     "tier": 4,
     "gold_by_level": [
       4,
@@ -86,6 +88,7 @@
     "name": "Venom Spider",
     "sprite": "assets/enemy-spider2.png",
     "class": "normal",
+    "rarity": "monster",
     "tier": 5,
     "gold_by_level": [
       5,
@@ -127,6 +130,7 @@
     "name": "Orc",
     "sprite": "assets/enemy-orc.png",
     "class": "normal",
+    "rarity": "monster",
     "tier": 6,
     "gold_by_level": [
       6,

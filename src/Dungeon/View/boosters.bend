@@ -1,12 +1,9 @@
 import HTML as HTML
 import Dungeon/CardRef as CardRef
 import Dungeon/Meta as Meta
-import Dungeon/PackDef as PackDef
-import Dungeon/PackPoolEntry as PackPoolEntry
 import Dungeon/PackReward as PackReward
 import Dungeon/DungeonEvent as DungeonEvent
-import Dungeon/config as config
-import Dungeon/Boosters/packs/active_pack as active_pack
+import Dungeon/card_rarity_helpers/card_background as card_background
 import Dungeon/View/selectors/meta_gold as meta_gold
 import Dungeon/View/selectors/meta_pack_total as meta_pack_total
 import Dungeon/View/selectors/active_pack_price as active_pack_price
@@ -153,64 +150,7 @@ def _reveal_card_surface_overrides(card: CardRef) -> List(Midum/Card/Override):
   ]
 
 def _reveal_card_background(card: CardRef) -> String:
-  _background_for_weight_share(card, active_pack(config()))
-
-def _background_for_weight_share(card: CardRef, pack: PackDef) -> String:
-  match pack:
-    case pack_def{name, price, reveal_count, allow_duplicates, pool}:
-      _background_for_pool_share(card, pool)
-
-def _background_for_pool_share(card: CardRef, pool: List(PackPoolEntry)) -> String:
-  total = _pool_total_weight(pool);
-  weighted = _pool_weight_for_card(pool, card) * 100;
-  match total:
-    case 0:
-      "assets/background-comum.png"
-    case _:
-      match weighted <= (total * 5):
-        case 1:
-          "assets/background-epic.png"
-        case _:
-          match weighted <= (total * 12):
-            case 1:
-              "assets/background-rare.png"
-            case _:
-              match weighted <= (total * 25):
-                case 1:
-                  "assets/background-incomum.png"
-                case _:
-                  "assets/background-comum.png"
-
-def _pool_total_weight(pool: List(PackPoolEntry)) -> U32:
-  match pool:
-    case []:
-      0
-    case pack_pool_entry{entry_card, weight}<>rest:
-      weight + _pool_total_weight(rest)
-
-def _pool_weight_for_card(pool: List(PackPoolEntry), target_card: CardRef) -> U32:
-  match pool:
-    case []:
-      0
-    case pack_pool_entry{entry_card, weight}<>rest:
-      match _card_ref_eq(entry_card, target_card):
-        case 1:
-          weight + _pool_weight_for_card(rest, target_card)
-        case _:
-          _pool_weight_for_card(rest, target_card)
-
-def _card_ref_eq(left: CardRef, right: CardRef) -> U32:
-  match left right:
-    case hero_card{} hero_card{}:
-      1
-    case monster_card{left_ref} monster_card{right_ref}:
-      left_ref === right_ref
-    case sword_card{left_ref} sword_card{right_ref}:
-      left_ref === right_ref
-    case potion_card{left_ref} potion_card{right_ref}:
-      left_ref === right_ref
-    case _ _:
-      0
+  card_background(card)
 
 def _reveal_action_button(reward: PackReward, reveal_index: U32) -> HTML(DungeonEvent):
   match booster_is_last_card(reward, reveal_index):

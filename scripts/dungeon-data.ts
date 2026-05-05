@@ -22,6 +22,7 @@ export type RawMonster = {
   name: string;
   sprite: string;
   class: string;
+  rarity: string;
   tier: number;
   gold_by_level: number[];
   hp_by_level: number[];
@@ -31,6 +32,7 @@ export type RawWeapon = {
   id: string;
   name: string;
   sprite: string;
+  rarity: string;
   dmg: number;
 };
 
@@ -38,6 +40,7 @@ export type RawPotion = {
   id: string;
   name: string;
   sprite: string;
+  rarity: string;
   heal: number;
 };
 
@@ -226,6 +229,36 @@ function renderMonsterClass(value: string, label: string): string {
     default:
       fail(`${label} must be one of: normal, champion, boss`);
   }
+}
+
+function renderLootRarity(value: string, label: string): string {
+  switch (value) {
+    case "common":
+      return "loot_common{}";
+    case "uncommon":
+      return "loot_uncommon{}";
+    case "rare":
+      return "loot_rare{}";
+    case "epic":
+      return "loot_epic{}";
+    default:
+      fail(`${label} must be one of: common, uncommon, rare, epic`);
+  }
+}
+
+function renderMonsterCardRarity(value: string, label: string): string {
+  if (value !== "monster") {
+    fail(`${label} must be "monster"`);
+  }
+  return "card_rarity_monster{}";
+}
+
+function renderEquipmentCardRarity(value: string, label: string): string {
+  return `card_rarity_equipment{${renderLootRarity(value, label)}}`;
+}
+
+function renderConsumableCardRarity(value: string, label: string): string {
+  return `card_rarity_consumable{${renderLootRarity(value, label)}}`;
 }
 
 function fail(message: string): never {
@@ -489,8 +522,12 @@ export function getGameDataErrors(data: GameData): string[] {
     addStringError(errors, monster?.name, `monsters[${index}].name`);
     addStringError(errors, monster?.sprite, `monsters[${index}].sprite`);
     addStringError(errors, monster?.class, `monsters[${index}].class`);
+    addStringError(errors, monster?.rarity, `monsters[${index}].rarity`);
     if (typeof monster?.class === "string" && !["normal", "champion", "boss"].includes(monster.class)) {
       errors.push(`monsters[${index}].class must be one of: normal, champion, boss`);
+    }
+    if (typeof monster?.rarity === "string" && monster.rarity !== "monster") {
+      errors.push(`monsters[${index}].rarity must be "monster"`);
     }
     addPositiveIntError(errors, monster?.tier, `monsters[${index}].tier`);
     const hpByLevel = requireArray<number>(errors, monster?.hp_by_level, `monsters[${index}].hp_by_level`);
@@ -521,6 +558,10 @@ export function getGameDataErrors(data: GameData): string[] {
     pushCardId(weapon?.id, "weapon", `weapons[${index}].id`);
     addStringError(errors, weapon?.name, `weapons[${index}].name`);
     addStringError(errors, weapon?.sprite, `weapons[${index}].sprite`);
+    addStringError(errors, weapon?.rarity, `weapons[${index}].rarity`);
+    if (typeof weapon?.rarity === "string" && !["common", "uncommon", "rare", "epic"].includes(weapon.rarity)) {
+      errors.push(`weapons[${index}].rarity must be one of: common, uncommon, rare, epic`);
+    }
     addPositiveIntError(errors, weapon?.dmg, `weapons[${index}].dmg`);
   });
 
@@ -528,6 +569,10 @@ export function getGameDataErrors(data: GameData): string[] {
     pushCardId(potion?.id, "potion", `potions[${index}].id`);
     addStringError(errors, potion?.name, `potions[${index}].name`);
     addStringError(errors, potion?.sprite, `potions[${index}].sprite`);
+    addStringError(errors, potion?.rarity, `potions[${index}].rarity`);
+    if (typeof potion?.rarity === "string" && !["common", "uncommon", "rare", "epic"].includes(potion.rarity)) {
+      errors.push(`potions[${index}].rarity must be one of: common, uncommon, rare, epic`);
+    }
     addPositiveIntError(errors, potion?.heal, `potions[${index}].heal`);
   });
 
@@ -912,6 +957,7 @@ export function renderConfigModule(data: GameData): string {
     const monsterName = requireContent(data, monsterNameKey(monsterId));
     validateString(monster.sprite, `monsters[${index}].sprite`);
     const monsterClass = renderMonsterClass(validateString(monster.class, `monsters[${index}].class`), `monsters[${index}].class`);
+    const monsterRarity = renderMonsterCardRarity(validateString(monster.rarity, `monsters[${index}].rarity`), `monsters[${index}].rarity`);
     const monsterTier = validatePositiveInt(monster.tier, `monsters[${index}].tier`);
     const goldLevels = monster.gold_by_level.map((value, levelIndex) =>
       String(validatePositiveInt(value, `monsters[${index}].gold_by_level[${levelIndex}]`))
@@ -923,23 +969,25 @@ export function renderConfigModule(data: GameData): string {
     const renderedHpLevels = renderTypedListHelpers(`generated_monster_${index}_hp_levels`, "U32", hpLevels);
     helperDefs.push(...renderedGoldLevels.defs);
     helperDefs.push(...renderedHpLevels.defs);
-    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${monsterClass}, ${monsterTier}, ${renderedGoldLevels.expr}, ${renderedHpLevels.expr}}`;
+    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${monsterClass}, ${monsterTier}, ${monsterRarity}, ${renderedGoldLevels.expr}, ${renderedHpLevels.expr}}`;
   });
 
   const swordDefs = data.weapons.map((weapon, index) => {
     const weaponId = validateString(weapon.id, `weapons[${index}].id`);
     const weaponName = requireContent(data, weaponNameKey(weaponId));
     validateString(weapon.sprite, `weapons[${index}].sprite`);
+    const weaponRarity = renderEquipmentCardRarity(validateString(weapon.rarity, `weapons[${index}].rarity`), `weapons[${index}].rarity`);
     validatePositiveInt(weapon.dmg, `weapons[${index}].dmg`);
-    return `sword_def{${bendString(weaponName)}, ${bendString(weapon.sprite)}, ${weapon.dmg}}`;
+    return `sword_def{${bendString(weaponName)}, ${bendString(weapon.sprite)}, ${weaponRarity}, ${weapon.dmg}}`;
   });
 
   const potionDefs = data.potions.map((potion, index) => {
     const potionId = validateString(potion.id, `potions[${index}].id`);
     const potionName = requireContent(data, potionNameKey(potionId));
     validateString(potion.sprite, `potions[${index}].sprite`);
+    const potionRarity = renderConsumableCardRarity(validateString(potion.rarity, `potions[${index}].rarity`), `potions[${index}].rarity`);
     validatePositiveInt(potion.heal, `potions[${index}].heal`);
-    return `potion_def{${bendString(potionName)}, ${bendString(potion.sprite)}, ${potion.heal}}`;
+    return `potion_def{${bendString(potionName)}, ${bendString(potion.sprite)}, ${potionRarity}, ${potion.heal}}`;
   });
 
   const baseDeck = data.decks.base_deck.map((entry, index) => {
@@ -1027,6 +1075,8 @@ export function renderConfigModule(data: GameData): string {
     "import Dungeon/HeroDef as HeroDef",
     "import Dungeon/Upgrade as Upgrade",
     "import Dungeon/MonsterClass as MonsterClass",
+    "import Dungeon/CardRarity as CardRarity",
+    "import Dungeon/LootRarity as LootRarity",
     "import Dungeon/MonsterDef as MonsterDef",
     "import Dungeon/SwordDef as SwordDef",
     "import Dungeon/PotionDef as PotionDef",

@@ -844,7 +844,7 @@ def _parse_monster_bonus(monsters: List(MonsterDef), counts: List(String), idx: 
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, rarity, gold_levels, hp_levels}<>rest:
       _monster_bonus_entry(
         _count_from_head(counts),
         idx,
@@ -862,7 +862,7 @@ def _parse_sword_bonus(swords: List(SwordDef), counts: List(String), idx: U32) -
   match swords:
     case []:
       []
-    case sword_def{name, sprite, dmg}<>rest:
+    case sword_def{name, sprite, rarity, dmg}<>rest:
       _sword_bonus_entry(
         _count_from_head(counts),
         idx,
@@ -880,7 +880,7 @@ def _parse_potion_bonus(potions: List(PotionDef), counts: List(String), idx: U32
   match potions:
     case []:
       []
-    case potion_def{name, sprite, heal}<>rest:
+    case potion_def{name, sprite, rarity, heal}<>rest:
       _potion_bonus_entry(
         _count_from_head(counts),
         idx,

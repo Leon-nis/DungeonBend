@@ -62,21 +62,21 @@ def _monster_bonus_counts(monsters: List(MonsterDef), bonus_deck: List(DeckEntry
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, rarity, gold_levels, hp_levels}<>rest:
       U32/show(deck_count_for_card(bonus_deck, monster_card{idx}))<>_monster_bonus_counts(rest, bonus_deck, idx + 1)
 
 def _sword_bonus_counts(swords: List(SwordDef), bonus_deck: List(DeckEntry), idx: U32) -> List(String):
   match swords:
     case []:
       []
-    case sword_def{name, sprite, dmg}<>rest:
+    case sword_def{name, sprite, rarity, dmg}<>rest:
       U32/show(deck_count_for_card(bonus_deck, sword_card{idx}))<>_sword_bonus_counts(rest, bonus_deck, idx + 1)
 
 def _potion_bonus_counts(potions: List(PotionDef), bonus_deck: List(DeckEntry), idx: U32) -> List(String):
   match potions:
     case []:
       []
-    case potion_def{name, sprite, heal}<>rest:
+    case potion_def{name, sprite, rarity, heal}<>rest:
       U32/show(deck_count_for_card(bonus_deck, potion_card{idx}))<>_potion_bonus_counts(rest, bonus_deck, idx + 1)
 
 def _pack_inventory_counts(packs: List(PackDef), pack_inventory: List(PackInventoryEntry), idx: U32) -> List(String):

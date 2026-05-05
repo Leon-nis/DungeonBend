@@ -6,6 +6,7 @@ import Dungeon/MonsterDef as MonsterDef
 import Dungeon/SwordDef as SwordDef
 import Dungeon/PotionDef as PotionDef
 import Dungeon/DeckbuilderNotice as DeckbuilderNotice
+import Dungeon/CardRarity as CardRarity
 import Dungeon/config as config
 import Dungeon/Deck/counts_pick/add_deck_entry as add_deck_entry
 import Dungeon/Deck/counts_pick/card_ref_entry as card_ref_entry
@@ -16,6 +17,9 @@ import Dungeon/Deck/counts_pick/sum_counts as sum_counts
 import Dungeon/monster_helpers/monster_class_label as monster_class_label
 import Dungeon/monster_helpers/monster_limit as monster_limit
 import Dungeon/monster_helpers/monster_tier as monster_tier
+import Dungeon/card_rarity_helpers/card_rarity as card_rarity
+import Dungeon/card_rarity_helpers/equipment_limit_for_rarity as equipment_limit_for_rarity
+import Dungeon/card_rarity_helpers/loot_rarity_label as loot_rarity_label
 import Dungeon/profile_helpers/deckbuilder_target_count as deckbuilder_target_count
 
 def card_ref_eq(left: CardRef, right: CardRef) -> U32:
@@ -137,21 +141,21 @@ def _monster_cards(monsters: List(MonsterDef), ref: U32) -> List(CardRef):
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, rarity, gold_levels, hp_levels}<>rest:
       monster_card{ref}<>_monster_cards(rest, ref + 1)
 
 def _sword_cards(swords: List(SwordDef), ref: U32) -> List(CardRef):
   match swords:
     case []:
       []
-    case sword_def{name, sprite, dmg}<>rest:
+    case sword_def{name, sprite, rarity, dmg}<>rest:
       sword_card{ref}<>_sword_cards(rest, ref + 1)
 
 def _potion_cards(potions: List(PotionDef), ref: U32) -> List(CardRef):
   match potions:
     case []:
       []
-    case potion_def{name, sprite, heal}<>rest:
+    case potion_def{name, sprite, rarity, heal}<>rest:
       potion_card{ref}<>_potion_cards(rest, ref + 1)
 
 def deck_list_count(entries: List(DeckEntry)) -> U32:
@@ -163,13 +167,6 @@ def stash_list_count(meta_state: Meta, draft_deck: List(DeckEntry)) -> U32:
 type DeckbuilderListKind {
   deck_list_kind{}
   stash_list_kind{}
-}
-
-type EquipmentRarity {
-  equipment_common{}
-  equipment_uncommon{}
-  equipment_rare{}
-  equipment_epic{}
 }
 
 def _visible_card_count(cards: List(CardRef), collection: List(DeckEntry), draft_deck: List(DeckEntry), kind: DeckbuilderListKind) -> U32:
@@ -295,25 +292,12 @@ def card_limit(card: CardRef) -> U32:
       0
 
 def sword_limit(ref: U32) -> U32:
-  equipment_limit(sword_rarity(ref))
+  _equipment_limit_from_card_rarity(card_rarity(sword_card{ref}))
 
-def sword_rarity(ref: U32) -> EquipmentRarity:
-  match ref:
-    case 0:
-      equipment_common{}
-    case 1:
-      equipment_uncommon{}
-    case 2:
-      equipment_rare{}
-    case _:
-      equipment_epic{}
-
-def equipment_limit(rarity: EquipmentRarity) -> U32:
+def _equipment_limit_from_card_rarity(rarity: CardRarity) -> U32:
   match rarity:
-    case equipment_common{}:
-      3
-    case equipment_uncommon{}:
-      3
+    case card_rarity_equipment{loot_rarity}:
+      equipment_limit_for_rarity(loot_rarity)
     case _:
       1
 
@@ -372,18 +356,14 @@ def monster_rule_label(ref: U32) -> String:
   monster_class_label(ref)
 
 def sword_rule_label(ref: U32) -> String:
-  equipment_rarity_label(sword_rarity(ref))
+  _sword_rule_label_from_card_rarity(card_rarity(sword_card{ref}))
 
-def equipment_rarity_label(rarity: EquipmentRarity) -> String:
+def _sword_rule_label_from_card_rarity(rarity: CardRarity) -> String:
   match rarity:
-    case equipment_common{}:
-      "Comum"
-    case equipment_uncommon{}:
-      "Incomum"
-    case equipment_rare{}:
-      "Raro"
-    case equipment_epic{}:
-      "Epico"
+    case card_rarity_equipment{loot_rarity}:
+      loot_rarity_label(loot_rarity)
+    case _:
+      ""
 
 def card_limit_notice(card: CardRef) -> DeckbuilderNotice:
   match card:
@@ -393,10 +373,10 @@ def card_limit_notice(card: CardRef) -> DeckbuilderNotice:
       no_deckbuilder_notice{}
 
 def sword_limit_notice(ref: U32) -> DeckbuilderNotice:
-  match sword_rarity(ref):
-    case equipment_rare{}:
+  match card_rarity(sword_card{ref}):
+    case card_rarity_equipment{loot_rare{}}:
       deckbuilder_notice{"Acao bloqueada: equipamentos raros e epicos aceitam apenas 1 copia por ID."}
-    case equipment_epic{}:
+    case card_rarity_equipment{loot_epic{}}:
       deckbuilder_notice{"Acao bloqueada: equipamentos raros e epicos aceitam apenas 1 copia por ID."}
     case _:
       no_deckbuilder_notice{}

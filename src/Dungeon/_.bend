@@ -37,16 +37,29 @@ type MonsterClass {
   monster_boss{}
 }
 
+type LootRarity {
+  loot_common{}
+  loot_uncommon{}
+  loot_rare{}
+  loot_epic{}
+}
+
+type CardRarity {
+  card_rarity_monster{}
+  card_rarity_consumable{loot_rarity: LootRarity}
+  card_rarity_equipment{loot_rarity: LootRarity}
+}
+
 type MonsterDef {
-  monster_def{name: String, sprite: String, class_kind: MonsterClass, tier: U32, gold_levels: List(U32), hp_levels: List(U32)}
+  monster_def{name: String, sprite: String, class_kind: MonsterClass, tier: U32, rarity: CardRarity, gold_levels: List(U32), hp_levels: List(U32)}
 }
 
 type SwordDef {
-  sword_def{name: String, sprite: String, dmg: U32}
+  sword_def{name: String, sprite: String, rarity: CardRarity, dmg: U32}
 }
 
 type PotionDef {
-  potion_def{name: String, sprite: String, heal: U32}
+  potion_def{name: String, sprite: String, rarity: CardRarity, heal: U32}
 }
 
 type DeckEntry {

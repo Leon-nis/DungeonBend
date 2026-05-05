@@ -42,7 +42,7 @@ def _monster_class_from_list(monsters: List(MonsterDef), ref: U32) -> MonsterCla
   match monsters:
     case []:
       monster_normal{}
-    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, rarity, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           class_kind
@@ -58,7 +58,7 @@ def _monster_tier_from_list(monsters: List(MonsterDef), ref: U32) -> U32:
   match monsters:
     case []:
       0
-    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, rarity, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           tier

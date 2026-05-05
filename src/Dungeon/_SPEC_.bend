@@ -4,6 +4,7 @@ import Dungeon/Upgrade as Upgrade
 import Dungeon/HeroProfile as HeroProfile
 import Dungeon/Meta as Meta
 import Dungeon/MonsterClass as MonsterClass
+import Dungeon/CardRarity as CardRarity
 import Dungeon/MonsterDef as MonsterDef
 import Dungeon/PackDef as PackDef
 
@@ -81,8 +82,8 @@ assert meta_holds_gold:
 # drop progression by spawn level. Concrete example: a 5-gold
 # level-1 monster.
 assert monster_def_carries_gold_levels:
-  monster_def{"slime", "assets/slime.png", monster_normal{}, 2, [5], [1]}
-    == monster_def{"slime", "assets/slime.png", monster_normal{}, 2, [5], [1]}
+  monster_def{"slime", "assets/slime.png", monster_normal{}, 2, card_rarity_monster{}, [5], [1]}
+    == monster_def{"slime", "assets/slime.png", monster_normal{}, 2, card_rarity_monster{}, [5], [1]}
     :: MonsterDef
 
 assert monster_class_exists:
