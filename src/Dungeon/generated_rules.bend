@@ -14,13 +14,13 @@ def generated_starting_dungeon_level() -> U32:
   1
 
 def generated_max_hero_upgrade_level() -> U32:
-  10
+  9
 
 def generated_deckbuilder_target_count() -> U32:
   20
 
 def generated_deckbuilder_min_monster_count() -> U32:
-  10
+  12
 
 def generated_dungeon_level_increment_per_refill() -> U32:
   1

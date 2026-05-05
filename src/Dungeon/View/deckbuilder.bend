@@ -2,6 +2,7 @@ import HTML as HTML
 import Dungeon/Meta as Meta
 import Dungeon/DeckEntry as DeckEntry
 import Dungeon/CardRef as CardRef
+import Dungeon/CardRarity as CardRarity
 import Dungeon/DeckbuilderSelection as DeckbuilderSelection
 import Dungeon/DeckbuilderNotice as DeckbuilderNotice
 import Dungeon/DungeonEvent as DungeonEvent
@@ -16,6 +17,7 @@ import Dungeon/deckbuilder_helpers/deck_star_total as deck_star_total
 import Dungeon/deckbuilder_helpers/deck_total as deck_total
 import Dungeon/deckbuilder_helpers/selectable_cards as selectable_cards
 import Dungeon/deckbuilder_helpers/stash_count as stash_count
+import Dungeon/card_rarity_helpers/card_rarity as card_rarity
 import Dungeon/profile_helpers/deckbuilder_target_count as deckbuilder_target_count
 import Midum/Layout/frame as layout_frame
 import Midum/Layout/shell as layout_shell
@@ -98,7 +100,6 @@ def _deck_panel(meta_state: Meta, draft_deck: List(DeckEntry), selection: Deckbu
         {_empty_notice(meta_state, draft_deck, deck_panel_kind{})}
       </div>
     </div>
-    {_scroll_controls(meta_state, draft_deck, scroll, deck_panel_kind{})}
   </section>
 
 def _stash_panel(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, scroll: U32) -> HTML(DungeonEvent):
@@ -115,7 +116,6 @@ def _stash_panel(meta_state: Meta, draft_deck: List(DeckEntry), selection: Deckb
         {_empty_notice(meta_state, draft_deck, stash_panel_kind{})}
       </div>
     </div>
-    {_scroll_controls(meta_state, draft_deck, scroll, stash_panel_kind{})}
   </section>
 
 def _table_header(kind: DeckbuilderPanelKind) -> HTML(DungeonEvent):
@@ -185,19 +185,46 @@ def _row_button(draft_deck: List(DeckEntry), selection: DeckbuilderSelection, ca
 def _row_class(selection: DeckbuilderSelection, card: CardRef, kind: DeckbuilderPanelKind) -> String:
   match _is_selected(selection, card):
     case 1:
-      _selected_row_class(kind)
+      _selected_row_class(kind, card)
     case _:
-      _base_row_class(kind)
+      _base_row_class(kind, card)
 
-def _base_row_class(kind: DeckbuilderPanelKind) -> String:
+def _base_row_class(kind: DeckbuilderPanelKind, card: CardRef) -> String:
+  _panel_row_class(kind) ++ _row_tone_class(card)
+
+def _panel_row_class(kind: DeckbuilderPanelKind) -> String:
   match kind:
     case deck_panel_kind{}:
       "deckbuilder-row deckbuilder-row--button deckbuilder-row--deck"
     case stash_panel_kind{}:
       "deckbuilder-row deckbuilder-row--button deckbuilder-row--stash"
 
-def _selected_row_class(kind: DeckbuilderPanelKind) -> String:
-  _base_row_class(kind) ++ " deckbuilder-row--selected"
+def _selected_row_class(kind: DeckbuilderPanelKind, card: CardRef) -> String:
+  _panel_row_class(kind) ++ _row_tone_class(card) ++ " deckbuilder-row--selected"
+
+def _row_tone_class(card: CardRef) -> String:
+  _rarity_row_tone_class(card_rarity(card))
+
+def _rarity_row_tone_class(rarity: CardRarity) -> String:
+  match rarity:
+    case card_rarity_monster{}:
+      " deckbuilder-row--rarity-common"
+    case card_rarity_consumable{loot_common{}}:
+      " deckbuilder-row--rarity-common"
+    case card_rarity_consumable{loot_uncommon{}}:
+      " deckbuilder-row--rarity-uncommon"
+    case card_rarity_consumable{loot_rare{}}:
+      " deckbuilder-row--rarity-rare"
+    case card_rarity_consumable{loot_epic{}}:
+      " deckbuilder-row--rarity-epic"
+    case card_rarity_equipment{loot_common{}}:
+      " deckbuilder-row--rarity-common"
+    case card_rarity_equipment{loot_uncommon{}}:
+      " deckbuilder-row--rarity-uncommon"
+    case card_rarity_equipment{loot_rare{}}:
+      " deckbuilder-row--rarity-rare"
+    case card_rarity_equipment{loot_epic{}}:
+      " deckbuilder-row--rarity-epic"
 
 def _is_selected(selection: DeckbuilderSelection, card: CardRef) -> U32:
   match selection:
@@ -259,69 +286,6 @@ def _has_visible_rows(meta_state: Meta, draft_deck: List(DeckEntry), kind: Deckb
       0
     case _:
       1
-
-def _scroll_controls(meta_state: Meta, draft_deck: List(DeckEntry), scroll: U32, kind: DeckbuilderPanelKind) -> HTML(DungeonEvent):
-  <aside class="deckbuilder-scroll">
-    {_scroll_button("^", _scroll_up_event(kind), _scroll_up_enabled(scroll))}
-    <div class="deckbuilder-scroll__track">
-      <div class="deckbuilder-scroll__slot" aria-hidden="true"></div>
-      <div class="deckbuilder-scroll__bar" aria-hidden="true" style={_scroll_bar_style(meta_state, draft_deck, scroll, kind)}></div>
-    </div>
-    {_scroll_button("v", _scroll_down_event(kind), _scroll_down_enabled(meta_state, draft_deck, scroll, kind))}
-  </aside>
-
-def _scroll_button(label: String, evt: DungeonEvent, enabled: U32) -> HTML(DungeonEvent):
-  <div class="deckbuilder-scroll__btn-wrap">
-    {button_secondary(DungeonEvent, evt, small{}, label, _deckbuilder_button_overrides(enabled))}
-  </div>
-
-def _scroll_up_enabled(scroll: U32) -> U32:
-  match scroll:
-    case 0:
-      0
-    case _:
-      1
-
-def _scroll_down_enabled(meta_state: Meta, draft_deck: List(DeckEntry), scroll: U32, kind: DeckbuilderPanelKind) -> U32:
-  total = _visible_total(meta_state, draft_deck, kind);
-  visible = _deckbuilder_visible_rows();
-  match total <= visible:
-    case 1:
-      0
-    case _:
-      match scroll + visible < total:
-        case 1:
-          1
-        case _:
-          0
-
-def _scroll_up_event(kind: DeckbuilderPanelKind) -> DungeonEvent:
-  match kind:
-    case deck_panel_kind{}:
-      deckbuilder_scroll_deck_up{}
-    case stash_panel_kind{}:
-      deckbuilder_scroll_stash_up{}
-
-def _scroll_down_event(kind: DeckbuilderPanelKind) -> DungeonEvent:
-  match kind:
-    case deck_panel_kind{}:
-      deckbuilder_scroll_deck_down{}
-    case stash_panel_kind{}:
-      deckbuilder_scroll_stash_down{}
-
-def _scroll_bar_style(meta_state: Meta, draft_deck: List(DeckEntry), scroll: U32, kind: DeckbuilderPanelKind) -> String:
-  total = _visible_total(meta_state, draft_deck, kind);
-  visible = _deckbuilder_visible_rows();
-  match total <= visible:
-    case 1:
-      "top:0%;"
-    case _:
-      max_scroll = total - visible;
-      match max_scroll:
-        case 0:
-          "top:0%;"
-        case _:
-          "top:" ++ U32/show(scroll * 18) ++ "px;"
 
 def _visible_total(meta_state: Meta, draft_deck: List(DeckEntry), kind: DeckbuilderPanelKind) -> U32:
   _visible_total_from_cards(meta_state, draft_deck, kind, selectable_cards())
@@ -427,13 +391,6 @@ def _deckbuilder_back_button() -> HTML(DungeonEvent):
   <div class="deckbuilder-back-wrap">
     {button_secondary(DungeonEvent, close_deckbuilder{}, small{}, "VOLTAR", [width_fit{}])}
   </div>
-
-def _deckbuilder_button_overrides(enabled: U32) -> List(Midum/Button/Override):
-  match enabled:
-    case 0:
-      [width_fit{}, state_disabled{}]
-    case _:
-      [width_fit{}]
 
 def _mode_chip_class(label: String) -> String:
   match label:

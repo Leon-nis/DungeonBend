@@ -16,27 +16,27 @@ import List/append as append
 def generated_hero_0_upgrades_chunk_0() -> List(Upgrade):
   [
     upgrade{40, 14},
-    upgrade{80, 16},
-    upgrade{120, 18},
-    upgrade{160, 20},
-    upgrade{200, 22},
-    upgrade{240, 24},
-    upgrade{280, 26},
-    upgrade{320, 28},
-    upgrade{360, 30}
+    upgrade{41, 16},
+    upgrade{42, 18},
+    upgrade{43, 20},
+    upgrade{44, 22},
+    upgrade{45, 24},
+    upgrade{46, 26},
+    upgrade{47, 28},
+    upgrade{48, 30}
   ]
 
 def generated_hero_1_upgrades_chunk_0() -> List(Upgrade):
   [
     upgrade{40, 13},
-    upgrade{100, 16},
-    upgrade{160, 19},
-    upgrade{220, 22},
-    upgrade{280, 25},
-    upgrade{340, 28},
-    upgrade{400, 31},
-    upgrade{460, 34},
-    upgrade{520, 37}
+    upgrade{41, 16},
+    upgrade{42, 19},
+    upgrade{43, 22},
+    upgrade{44, 25},
+    upgrade{45, 28},
+    upgrade{46, 31},
+    upgrade{47, 34},
+    upgrade{48, 37}
   ]
 
 def generated_monster_0_gold_levels_chunk_0() -> List(U32):
@@ -221,7 +221,7 @@ def generated_config_swords_chunk_0() -> List(SwordDef):
   [
     sword_def{"Sword A", "assets/item-sword.png", card_rarity_equipment{loot_common{}}, 5},
     sword_def{"Sword S", "assets/item-sword.png", card_rarity_equipment{loot_uncommon{}}, 7},
-    sword_def{"Sword S+", "assets/item-sword.png", card_rarity_equipment{loot_epic{}}, 9}
+    sword_def{"Sword S+", "assets/item-sword.png", card_rarity_equipment{loot_rare{}}, 9}
   ]
 
 def generated_config_potions_chunk_0() -> List(PotionDef):

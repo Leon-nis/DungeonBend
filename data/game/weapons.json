@@ -17,7 +17,7 @@
     "id": "sword_3",
     "name": "Sword S+",
     "sprite": "assets/item-sword.png",
-    "rarity": "epic",
+    "rarity": "rare",
     "dmg": 9
   }
 ]
