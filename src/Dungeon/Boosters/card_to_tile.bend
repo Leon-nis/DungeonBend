@@ -8,7 +8,7 @@ import Dungeon/Deck/counts_pick/_potion_heal as _potion_heal
 def card_to_tile(config_value: Config, card: CardRef) -> Tile:
   match config_value card:
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} monster_card{ref}:
-      monster{ref, _monster_hp(monsters, ref, 1)}
+      monster{ref, _monster_hp(monsters, ref, 1), 1}
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} sword_card{ref}:
       sword{ref, _sword_damage(swords, ref)}
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} potion_card{ref}:

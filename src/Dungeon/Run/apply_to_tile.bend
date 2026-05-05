@@ -87,7 +87,7 @@ def _apply_to_tile(config_value: Config, meta_state: Meta, dungeon_level: U32, h
   match tile_value:
     case none{}:
       _keep_run(meta_state, run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref})
-    case monster{ref, hp}:
+    case monster{ref, hp, spawn_level}:
       _from_combat(
         meta_state,
         dungeon_level,
@@ -100,7 +100,7 @@ def _apply_to_tile(config_value: Config, meta_state: Meta, dungeon_level: U32, h
         capacity,
         seed,
         ult_charge,
-        resolve_monster(config_value, board_value, hero_hp, weapon_value, target_index, ref, hp)
+        resolve_monster(config_value, board_value, hero_hp, weapon_value, target_index, ref, hp, spawn_level)
       )
     case sword{ref, dmg}:
       _move_after_collect(config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon{ref, dmg}, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, dir)

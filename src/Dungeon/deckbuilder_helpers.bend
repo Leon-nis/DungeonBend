@@ -5,6 +5,7 @@ import Dungeon/CardRef as CardRef
 import Dungeon/MonsterDef as MonsterDef
 import Dungeon/SwordDef as SwordDef
 import Dungeon/PotionDef as PotionDef
+import Dungeon/DeckbuilderNotice as DeckbuilderNotice
 import Dungeon/config as config
 import Dungeon/Deck/counts_pick/add_deck_entry as add_deck_entry
 import Dungeon/Deck/counts_pick/card_ref_entry as card_ref_entry
@@ -43,12 +44,51 @@ def selected_deck(meta_state: Meta) -> List(DeckEntry):
 def deck_total(entries: List(DeckEntry)) -> U32:
   sum_counts(entries)
 
+def deck_monster_total(entries: List(DeckEntry)) -> U32:
+  match entries:
+    case []:
+      0
+    case entry<>rest:
+      _entry_monster_total(entry) + deck_monster_total(rest)
+
+def _entry_monster_total(entry: DeckEntry) -> U32:
+  match entry:
+    case monster_entry{ref, count}:
+      count
+    case _:
+      0
+
 def deck_total_ready(entries: List(DeckEntry)) -> U32:
   match deck_total(entries) === deckbuilder_target_count():
     case 1:
-      1
+      _deck_monster_min_ready(deck_monster_total(entries))
     case _:
       0
+
+def _deck_monster_min_ready(monster_total: U32) -> U32:
+  match monster_total < 10:
+    case 1:
+      0
+    case _:
+      1
+
+def deck_invalid_notice(entries: List(DeckEntry)) -> DeckbuilderNotice:
+  total = deck_total(entries);
+  monsters = deck_monster_total(entries);
+  target = deckbuilder_target_count();
+  match total > target:
+    case 1:
+      deckbuilder_notice{"Acao bloqueada: limite de cartas excedido. Max: " ++ U32/show(target) ++ " no deck."}
+    case _:
+      match total < target:
+        case 1:
+          deckbuilder_notice{"Acao bloqueada: deck incompleto. Faltam " ++ U32/show(target - total) ++ " cartas."}
+        case _:
+          match monsters < 10:
+            case 1:
+              deckbuilder_notice{"Acao bloqueada: minimo de 10 monsters no deck."}
+            case _:
+              no_deckbuilder_notice{}
 
 def deck_star_total(entries: List(DeckEntry)) -> U32:
   match entries:
@@ -97,7 +137,7 @@ def _monster_cards(monsters: List(MonsterDef), ref: U32) -> List(CardRef):
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       monster_card{ref}<>_monster_cards(rest, ref + 1)
 
 def _sword_cards(swords: List(SwordDef), ref: U32) -> List(CardRef):
@@ -123,6 +163,13 @@ def stash_list_count(meta_state: Meta, draft_deck: List(DeckEntry)) -> U32:
 type DeckbuilderListKind {
   deck_list_kind{}
   stash_list_kind{}
+}
+
+type EquipmentRarity {
+  equipment_common{}
+  equipment_uncommon{}
+  equipment_rare{}
+  equipment_epic{}
 }
 
 def _visible_card_count(cards: List(CardRef), collection: List(DeckEntry), draft_deck: List(DeckEntry), kind: DeckbuilderListKind) -> U32:
@@ -248,10 +295,24 @@ def card_limit(card: CardRef) -> U32:
       0
 
 def sword_limit(ref: U32) -> U32:
+  equipment_limit(sword_rarity(ref))
+
+def sword_rarity(ref: U32) -> EquipmentRarity:
   match ref:
     case 0:
-      3
+      equipment_common{}
     case 1:
+      equipment_uncommon{}
+    case 2:
+      equipment_rare{}
+    case _:
+      equipment_epic{}
+
+def equipment_limit(rarity: EquipmentRarity) -> U32:
+  match rarity:
+    case equipment_common{}:
+      3
+    case equipment_uncommon{}:
       3
     case _:
       1
@@ -311,15 +372,34 @@ def monster_rule_label(ref: U32) -> String:
   monster_class_label(ref)
 
 def sword_rule_label(ref: U32) -> String:
-  match ref:
-    case 0:
+  equipment_rarity_label(sword_rarity(ref))
+
+def equipment_rarity_label(rarity: EquipmentRarity) -> String:
+  match rarity:
+    case equipment_common{}:
       "Comum"
-    case 1:
+    case equipment_uncommon{}:
       "Incomum"
-    case 2:
+    case equipment_rare{}:
       "Raro"
-    case _:
+    case equipment_epic{}:
       "Epico"
+
+def card_limit_notice(card: CardRef) -> DeckbuilderNotice:
+  match card:
+    case sword_card{ref}:
+      sword_limit_notice(ref)
+    case _:
+      no_deckbuilder_notice{}
+
+def sword_limit_notice(ref: U32) -> DeckbuilderNotice:
+  match sword_rarity(ref):
+    case equipment_rare{}:
+      deckbuilder_notice{"Acao bloqueada: equipamentos raros e epicos aceitam apenas 1 copia por ID."}
+    case equipment_epic{}:
+      deckbuilder_notice{"Acao bloqueada: equipamentos raros e epicos aceitam apenas 1 copia por ID."}
+    case _:
+      no_deckbuilder_notice{}
 
 def card_tier_count(card: CardRef) -> U32:
   match card:

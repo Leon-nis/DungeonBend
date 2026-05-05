@@ -75,8 +75,8 @@ def _tile_card(tile: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(D
         </div>,
         [padding_none{}]
       )
-    case monster{ref, hp}:
-      _standard_tile_card(monster{ref, hp}, "card card--tile card--monster", pos, damage_overlay)
+    case monster{ref, hp, spawn_level}:
+      _standard_tile_card(monster{ref, hp, spawn_level}, "card card--tile card--monster", pos, damage_overlay)
     case sword{ref, dmg}:
       _standard_tile_card(sword{ref, dmg}, "card card--tile card--sword", pos, damage_overlay)
     case potion{ref, heal}:

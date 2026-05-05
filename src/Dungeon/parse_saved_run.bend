@@ -82,7 +82,7 @@ def _parse_run_with_core_values(dungeon_level: U32, hero_hp: U32, hero_max_hp: U
       none{}
 
 def _parse_run_with_weapon(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, weapon_value: Weapon, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
-  match _parse_saved_board(String/split(board_snapshot, ';'), 0, empty_board()):
+  match _parse_saved_board(String/split(board_snapshot, ';'), 0, dungeon_level, empty_board()):
     case some{current_board}:
       _parse_run_with_board(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, weapon_value, current_board, blueprint, draw_counts)
     case none{}:
@@ -147,22 +147,22 @@ def _parse_saved_weapon_result(ref_maybe: Maybe(U32), dmg_maybe: Maybe(U32)) -> 
     case _ _:
       none{}
 
-def _parse_saved_board(parts: List(String), idx: U32, current_board: Board) -> Maybe(Board):
-  _parse_saved_board_match(idx === 9, parts, idx, current_board)
+def _parse_saved_board(parts: List(String), idx: U32, dungeon_level: U32, current_board: Board) -> Maybe(Board):
+  _parse_saved_board_match(idx === 9, parts, idx, dungeon_level, current_board)
 
-def _parse_saved_board_match(done: U32, parts: List(String), idx: U32, current_board: Board) -> Maybe(Board):
+def _parse_saved_board_match(done: U32, parts: List(String), idx: U32, dungeon_level: U32, current_board: Board) -> Maybe(Board):
   match done:
     case 0:
-      _parse_saved_board_next(parts, idx, current_board)
+      _parse_saved_board_next(parts, idx, dungeon_level, current_board)
     case _:
       _parse_saved_board_done(parts, current_board)
 
-def _parse_saved_board_next(parts: List(String), idx: U32, current_board: Board) -> Maybe(Board):
+def _parse_saved_board_next(parts: List(String), idx: U32, dungeon_level: U32, current_board: Board) -> Maybe(Board):
   match parts:
     case part<>rest:
-      match _parse_saved_tile(String/split(part, '~')):
+      match _parse_saved_tile(String/split(part, '~'), dungeon_level):
         case some{tile_value}:
-          _parse_saved_board(rest, idx + 1, board_set(current_board, idx, tile_value))
+          _parse_saved_board(rest, idx + 1, dungeon_level, board_set(current_board, idx, tile_value))
         case none{}:
           none{}
     case _:
@@ -175,19 +175,19 @@ def _parse_saved_board_done(parts: List(String), current_board: Board) -> Maybe(
     case _:
       none{}
 
-def _parse_saved_tile(parts: List(String)) -> Maybe(Tile):
+def _parse_saved_tile(parts: List(String), dungeon_level: U32) -> Maybe(Tile):
   match parts:
     case kind_str<>rest:
-      _parse_saved_tile_kind(String/to_u32(kind_str), rest)
+      _parse_saved_tile_kind(String/to_u32(kind_str), rest, dungeon_level)
     case _:
       none{}
 
-def _parse_saved_tile_kind(kind_maybe: Maybe(U32), rest: List(String)) -> Maybe(Tile):
+def _parse_saved_tile_kind(kind_maybe: Maybe(U32), rest: List(String), dungeon_level: U32) -> Maybe(Tile):
   match kind_maybe:
     case some{0}:
       _parse_saved_none_tile(rest)
     case some{1}:
-      _parse_saved_monster_tile(rest)
+      _parse_saved_monster_tile(rest, dungeon_level)
     case some{2}:
       _parse_saved_sword_tile(rest)
     case some{3}:
@@ -204,14 +204,20 @@ def _parse_saved_none_tile(rest: List(String)) -> Maybe(Tile):
     case _:
       none{}
 
-def _parse_saved_monster_tile(rest: List(String)) -> Maybe(Tile):
+def _parse_saved_monster_tile(rest: List(String), dungeon_level: U32) -> Maybe(Tile):
   match rest:
     case ref_str<>rest1:
       match rest1:
         case hp_str<>rest2:
           match rest2:
             case []:
-              _parse_saved_monster_tile_values(String/to_u32(ref_str), String/to_u32(hp_str))
+              _parse_saved_monster_tile_values(String/to_u32(ref_str), String/to_u32(hp_str), some{dungeon_level})
+            case spawn_level_str<>rest3:
+              match rest3:
+                case []:
+                  _parse_saved_monster_tile_values(String/to_u32(ref_str), String/to_u32(hp_str), String/to_u32(spawn_level_str))
+                case _:
+                  none{}
             case _:
               none{}
         case _:
@@ -219,11 +225,11 @@ def _parse_saved_monster_tile(rest: List(String)) -> Maybe(Tile):
     case _:
       none{}
 
-def _parse_saved_monster_tile_values(ref_maybe: Maybe(U32), hp_maybe: Maybe(U32)) -> Maybe(Tile):
-  match ref_maybe hp_maybe:
-    case some{ref} some{hp}:
-      some{monster{ref, hp}}
-    case _ _:
+def _parse_saved_monster_tile_values(ref_maybe: Maybe(U32), hp_maybe: Maybe(U32), spawn_level_maybe: Maybe(U32)) -> Maybe(Tile):
+  match ref_maybe hp_maybe spawn_level_maybe:
+    case some{ref} some{hp} some{spawn_level}:
+      some{monster{ref, hp, spawn_level}}
+    case _ _ _:
       none{}
 
 def _parse_saved_sword_tile(rest: List(String)) -> Maybe(Tile):

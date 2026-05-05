@@ -844,7 +844,7 @@ def _parse_monster_bonus(monsters: List(MonsterDef), counts: List(String), idx: 
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       _monster_bonus_entry(
         _count_from_head(counts),
         idx,

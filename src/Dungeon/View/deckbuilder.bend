@@ -3,6 +3,7 @@ import Dungeon/Meta as Meta
 import Dungeon/DeckEntry as DeckEntry
 import Dungeon/CardRef as CardRef
 import Dungeon/DeckbuilderSelection as DeckbuilderSelection
+import Dungeon/DeckbuilderNotice as DeckbuilderNotice
 import Dungeon/DungeonEvent as DungeonEvent
 import Dungeon/View/menu_screen/_menu_screen_frame as _menu_screen_frame
 import Dungeon/View/assets_and_labels/_card_name as _card_name
@@ -13,10 +14,9 @@ import Dungeon/deckbuilder_helpers/card_tier_count as card_tier_count
 import Dungeon/deckbuilder_helpers/deck_mode_label as deck_mode_label
 import Dungeon/deckbuilder_helpers/deck_star_total as deck_star_total
 import Dungeon/deckbuilder_helpers/deck_total as deck_total
-import Dungeon/deckbuilder_helpers/deck_total_ready as deck_total_ready
-import Dungeon/profile_helpers/deckbuilder_target_count as deckbuilder_target_count
 import Dungeon/deckbuilder_helpers/selectable_cards as selectable_cards
 import Dungeon/deckbuilder_helpers/stash_count as stash_count
+import Dungeon/profile_helpers/deckbuilder_target_count as deckbuilder_target_count
 import Midum/Layout/frame as layout_frame
 import Midum/Layout/shell as layout_shell
 import Midum/Button/primary as button_primary
@@ -32,14 +32,14 @@ type DeckbuilderPanelKind {
 def _deckbuilder_visible_rows() -> U32:
   6
 
-def _render_deckbuilder(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32) -> HTML(DungeonEvent):
+def _render_deckbuilder(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, action_notice: DeckbuilderNotice) -> HTML(DungeonEvent):
   layout_shell(
     DungeonEvent,
     layout_frame(
       DungeonEvent,
       _menu_screen_frame(
         _deckbuilder_header(draft_deck),
-        _deckbuilder_body(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll),
+        _deckbuilder_body(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice),
         _deckbuilder_footer(draft_deck)
       ),
       [width_full{}, height_full{}, inset_none{}]
@@ -67,14 +67,14 @@ def _deckbuilder_header(draft_deck: List(DeckEntry)) -> HTML(DungeonEvent):
     </div>
   </div>
 
-def _deckbuilder_body(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32) -> HTML(DungeonEvent):
+def _deckbuilder_body(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, action_notice: DeckbuilderNotice) -> HTML(DungeonEvent):
   <section class="deckbuilder-layout">
-    {_deck_panel(meta_state, draft_deck, deck_selection, deck_scroll)}
+    {_deck_panel(meta_state, draft_deck, deck_selection, deck_scroll, action_notice)}
     {_deckbuilder_transfer_controls()}
     {_stash_panel(meta_state, draft_deck, stash_selection, stash_scroll)}
   </section>
 
-def _deck_panel(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, scroll: U32) -> HTML(DungeonEvent):
+def _deck_panel(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, scroll: U32, action_notice: DeckbuilderNotice) -> HTML(DungeonEvent):
   <section class="deckbuilder-panel deckbuilder-panel--deck">
     <div class="deckbuilder-panel__surface deckbuilder-panel__surface--deck">
       <div class="deckbuilder-panel__head">
@@ -90,6 +90,7 @@ def _deck_panel(meta_state: Meta, draft_deck: List(DeckEntry), selection: Deckbu
             <span class="deckbuilder-summary__label">{text{"★ Total: " ++ U32/show(deck_star_total(draft_deck))}}</span>
           </div>
         </div>
+        {_deck_action_notice(action_notice)}
       </div>
       {_table_header(deck_panel_kind{})}
       <div class="deckbuilder-table">
@@ -404,22 +405,20 @@ def _transfer_button(label: String, evt: DungeonEvent) -> HTML(DungeonEvent):
   </div>
 
 def _deckbuilder_footer(draft_deck: List(DeckEntry)) -> HTML(DungeonEvent):
-  ready = deck_total_ready(draft_deck);
   <div class="deckbuilder-footer-layout">
     <div class="deckbuilder-footer">
-      <p class="deckbuilder-footer__note">{text{_save_note(draft_deck)}}</p>
       <div class="deckbuilder-save-wrap">
-        {button_primary(DungeonEvent, _save_event(ready), large{}, "SAVE", _deckbuilder_save_overrides(ready))}
+        {button_primary(DungeonEvent, save_deckbuilder{}, large{}, "SAVE", [width_fit{}])}
       </div>
     </div>
   </div>
 
-def _save_note(draft_deck: List(DeckEntry)) -> String:
-  match deck_total_ready(draft_deck):
-    case 1:
-      "Deck pronto para salvar."
-    case _:
-      "Deck deve ter exatamente 20 cartas."
+def _deck_action_notice(action_notice: DeckbuilderNotice) -> HTML(DungeonEvent):
+  match action_notice:
+    case no_deckbuilder_notice{}:
+      text{""}
+    case deckbuilder_notice{text_value}:
+      <p class="deckbuilder-panel__notice">{text{text_value}}</p>
 
 def _deck_cards_label(draft_deck: List(DeckEntry)) -> String:
   U32/show(deck_total(draft_deck)) ++ "/" ++ U32/show(deckbuilder_target_count()) ++ " cards"
@@ -435,20 +434,6 @@ def _deckbuilder_button_overrides(enabled: U32) -> List(Midum/Button/Override):
       [width_fit{}, state_disabled{}]
     case _:
       [width_fit{}]
-
-def _deckbuilder_save_overrides(enabled: U32) -> List(Midum/Button/Override):
-  match enabled:
-    case 0:
-      [width_fit{}, state_disabled{}]
-    case _:
-      [width_fit{}]
-
-def _save_event(ready: U32) -> DungeonEvent:
-  match ready:
-    case 1:
-      save_deckbuilder{}
-    case _:
-      ignore{}
 
 def _mode_chip_class(label: String) -> String:
   match label:

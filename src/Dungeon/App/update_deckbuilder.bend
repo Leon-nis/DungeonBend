@@ -1,6 +1,7 @@
 import Dungeon/Meta as Meta
 import Dungeon/DeckEntry as DeckEntry
 import Dungeon/DeckbuilderSelection as DeckbuilderSelection
+import Dungeon/DeckbuilderNotice as DeckbuilderNotice
 import Dungeon/CardRef as CardRef
 import Dungeon/UiState as UiState
 import Dungeon/DungeonEvent as DungeonEvent
@@ -12,6 +13,8 @@ import Dungeon/profile_helpers/set_meta_selected_deck as set_meta_selected_deck
 import Dungeon/profile_helpers/meta_selected_deck as meta_selected_deck
 import Dungeon/deckbuilder_helpers/add_all_to_draft as add_all_to_draft
 import Dungeon/deckbuilder_helpers/add_one_to_draft as add_one_to_draft
+import Dungeon/deckbuilder_helpers/card_limit_notice as card_limit_notice
+import Dungeon/deckbuilder_helpers/deck_invalid_notice as deck_invalid_notice
 import Dungeon/Deck/counts_pick/deck_count_for_card as deck_count_for_card
 import Dungeon/deckbuilder_helpers/deck_list_count as deck_list_count
 import Dungeon/deckbuilder_helpers/deck_total_ready as deck_total_ready
@@ -29,7 +32,7 @@ def update_deckbuilder(evt: DungeonEvent, meta_state: Meta, draft_deck: List(Dec
     case close_deckbuilder{}:
       _state(meta_state, setup{}, next_seed_value, default_ui())
     case save_deckbuilder{}:
-      _save_deck(meta_state, draft_deck, next_seed_value, ui_value)
+      _save_deck(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, next_seed_value, ui_value)
     case deckbuilder_toggle_list{}:
       _toggle_active_list(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, next_seed_value, ui_value)
     case deckbuilder_select_deck{card}:
@@ -97,7 +100,7 @@ def _update_draft(meta_state: Meta, selection: DeckbuilderSelection, draft_deck:
 
 def _update_draft_card(meta_state: Meta, card: CardRef, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState, action: DeckbuilderAction) -> DungeonState:
   next_draft = _apply_draft_action(meta_state, card, draft_deck, action);
-  _state_after_action(meta_state, next_draft, card, deck_scroll, stash_scroll, next_seed_value, ui_value, action)
+  _state_after_action(meta_state, next_draft, card, deck_scroll, stash_scroll, next_seed_value, ui_value, action, _action_notice(meta_state, draft_deck, next_draft, card, action))
 
 def _apply_draft_action(meta_state: Meta, card: CardRef, draft_deck: List(DeckEntry), action: DeckbuilderAction) -> List(DeckEntry):
   match action:
@@ -110,14 +113,17 @@ def _apply_draft_action(meta_state: Meta, card: CardRef, draft_deck: List(DeckEn
     case remove_all_action{}:
       remove_all_from_draft(draft_deck, card)
 
-def _save_deck(meta_state: Meta, draft_deck: List(DeckEntry), next_seed_value: U32, ui_value: UiState) -> DungeonState:
+def _save_deck(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState) -> DungeonState:
   match deck_total_ready(draft_deck):
     case 1:
       _state(set_meta_selected_deck(meta_state, draft_deck), setup{}, next_seed_value, default_ui())
     case _:
-      _deckbuilder_state(meta_state, draft_deck, no_deckbuilder_selection{}, no_deckbuilder_selection{}, 0, 0, next_seed_value, ui_value)
+      _deckbuilder_state_with_notice(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, deck_invalid_notice(draft_deck), next_seed_value, ui_value)
 
 def _deckbuilder_state(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState) -> DungeonState:
+  _deckbuilder_state_with_notice(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, no_deckbuilder_notice{}, next_seed_value, ui_value)
+
+def _deckbuilder_state_with_notice(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, action_notice: DeckbuilderNotice, next_seed_value: U32, ui_value: UiState) -> DungeonState:
   next_deck_selection = _normalize_selection(meta_state, draft_deck, deck_selection, deck_focus{});
   next_stash_selection = _normalize_selection(meta_state, draft_deck, stash_selection, stash_focus{});
   _state(
@@ -127,7 +133,8 @@ def _deckbuilder_state(meta_state: Meta, draft_deck: List(DeckEntry), deck_selec
       next_deck_selection,
       next_stash_selection,
       _normalize_scroll(deck_scroll, deck_list_count(draft_deck)),
-      _normalize_scroll(stash_scroll, stash_list_count(meta_state, draft_deck))
+      _normalize_scroll(stash_scroll, stash_list_count(meta_state, draft_deck)),
+      action_notice
     },
     next_seed_value,
     ui_value
@@ -135,7 +142,7 @@ def _deckbuilder_state(meta_state: Meta, draft_deck: List(DeckEntry), deck_selec
 
 def initial_deckbuilder_state(meta_state: Meta, next_seed_value: U32) -> DungeonState:
   draft_deck = meta_selected_deck(meta_state);
-  _state(meta_state, deckbuilder{draft_deck, no_deckbuilder_selection{}, no_deckbuilder_selection{}, 0, 0}, next_seed_value, default_ui())
+  _state(meta_state, deckbuilder{draft_deck, no_deckbuilder_selection{}, no_deckbuilder_selection{}, 0, 0, no_deckbuilder_notice{}}, next_seed_value, default_ui())
 
 def _move_selection(meta_state: Meta, draft_deck: List(DeckEntry), deck_selection: DeckbuilderSelection, stash_selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState, step: DeckbuilderSelectionStep) -> DungeonState:
   match _active_focus(deck_selection, stash_selection):
@@ -172,29 +179,37 @@ def _toggle_active_list(meta_state: Meta, draft_deck: List(DeckEntry), deck_sele
       _activate_deck_selection(meta_state, draft_deck, _preferred_target_selection(meta_state, draft_deck, deck_selection, stash_selection, deck_focus{}), deck_scroll, stash_scroll, next_seed_value, ui_value)
 
 def _activate_deck_selection(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState) -> DungeonState:
+  _activate_deck_selection_with_notice(meta_state, draft_deck, selection, deck_scroll, stash_scroll, no_deckbuilder_notice{}, next_seed_value, ui_value)
+
+def _activate_deck_selection_with_notice(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, action_notice: DeckbuilderNotice, next_seed_value: U32, ui_value: UiState) -> DungeonState:
   cards = _visible_cards(meta_state, draft_deck, deck_focus{}, selectable_cards());
   next_selection = _preferred_or_first_selection(cards, selection);
-  _deckbuilder_state(
+  _deckbuilder_state_with_notice(
     meta_state,
     draft_deck,
     next_selection,
     no_deckbuilder_selection{},
     _scroll_for_selection(deck_scroll, cards, next_selection),
     stash_scroll,
+    action_notice,
     next_seed_value,
     ui_value
   )
 
 def _activate_stash_selection(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState) -> DungeonState:
+  _activate_stash_selection_with_notice(meta_state, draft_deck, selection, deck_scroll, stash_scroll, no_deckbuilder_notice{}, next_seed_value, ui_value)
+
+def _activate_stash_selection_with_notice(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, deck_scroll: U32, stash_scroll: U32, action_notice: DeckbuilderNotice, next_seed_value: U32, ui_value: UiState) -> DungeonState:
   cards = _visible_cards(meta_state, draft_deck, stash_focus{}, selectable_cards());
   next_selection = _preferred_or_first_selection(cards, selection);
-  _deckbuilder_state(
+  _deckbuilder_state_with_notice(
     meta_state,
     draft_deck,
     no_deckbuilder_selection{},
     next_selection,
     deck_scroll,
     _scroll_for_selection(stash_scroll, cards, next_selection),
+    action_notice,
     next_seed_value,
     ui_value
   )
@@ -221,16 +236,43 @@ def _valid_action_selection(meta_state: Meta, draft_deck: List(DeckEntry), selec
     case remove_all_action{}:
       _normalize_selection(meta_state, draft_deck, selection, deck_focus{})
 
-def _state_after_action(meta_state: Meta, draft_deck: List(DeckEntry), card: CardRef, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState, action: DeckbuilderAction) -> DungeonState:
+def _state_after_action(meta_state: Meta, draft_deck: List(DeckEntry), card: CardRef, deck_scroll: U32, stash_scroll: U32, next_seed_value: U32, ui_value: UiState, action: DeckbuilderAction, action_notice: DeckbuilderNotice) -> DungeonState:
   match action:
     case add_one_action{}:
-      _activate_stash_selection(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, next_seed_value, ui_value)
+      _activate_stash_selection_with_notice(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, action_notice, next_seed_value, ui_value)
     case add_all_action{}:
-      _activate_stash_selection(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, next_seed_value, ui_value)
+      _activate_stash_selection_with_notice(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, action_notice, next_seed_value, ui_value)
     case remove_one_action{}:
-      _activate_deck_selection(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, next_seed_value, ui_value)
+      _activate_deck_selection_with_notice(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, action_notice, next_seed_value, ui_value)
     case remove_all_action{}:
-      _activate_deck_selection(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, next_seed_value, ui_value)
+      _activate_deck_selection_with_notice(meta_state, draft_deck, deckbuilder_selection{card}, deck_scroll, stash_scroll, action_notice, next_seed_value, ui_value)
+
+def _action_notice(meta_state: Meta, draft_deck: List(DeckEntry), next_draft: List(DeckEntry), card: CardRef, action: DeckbuilderAction) -> DeckbuilderNotice:
+  requested = _requested_additions(meta_state, draft_deck, card, action);
+  added = _added_count(draft_deck, next_draft, card);
+  match added < requested:
+    case 1:
+      card_limit_notice(card)
+    case _:
+      no_deckbuilder_notice{}
+
+def _requested_additions(meta_state: Meta, draft_deck: List(DeckEntry), card: CardRef, action: DeckbuilderAction) -> U32:
+  match action:
+    case add_one_action{}:
+      1
+    case add_all_action{}:
+      stash_count(meta_state, draft_deck, card)
+    case _:
+      0
+
+def _added_count(current_draft: List(DeckEntry), next_draft: List(DeckEntry), card: CardRef) -> U32:
+  next_count = deck_count_for_card(next_draft, card);
+  current_count = deck_count_for_card(current_draft, card);
+  match current_count < next_count:
+    case 1:
+      next_count - current_count
+    case _:
+      0
 
 def _normalize_selection(meta_state: Meta, draft_deck: List(DeckEntry), selection: DeckbuilderSelection, focus: DeckbuilderFocus) -> DeckbuilderSelection:
   match selection:

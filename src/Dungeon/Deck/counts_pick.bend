@@ -147,16 +147,16 @@ def hero_max_hp(base_hp: U32, upgrades: List(Upgrade), hero_level: U32) -> U32:
     case _:
       _from_upgrade(nth_upgrade(upgrades, hero_level - 1), base_hp)
 
-def monster_gold(monsters: List(MonsterDef), idx: U32) -> U32:
+def monster_gold(monsters: List(MonsterDef), idx: U32, level: U32) -> U32:
   match monsters:
     case []:
       0
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       match idx:
         case 0:
-          gold_drop
+          _nth_u32(gold_levels, level - 1, 0)
         case _:
-          monster_gold(rest, idx - 1)
+          monster_gold(rest, idx - 1, level)
 
 def _remove_hero_entry(count: U32, rest: List(DeckEntry)) -> List(DeckEntry):
   match count:
@@ -233,7 +233,7 @@ def _monster_hp(monsters: List(MonsterDef), idx: U32, level: U32) -> U32:
   match monsters:
     case []:
       1
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       match idx:
         case 0:
           _nth_u32(hp_levels, level - 1, 1)

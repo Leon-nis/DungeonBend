@@ -40,8 +40,8 @@ def _screen_root(meta_state: Meta, scene_value: Scene, ui_value: UiState) -> HTM
       _render_menu(meta_state)
     case character_select{preview_hero}:
       _render_character_select(meta_state, preview_hero)
-    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll}:
-      _render_deckbuilder(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll)
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
+      _render_deckbuilder(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice)
     case boosters{reward, reveal_index, return_to}:
       _render_boosters(meta_state, reward, reveal_index)
     case ultimate_preview{fx}:

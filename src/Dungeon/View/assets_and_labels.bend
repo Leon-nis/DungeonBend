@@ -53,7 +53,7 @@ def _monster_name_from_list(monsters: List(MonsterDef), ref: U32) -> String:
   match monsters:
     case []:
       Content.fallback_monster_name()
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           name
@@ -72,7 +72,7 @@ def _monster_sprite_from_list(monsters: List(MonsterDef), ref: U32) -> String:
   match monsters:
     case []:
       ""
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           sprite
@@ -159,7 +159,7 @@ def _tile_name(tile: Tile) -> String:
   match tile:
     case none{}:
       Content.card_empty()
-    case monster{ref, hp}:
+    case monster{ref, hp, spawn_level}:
       _monster_name(ref)
     case sword{ref, dmg}:
       _sword_name(ref)
@@ -172,7 +172,7 @@ def _tile_sprite(tile: Tile) -> String:
   match tile:
     case none{}:
       ""
-    case monster{ref, hp}:
+    case monster{ref, hp, spawn_level}:
       _monster_sprite(ref)
     case sword{ref, dmg}:
       _sword_sprite(ref)
@@ -185,7 +185,7 @@ def _tile_badge(tile: Tile) -> String:
   match tile:
     case none{}:
       ""
-    case monster{ref, hp}:
+    case monster{ref, hp, spawn_level}:
       Content.stat_hp() ++ " " ++ U32/show(hp)
     case sword{ref, dmg}:
       Content.stat_dmg() ++ " " ++ U32/show(dmg)
@@ -219,7 +219,7 @@ def _card_sprite(card: CardRef) -> String:
 def _card_stat(card: CardRef) -> String:
   match card:
     case monster_card{ref}:
-      _tile_badge(monster{ref, _monster_hp_value(ref)})
+      _tile_badge(monster{ref, _monster_hp_value(ref), 1})
     case sword_card{ref}:
       _tile_badge(sword{ref, _sword_damage_value(ref)})
     case potion_card{ref}:
@@ -239,7 +239,7 @@ def _monster_hp_from_list(monsters: List(MonsterDef), ref: U32) -> U32:
   match monsters:
     case []:
       1
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           _first_hp(hp_levels)
@@ -272,7 +272,7 @@ def _monster_hp_range_from_list(monsters: List(MonsterDef), ref: U32) -> String:
   match monsters:
     case []:
       "1 - 1"
-    case monster_def{name, sprite, class_kind, tier, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           U32/show(_first_hp(hp_levels)) ++ " - " ++ U32/show(_last_hp(hp_levels, 1))

@@ -15,10 +15,9 @@ import Dungeon/Deck/counts_pick/hero_max_hp as hero_max_hp
 import Dungeon/Deck/counts_pick/nth_upgrade as nth_upgrade
 import Dungeon/Deck/counts_pick/deck_count_for_card as deck_count_for_card
 import Dungeon/Deck/counts_pick/merge_deck_entries as merge_deck_entries
-import Dungeon/Deck/counts_pick/sum_counts as sum_counts
+import Dungeon/deckbuilder_helpers/deck_total_ready as deck_total_ready
 import Dungeon/profile_helpers/meta_bonus_deck as meta_bonus_deck
 import Dungeon/profile_helpers/meta_selected_deck as meta_selected_deck
-import Dungeon/profile_helpers/deckbuilder_target_count as deckbuilder_target_count
 import Dungeon/Boosters/inventory/pack_inventory_count as pack_inventory_count
 import Dungeon/Boosters/inventory/pack_inventory_total as pack_inventory_total
 import Dungeon/Boosters/packs/active_pack as active_pack
@@ -130,7 +129,7 @@ def dungeon_level_value(scene_value: Scene) -> String:
       "--"
     case character_select{preview_hero}:
       "--"
-    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll}:
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
       "--"
     case boosters{reward, reveal_index, return_to}:
       "--"
@@ -153,7 +152,7 @@ def remaining_value(scene_value: Scene) -> String:
       "--/--"
     case character_select{preview_hero}:
       "--/--"
-    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll}:
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
       "--/--"
     case boosters{reward, reveal_index, return_to}:
       "--/--"
@@ -176,7 +175,7 @@ def weapon_value(scene_value: Scene) -> String:
       "--"
     case character_select{preview_hero}:
       "--"
-    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll}:
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
       "--"
     case boosters{reward, reveal_index, return_to}:
       "--"
@@ -199,7 +198,7 @@ def ultimate_label(scene_value: Scene) -> String:
       Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
     case character_select{preview_hero}:
       Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
-    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll}:
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
       Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
     case boosters{reward, reveal_index, return_to}:
       Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
@@ -231,14 +230,7 @@ def start_enabled(scene_value: Scene) -> U32:
       0
 
 def menu_start_enabled(meta_state: Meta) -> U32:
-  _menu_start_enabled_count(sum_counts(meta_selected_deck(meta_state)))
-
-def _menu_start_enabled_count(count: U32) -> U32:
-  match count === deckbuilder_target_count():
-    case 1:
-      1
-    case _:
-      0
+  deck_total_ready(meta_selected_deck(meta_state))
 
 def can_upgrade(scene_value: Scene) -> U32:
   start_enabled(scene_value)

@@ -14,53 +14,169 @@ import List/append as append
 def generated_hero_0_upgrades_chunk_0() -> List(Upgrade):
   [
     upgrade{40, 14},
-    upgrade{70, 16},
-    upgrade{100, 18},
-    upgrade{130, 20}
+    upgrade{80, 16},
+    upgrade{120, 18},
+    upgrade{160, 20}
   ]
 
 def generated_hero_1_upgrades_chunk_0() -> List(Upgrade):
   [
-    upgrade{36, 12},
-    upgrade{60, 14},
-    upgrade{84, 17},
-    upgrade{108, 20}
+    upgrade{40, 13},
+    upgrade{100, 16},
+    upgrade{160, 19},
+    upgrade{220, 22}
+  ]
+
+def generated_monster_0_gold_levels_chunk_0() -> List(U32):
+  [
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
   ]
 
 def generated_monster_0_hp_levels_chunk_0() -> List(U32):
   [
     3,
+    4,
     5,
+    6,
     7,
+    8,
     9,
-    11
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17
+  ]
+
+def generated_monster_1_gold_levels_chunk_0() -> List(U32):
+  [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18
   ]
 
 def generated_monster_1_hp_levels_chunk_0() -> List(U32):
   [
     5,
+    6,
     7,
+    8,
     9,
+    10,
     11,
-    13
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ]
+
+def generated_monster_2_gold_levels_chunk_0() -> List(U32):
+  [
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
   ]
 
 def generated_monster_2_hp_levels_chunk_0() -> List(U32):
   [
     7,
+    8,
     9,
+    10,
     11,
+    12,
     13,
-    15
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21
+  ]
+
+def generated_monster_3_gold_levels_chunk_0() -> List(U32):
+  [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20
   ]
 
 def generated_monster_3_hp_levels_chunk_0() -> List(U32):
   [
     9,
     11,
-    14,
+    13,
+    15,
     17,
-    20
+    19,
+    21,
+    23,
+    25,
+    27,
+    29,
+    31,
+    33,
+    35,
+    37
   ]
 
 def generated_pack_0_pool_chunk_0() -> List(PackPoolEntry):
@@ -78,15 +194,15 @@ def generated_pack_0_pool_chunk_0() -> List(PackPoolEntry):
 def generated_config_heroes_chunk_0() -> List(HeroDef):
   [
     hero_def{"adventurer", "Adventurer", "assets/player-boy.png", 12, 0, 1, generated_hero_0_upgrades_chunk_0()},
-    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 10, 45, 0, generated_hero_1_upgrades_chunk_0()}
+    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 10, 45, 1, generated_hero_1_upgrades_chunk_0()}
   ]
 
 def generated_config_monsters_chunk_0() -> List(MonsterDef):
   [
-    monster_def{"Rat", "assets/enemy-rat.png", monster_normal{}, 3, 3, generated_monster_0_hp_levels_chunk_0()},
-    monster_def{"Spider", "assets/enemy-spider.png", monster_normal{}, 4, 4, generated_monster_1_hp_levels_chunk_0()},
-    monster_def{"Venom Spider", "assets/enemy-spider2.png", monster_normal{}, 5, 5, generated_monster_2_hp_levels_chunk_0()},
-    monster_def{"Orc", "assets/enemy-orc.png", monster_normal{}, 6, 6, generated_monster_3_hp_levels_chunk_0()}
+    monster_def{"Rat", "assets/enemy-rat.png", monster_normal{}, 3, generated_monster_0_gold_levels_chunk_0(), generated_monster_0_hp_levels_chunk_0()},
+    monster_def{"Spider", "assets/enemy-spider.png", monster_normal{}, 4, generated_monster_1_gold_levels_chunk_0(), generated_monster_1_hp_levels_chunk_0()},
+    monster_def{"Venom Spider", "assets/enemy-spider2.png", monster_normal{}, 5, generated_monster_2_gold_levels_chunk_0(), generated_monster_2_hp_levels_chunk_0()},
+    monster_def{"Orc", "assets/enemy-orc.png", monster_normal{}, 6, generated_monster_3_gold_levels_chunk_0(), generated_monster_3_hp_levels_chunk_0()}
   ]
 
 def generated_config_swords_chunk_0() -> List(SwordDef):

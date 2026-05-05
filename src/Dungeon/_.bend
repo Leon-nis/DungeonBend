@@ -38,7 +38,7 @@ type MonsterClass {
 }
 
 type MonsterDef {
-  monster_def{name: String, sprite: String, class_kind: MonsterClass, tier: U32, gold_drop: U32, hp_levels: List(U32)}
+  monster_def{name: String, sprite: String, class_kind: MonsterClass, tier: U32, gold_levels: List(U32), hp_levels: List(U32)}
 }
 
 type SwordDef {
@@ -104,7 +104,7 @@ type Weapon {
 
 type Tile {
   none{}
-  monster{ref: U32, hp: U32}
+  monster{ref: U32, hp: U32, spawn_level: U32}
   sword{ref: U32, dmg: U32}
   potion{ref: U32, heal: U32}
   gold{amount: U32}
@@ -216,6 +216,11 @@ type DeckbuilderSelection {
   deckbuilder_selection{card: CardRef}
 }
 
+type DeckbuilderNotice {
+  no_deckbuilder_notice{}
+  deckbuilder_notice{text: String}
+}
+
 type Scene {
   setup{}
   character_select{preview_hero: U32}
@@ -224,7 +229,8 @@ type Scene {
     deck_selection: DeckbuilderSelection,
     stash_selection: DeckbuilderSelection,
     deck_scroll: U32,
-    stash_scroll: U32
+    stash_scroll: U32,
+    action_notice: DeckbuilderNotice
   }
   boosters{reward: PackReward, reveal_index: U32, return_to: BoosterReturn}
   ultimate_preview{fx: UltimatePreviewFx}

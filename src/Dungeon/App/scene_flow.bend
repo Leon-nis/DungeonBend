@@ -24,7 +24,7 @@ def _next_state_scene(evt: DungeonEvent, state: DungeonState) -> DungeonState:
       update_setup(evt, meta_state, next_seed_value, ui_value)
     case dungeon{game_state{meta_state, character_select{preview_hero}, next_seed_value}, ui_value}:
       update_character_select(evt, meta_state, preview_hero, next_seed_value, ui_value)
-    case dungeon{game_state{meta_state, deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll}, next_seed_value}, ui_value}:
+    case dungeon{game_state{meta_state, deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}, next_seed_value}, ui_value}:
       update_deckbuilder(evt, meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, next_seed_value, ui_value)
     case dungeon{game_state{meta_state, boosters{reward, reveal_index, return_to}, next_seed_value}, ui_value}:
       update_boosters(evt, meta_state, reward, reveal_index, return_to, next_seed_value, ui_value)

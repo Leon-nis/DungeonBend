@@ -77,11 +77,12 @@ assert meta_holds_gold:
   meta{0, 0, 100, [], [], [], []} == meta{0, 0, 100, [], [], [], []} :: Meta
 
 # "Gold is earned during runs, mainly by defeating monsters and
-# collecting their drops." MonsterDef.gold_drop is the amount
-# awarded per kill. Concrete example: a 5-gold monster.
-assert monster_def_carries_gold_drop:
-  monster_def{"slime", "assets/slime.png", monster_normal{}, 2, 5, [1]}
-    == monster_def{"slime", "assets/slime.png", monster_normal{}, 2, 5, [1]}
+# collecting their drops." MonsterDef.gold_levels carries the
+# drop progression by spawn level. Concrete example: a 5-gold
+# level-1 monster.
+assert monster_def_carries_gold_levels:
+  monster_def{"slime", "assets/slime.png", monster_normal{}, 2, [5], [1]}
+    == monster_def{"slime", "assets/slime.png", monster_normal{}, 2, [5], [1]}
     :: MonsterDef
 
 assert monster_class_exists:
