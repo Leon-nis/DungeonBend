@@ -7,9 +7,14 @@ import Dungeon/Config as Config
 import Dungeon/hero_helpers/hero_starts_unlocked as hero_starts_unlocked
 import Dungeon/Deck/counts_pick/merge_deck_entries as merge_deck_entries
 import Dungeon/Deck/counts_pick/remove_hero_card as remove_hero_card
+import Dungeon/rules/deckbuilder_target_count as rules_deckbuilder_target_count
+import Dungeon/rules/deckbuilder_min_monster_count as rules_deckbuilder_min_monster_count
 
 def deckbuilder_target_count() -> U32:
-  20
+  rules_deckbuilder_target_count()
+
+def deckbuilder_min_monster_count() -> U32:
+  rules_deckbuilder_min_monster_count()
 
 def default_selected_deck(config_value: Config, bonus_deck: List(DeckEntry)) -> List(DeckEntry):
   _default_selected_deck_entries(config_value, bonus_deck, deckbuilder_target_count())

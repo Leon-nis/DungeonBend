@@ -78,6 +78,9 @@ export type RawRules = {
   starting_selected_hero_id: string;
   starting_selection_confirmed: boolean;
   starting_dungeon_level: number;
+  max_hero_upgrade_level: number;
+  deckbuilder_target_count: number;
+  deckbuilder_min_monster_count: number;
   dungeon_level_increment_per_refill: number;
   ultimate_charge_required: number;
   ultimate_charge_per_move: number;
@@ -602,6 +605,16 @@ export function getGameDataErrors(data: GameData): string[] {
         errors.push(`hero "${hero.id}" upgrades must use contiguous levels starting at 1`);
       }
     });
+    if (
+      typeof data.rules?.max_hero_upgrade_level === "number" &&
+      Number.isInteger(data.rules.max_hero_upgrade_level) &&
+      data.rules.max_hero_upgrade_level > 0 &&
+      rows.length + 1 < data.rules.max_hero_upgrade_level
+    ) {
+      errors.push(
+        `hero "${hero.id}" must define at least ${data.rules.max_hero_upgrade_level - 1} upgrades to support rules.max_hero_upgrade_level=${data.rules.max_hero_upgrade_level}`,
+      );
+    }
   });
 
   let heroEntryCount = 0;
@@ -699,6 +712,9 @@ export function getGameDataErrors(data: GameData): string[] {
   }
   addBooleanError(errors, data.rules?.starting_selection_confirmed, "rules.starting_selection_confirmed");
   addPositiveIntError(errors, data.rules?.starting_dungeon_level, "rules.starting_dungeon_level");
+  addPositiveIntError(errors, data.rules?.max_hero_upgrade_level, "rules.max_hero_upgrade_level");
+  addPositiveIntError(errors, data.rules?.deckbuilder_target_count, "rules.deckbuilder_target_count");
+  addPositiveIntError(errors, data.rules?.deckbuilder_min_monster_count, "rules.deckbuilder_min_monster_count");
   addPositiveIntError(errors, data.rules?.dungeon_level_increment_per_refill, "rules.dungeon_level_increment_per_refill");
   addPositiveIntError(errors, data.rules?.ultimate_charge_required, "rules.ultimate_charge_required");
   addPositiveIntError(errors, data.rules?.ultimate_charge_per_move, "rules.ultimate_charge_per_move");
@@ -1123,6 +1139,15 @@ export function renderRulesModule(data: GameData): string {
     "",
     "def generated_starting_dungeon_level() -> U32:",
     `  ${data.rules.starting_dungeon_level}`,
+    "",
+    "def generated_max_hero_upgrade_level() -> U32:",
+    `  ${data.rules.max_hero_upgrade_level}`,
+    "",
+    "def generated_deckbuilder_target_count() -> U32:",
+    `  ${data.rules.deckbuilder_target_count}`,
+    "",
+    "def generated_deckbuilder_min_monster_count() -> U32:",
+    `  ${data.rules.deckbuilder_min_monster_count}`,
     "",
     "def generated_dungeon_level_increment_per_refill() -> U32:",
     `  ${data.rules.dungeon_level_increment_per_refill}`,

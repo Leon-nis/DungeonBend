@@ -2,9 +2,9 @@ import Dungeon/Upgrade as Upgrade
 import Dungeon/HeroProfile as HeroProfile
 import Dungeon/Meta as Meta
 import Dungeon/Config as Config
-import Dungeon/Deck/counts_pick/nth_upgrade as nth_upgrade
 import Dungeon/hero_helpers/hero_at as hero_at
-import Dungeon/hero_helpers/hero_upgrades as hero_upgrades
+import Dungeon/hero_progression_helpers/hero_next_upgrade as hero_next_upgrade
+import Dungeon/hero_progression_helpers/clamp_hero_upgrade_level as clamp_hero_upgrade_level
 import Dungeon/profile_helpers/selected_hero as selected_hero
 import Dungeon/profile_helpers/profile_for_hero as profile_for_hero
 import Dungeon/profile_helpers/update_profile as update_profile
@@ -21,7 +21,7 @@ def upgrade_hero(config_value: Config, meta_state: Meta) -> Meta:
 def upgrade_hero_ref(config_value: Config, meta_state: Meta, hero_ref: U32) -> Meta:
   hero_value = hero_at(config_value, hero_ref);
   profile = profile_for_hero(meta_state, hero_ref);
-  _upgrade_from_step(meta_state, hero_ref, profile, nth_upgrade(hero_upgrades(hero_value), profile_hero_level(profile)))
+  _upgrade_from_step(meta_state, hero_ref, profile, hero_next_upgrade(hero_value, profile_hero_level(profile)))
 
 def _upgrade_from_step(meta_state: Meta, hero_ref: U32, profile: HeroProfile, step: Upgrade) -> Meta:
   match profile_unlocked(profile):
@@ -43,7 +43,7 @@ def _upgrade_if_affordable_flag(gold_lt_cost: U32, meta_state: Meta, hero_ref: U
   match gold_lt_cost:
     case 0:
       set_meta_gold(
-        update_profile(meta_state, hero_ref, profile_with_level(profile, profile_hero_level(profile) + 1)),
+        update_profile(meta_state, hero_ref, profile_with_level(profile, clamp_hero_upgrade_level(profile_hero_level(profile)) + 1)),
         meta_gold(meta_state) - cost
       )
     case _:

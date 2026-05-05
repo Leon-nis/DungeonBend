@@ -1,0 +1,41 @@
+Branch status atual
+
+1. Deckbuilder
+- Deckbuilder com dual list entre DECK e ARMAZEM.
+- Regras de validacao do deck movidas para helpers centrais.
+- Quantidade alvo de cartas e minimo de monsters agora sao data-driven via rules.json.
+- Feedback de acoes bloqueadas fica no topo do painel do deck.
+- Save e start respeitam as regras reais do runtime.
+
+2. Rules data-driven
+- rules.json agora controla:
+  - max_hero_upgrade_level
+  - deckbuilder_target_count
+  - deckbuilder_min_monster_count
+- scripts/dungeon-data.ts valida e gera essas rules para o runtime.
+- src/Dungeon/rules.bend expoe helpers para consumo do jogo.
+
+3. Progressao de heroi
+- O level maximo de upgrade do heroi deixou de ser apenas implicito pelo tamanho da lista.
+- Foi criada uma camada central em src/Dungeon/hero_progression_helpers.bend.
+- UI, calculo de HP e fluxo de upgrade agora leem o cap global de rules.max_hero_upgrade_level.
+- Saves antigos acima do cap sao tratados com clamp em tempo de uso.
+- O build falha se hero_upgrades nao tiver upgrades suficientes para sustentar o maximo configurado.
+
+4. Dados de heroi
+- hero_upgrades.json foi ampliado para suportar 10 niveis visiveis de heroi.
+- O runtime continua usando a curva real de upgrades para custo e HP, mas respeitando o teto global configurado.
+
+5. Monstros e escalas
+- MonsterDef foi refatorado para carregar class_kind, tier, rarity e gold_by_level.
+- Tiles de monster agora guardam spawn_level.
+- Gold drop do monster usa o spawn_level, nao o level atual da dungeon.
+
+6. Raridade de cartas
+- Raridade deixou de ser inferida por ref/weight em partes criticas.
+- CardRarity e LootRarity foram introduzidos como tipos explicitos.
+- Booster background agora usa as flags de raridade da carta, nao heuristica por weight do pack.
+
+7. Observacao de consistencia
+- Expor qualquer uma dessas regras no editor so e seguro quando o runtime consome o campo correspondente.
+- Nesta branch, deckbuilder_target_count, deckbuilder_min_monster_count e max_hero_upgrade_level ja sao consumidos de forma real pelo jogo.

@@ -12,10 +12,12 @@ import Dungeon/CardRef as CardRef
 import Dungeon/Config as Config
 import Dungeon/DeckEntry as DeckEntry
 import Dungeon/Deck/counts_pick/hero_max_hp as hero_max_hp
-import Dungeon/Deck/counts_pick/nth_upgrade as nth_upgrade
 import Dungeon/Deck/counts_pick/deck_count_for_card as deck_count_for_card
 import Dungeon/Deck/counts_pick/merge_deck_entries as merge_deck_entries
 import Dungeon/deckbuilder_helpers/deck_total_ready as deck_total_ready
+import Dungeon/hero_progression_helpers/hero_visible_max_level as hero_visible_max_level
+import Dungeon/hero_progression_helpers/clamp_hero_upgrade_level as clamp_hero_upgrade_level
+import Dungeon/hero_progression_helpers/hero_next_upgrade as hero_next_upgrade
 import Dungeon/profile_helpers/meta_bonus_deck as meta_bonus_deck
 import Dungeon/profile_helpers/meta_selected_deck as meta_selected_deck
 import Dungeon/Boosters/inventory/pack_inventory_count as pack_inventory_count
@@ -41,10 +43,10 @@ def meta_pack_total(meta_state: Meta) -> String:
   U32/show(pack_inventory_total(meta_pack_inventory_value(meta_state)))
 
 def hero_level_text(profile: HeroProfile) -> String:
-  Content.ui_hero_level_prefix_long() ++ U32/show(profile_hero_level(profile))
+  Content.ui_hero_level_prefix_long() ++ U32/show(clamp_hero_upgrade_level(profile_hero_level(profile)))
 
 def hero_display_level(profile: HeroProfile) -> String:
-  U32/show(profile_hero_level(profile) + 1)
+  U32/show(clamp_hero_upgrade_level(profile_hero_level(profile)) + 1)
 
 def hero_menu_level_text(profile: HeroProfile) -> String:
   Content.ui_hero_level_prefix_short() ++ hero_display_level(profile)
@@ -53,20 +55,10 @@ def hero_level_progress_text(hero_value: HeroDef, profile: HeroProfile) -> Strin
   Content.ui_hero_level_prefix_short() ++ hero_level_ratio_text(hero_value, profile)
 
 def hero_level_ratio_text(hero_value: HeroDef, profile: HeroProfile) -> String:
-  _two_digit_value(profile_hero_level(profile) + 1) ++ "/" ++ _two_digit_value(hero_visible_max_level(hero_value))
+  _two_digit_value(clamp_hero_upgrade_level(profile_hero_level(profile)) + 1) ++ "/" ++ _two_digit_value(hero_visible_max_level())
 
 def hero_base_hp_text(hero_value: HeroDef) -> String:
   U32/show(hero_base_max_hp(hero_value))
-
-def hero_visible_max_level(hero_value: HeroDef) -> U32:
-  1 + _upgrade_count(hero_upgrades(hero_value))
-
-def _upgrade_count(upgrades: List(Upgrade)) -> U32:
-  match upgrades:
-    case []:
-      0
-    case upgrade{cost, max_hp}<>rest:
-      1 + _upgrade_count(rest)
 
 def hero_menu_current_hp_text(hero_value: HeroDef, profile: HeroProfile) -> String:
   hero_menu_max_hp_text(hero_value, profile)
@@ -272,10 +264,10 @@ def _upgrade_cost_or_zero(step: Upgrade) -> U32:
           cost
 
 def hero_max_hp_value(hero_value: HeroDef, profile: HeroProfile) -> U32:
-  hero_max_hp(hero_base_max_hp(hero_value), hero_upgrades(hero_value), profile_hero_level(profile))
+  hero_max_hp(hero_base_max_hp(hero_value), hero_upgrades(hero_value), clamp_hero_upgrade_level(profile_hero_level(profile)))
 
 def next_upgrade_cost(hero_value: HeroDef, profile: HeroProfile) -> U32:
-  _upgrade_cost_or_zero(nth_upgrade(hero_upgrades(hero_value), profile_hero_level(profile)))
+  _upgrade_cost_or_zero(hero_next_upgrade(hero_value, profile_hero_level(profile)))
 
 def menu_upgrade_visible(meta_state: Meta, hero_value: HeroDef, profile: HeroProfile) -> U32:
   upgrade_enabled(meta_state, setup{}, next_upgrade_cost(hero_value, profile))

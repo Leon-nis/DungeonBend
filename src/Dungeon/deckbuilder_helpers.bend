@@ -21,6 +21,7 @@ import Dungeon/card_rarity_helpers/card_rarity as card_rarity
 import Dungeon/card_rarity_helpers/equipment_limit_for_rarity as equipment_limit_for_rarity
 import Dungeon/card_rarity_helpers/loot_rarity_label as loot_rarity_label
 import Dungeon/profile_helpers/deckbuilder_target_count as deckbuilder_target_count
+import Dungeon/profile_helpers/deckbuilder_min_monster_count as deckbuilder_min_monster_count
 
 def card_ref_eq(left: CardRef, right: CardRef) -> U32:
   match left right:
@@ -70,7 +71,7 @@ def deck_total_ready(entries: List(DeckEntry)) -> U32:
       0
 
 def _deck_monster_min_ready(monster_total: U32) -> U32:
-  match monster_total < 10:
+  match monster_total < deckbuilder_min_monster_count():
     case 1:
       0
     case _:
@@ -88,9 +89,10 @@ def deck_invalid_notice(entries: List(DeckEntry)) -> DeckbuilderNotice:
         case 1:
           deckbuilder_notice{"Acao bloqueada: deck incompleto. Faltam " ++ U32/show(target - total) ++ " cartas."}
         case _:
-          match monsters < 10:
+          min_monsters = deckbuilder_min_monster_count();
+          match monsters < min_monsters:
             case 1:
-              deckbuilder_notice{"Acao bloqueada: minimo de 10 monsters no deck."}
+              deckbuilder_notice{"Acao bloqueada: minimo de " ++ U32/show(min_monsters) ++ " monsters no deck."}
             case _:
               no_deckbuilder_notice{}
 
