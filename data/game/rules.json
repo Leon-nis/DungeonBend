@@ -4,7 +4,7 @@
   "starting_selected_hero_id": "adventurer",
   "starting_selection_confirmed": true,
   "starting_dungeon_level": 1,
-  "max_hero_upgrade_level": 9,
+  "max_hero_upgrade_level": 10,
   "deckbuilder_target_count": 20,
   "deckbuilder_min_monster_count": 12,
   "dungeon_level_increment_per_refill": 1,

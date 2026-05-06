@@ -16,14 +16,14 @@ import List/append as append
 def generated_hero_0_upgrades_chunk_0() -> List(Upgrade):
   [
     upgrade{40, 14},
-    upgrade{41, 16},
-    upgrade{42, 18},
-    upgrade{43, 20},
-    upgrade{44, 22},
-    upgrade{45, 24},
-    upgrade{46, 26},
-    upgrade{47, 28},
-    upgrade{48, 30}
+    upgrade{80, 16},
+    upgrade{120, 18},
+    upgrade{160, 20},
+    upgrade{200, 22},
+    upgrade{240, 24},
+    upgrade{280, 26},
+    upgrade{320, 28},
+    upgrade{360, 30}
   ]
 
 def generated_hero_1_upgrades_chunk_0() -> List(Upgrade):
@@ -236,10 +236,10 @@ def generated_config_base_deck_chunk_0() -> List(DeckEntry):
     monster_entry{0, 7},
     monster_entry{1, 3},
     monster_entry{2, 3},
-    monster_entry{3, 3},
+    monster_entry{3, 2},
     sword_entry{0, 1},
     sword_entry{1, 1},
-    potion_entry{0, 1},
+    potion_entry{0, 2},
     potion_entry{1, 1},
     hero_entry{1}
   ]

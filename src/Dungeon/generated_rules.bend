@@ -13,9 +13,6 @@ def generated_starting_selection_confirmed() -> U32:
 def generated_starting_dungeon_level() -> U32:
   1
 
-def generated_max_hero_upgrade_level() -> U32:
-  9
-
 def generated_deckbuilder_target_count() -> U32:
   20
 

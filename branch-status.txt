@@ -1,41 +1,75 @@
-Branch status atual
+DungeonBend / branch status consolidado
 
-1. Deckbuilder
-- Deckbuilder com dual list entre DECK e ARMAZEM.
-- Regras de validacao do deck movidas para helpers centrais.
-- Quantidade alvo de cartas e minimo de monsters agora sao data-driven via rules.json.
-- Feedback de acoes bloqueadas fica no topo do painel do deck.
-- Save e start respeitam as regras reais do runtime.
+Este arquivo junta os topicos principais trabalhados nesta branch, unificando os blocos de texto da raiz em um resumo unico e coerente.
 
-2. Rules data-driven
-- rules.json agora controla:
-  - max_hero_upgrade_level
-  - deckbuilder_target_count
-  - deckbuilder_min_monster_count
-- scripts/dungeon-data.ts valida e gera essas rules para o runtime.
-- src/Dungeon/rules.bend expoe helpers para consumo do jogo.
+1. Base estrutural / Bend2
+- Ajustes de build e geracao para compatibilidade com o Bend2 mais novo.
+- `scripts/build.sh`, `scripts/build.ts` e `scripts/generate-dungeon-view-css.ts` passaram a participar mais diretamente do pipeline.
+- `scripts/dungeon-data.ts` ganhou mais responsabilidade na validacao e na geracao de codigo Bend.
+- O codigo gerado em `src/Dungeon/generated_*.bend` foi reorganizado para suportar blocos auxiliares maiores.
+- Houve refactor amplo de imports, aliases e organizacao de modulos em `src/Dungeon/**` e `src/Midum/**`.
+- A camada Midum / DOM e o runtime JS gerado tambem foram ajustados para o formato novo.
 
-3. Progressao de heroi
-- O level maximo de upgrade do heroi deixou de ser apenas implicito pelo tamanho da lista.
-- Foi criada uma camada central em src/Dungeon/hero_progression_helpers.bend.
-- UI, calculo de HP e fluxo de upgrade agora leem o cap global de rules.max_hero_upgrade_level.
-- Saves antigos acima do cap sao tratados com clamp em tempo de uso.
-- O build falha se hero_upgrades nao tiver upgrades suficientes para sustentar o maximo configurado.
+2. Deckbuilder
+- Foi criada uma scene de deckbuilder com dual list entre `DECK` e `ARMAZEM`.
+- O fluxo de deck salvo passou a ser usado de forma real pelo jogo.
+- O deckbuilder ganhou keymap de navegacao:
+  - `Up/Down` troca selecao
+  - `Left/Right` move 1 unidade
+  - `Tab` troca a lista ativa
+- A UI de scroll foi removida; a navegacao visual agora depende apenas de selecao e keymap.
+- O `SAVE` foi reposicionado e o layout passou por varios ajustes de espacamento.
+- As linhas das cartas agora usam coloracao por raridade via flag real da carta.
 
-4. Dados de heroi
-- hero_upgrades.json foi ampliado para suportar 10 niveis visiveis de heroi.
-- O runtime continua usando a curva real de upgrades para custo e HP, mas respeitando o teto global configurado.
+3. Regras do deck
+- A validacao do deck foi centralizada em helpers dedicados.
+- O deck precisa respeitar quantidade alvo de cartas e minimo de monsters.
+- Tentativas invalidas de salvar ou adicionar cartas exibem aviso imediato no topo do painel do deck.
+- O `START` do menu tambem passou a respeitar a mesma validacao do deck salvo.
+- O bug de criar cartas ao tentar adicionar unidade esgotada no armazem foi corrigido e coberto por assert.
 
-5. Monstros e escalas
-- MonsterDef foi refatorado para carregar class_kind, tier, rarity e gold_by_level.
-- Tiles de monster agora guardam spawn_level.
-- Gold drop do monster usa o spawn_level, nao o level atual da dungeon.
+4. Rules data-driven
+- `rules.json` agora controla regras que antes estavam hardcoded no runtime.
+- Campos atuais ligados de forma real:
+  - `max_hero_upgrade_level`
+  - `deckbuilder_target_count`
+  - `deckbuilder_min_monster_count`
+- `scripts/dungeon-data.ts` valida esses campos e gera `src/Dungeon/generated_rules.bend`.
+- `src/Dungeon/rules.bend` expoe os helpers para o restante do jogo.
 
-6. Raridade de cartas
-- Raridade deixou de ser inferida por ref/weight em partes criticas.
-- CardRarity e LootRarity foram introduzidos como tipos explicitos.
-- Booster background agora usa as flags de raridade da carta, nao heuristica por weight do pack.
+5. Progressao de heroi
+- O limite maximo de upgrade do heroi deixou de ser apenas implicito pelo comprimento de `hero_upgrades`.
+- Foi criada a camada `src/Dungeon/hero_progression_helpers.bend`.
+- UI, calculo de HP e fluxo de upgrade agora usam `rules.max_hero_upgrade_level`.
+- Saves antigos acima do teto sao tratados com clamp em tempo de uso.
+- O build falha se `hero_upgrades` nao tiver upgrades suficientes para sustentar o maximo configurado.
+- `data/game/hero_upgrades.json` foi ampliado para suportar 10 niveis visiveis de heroi.
 
-7. Observacao de consistencia
-- Expor qualquer uma dessas regras no editor so e seguro quando o runtime consome o campo correspondente.
-- Nesta branch, deckbuilder_target_count, deckbuilder_min_monster_count e max_hero_upgrade_level ja sao consumidos de forma real pelo jogo.
+6. Monstros
+- `MonsterDef` foi refatorado para carregar dados mais explicitos:
+  - `class_kind`
+  - `tier`
+  - `rarity`
+  - `gold_by_level`
+  - `hp_by_level`
+- A classe do monstro deixou de depender de heuristica espalhada por `ref`.
+- O `orc` foi tratado como `monster normal`.
+
+7. Spawn level e escalas
+- Tiles de monster agora guardam `spawn_level`.
+- O drop de gold do monstro usa o `spawn_level`, nao o level atual da dungeon.
+- Isso prepara o runtime para futuras mecanicas que dependam do level de origem do monster.
+
+8. Raridade de cartas
+- A raridade deixou de ser inferida por `ref` ou por heuristicas de `weight` em pontos criticos.
+- Foram introduzidos tipos explicitos:
+  - `CardRarity`
+  - `LootRarity`
+- `MonsterDef`, `SwordDef` e `PotionDef` agora carregam essa informacao.
+- O booster background passou a usar a flag de raridade da carta, em vez de heuristica por peso do pack.
+- No deckbuilder, `card_rarity_monster{}` e tratado visualmente como `common`.
+
+9. Observacao de consistencia
+- Nesta branch, so foram expostas como configuraveis no editor as regras que o runtime realmente consome.
+- `deckbuilder_target_count`, `deckbuilder_min_monster_count` e `max_hero_upgrade_level` ja estao ligados de ponta a ponta.
+- A direcao mantida na branch foi evitar UI prometendo regras que o jogo ainda nao consome.
