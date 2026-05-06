@@ -19,23 +19,11 @@ def hero_adventurer_lore() -> String:
 def hero_adventurer_name() -> String:
   "Adventurer"
 
-def hero_adventurer_ultimate_desc() -> String:
-  "Refills the dungeon with new cards while keeping the hero in place."
-
-def hero_adventurer_ultimate_title() -> String:
-  "Ultimate"
-
 def hero_gato_de_botas_lore() -> String:
   "A sly duelist who turns quick moves into clean wins."
 
 def hero_gato_de_botas_name() -> String:
   "Gato de Botas"
-
-def hero_gato_de_botas_ultimate_desc() -> String:
-  "Refills the dungeon with new cards while keeping the hero in place."
-
-def hero_gato_de_botas_ultimate_title() -> String:
-  "Ultimate"
 
 def item_gold_name() -> String:
   "Gold"
@@ -210,6 +198,18 @@ def ui_upgrade_upgrade() -> String:
 
 def ui_upgrade_upgrade_prefix() -> String:
   "Upgrade - "
+
+def ultimate_refill_desc() -> String:
+  "Refills the dungeon with new cards while keeping the hero in place."
+
+def ultimate_refill_title() -> String:
+  "Ultimate"
+
+def ultimate_shadow_step_desc() -> String:
+  "Arms a shadow. The next move leaves it behind, and a second use returns the hero to that spot."
+
+def ultimate_shadow_step_title() -> String:
+  "Ultimate"
 
 def weapon_sword_1_name() -> String:
   "Sword A"

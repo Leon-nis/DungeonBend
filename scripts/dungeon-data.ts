@@ -199,12 +199,12 @@ function heroLoreKey(heroId: string): string {
   return `hero.${heroId}.lore`;
 }
 
-function heroUltimateTitleKey(heroId: string): string {
-  return `hero.${heroId}.ultimateTitle`;
+function ultimateTitleKey(ultimateKind: string): string {
+  return `ultimate.${ultimateKind}.title`;
 }
 
-function heroUltimateDescKey(heroId: string): string {
-  return `hero.${heroId}.ultimateDesc`;
+function ultimateDescKey(ultimateKind: string): string {
+  return `ultimate.${ultimateKind}.desc`;
 }
 
 function monsterNameKey(id: string): string {
@@ -438,8 +438,10 @@ function requiredContentKeys(data: GameData): string[] {
     if (typeof hero?.id === "string" && hero.id.trim() !== "") {
       keys.add(heroNameKey(hero.id));
       keys.add(heroLoreKey(hero.id));
-      keys.add(heroUltimateTitleKey(hero.id));
-      keys.add(heroUltimateDescKey(hero.id));
+    }
+    if (typeof hero?.ultimate_kind === "string" && hero.ultimate_kind.trim() !== "") {
+      keys.add(ultimateTitleKey(hero.ultimate_kind));
+      keys.add(ultimateDescKey(hero.ultimate_kind));
     }
   });
   (Array.isArray(data.monsters) ? data.monsters : []).forEach((monster) => {
@@ -1207,8 +1209,9 @@ export function renderHeroPresentationModule(data: GameData): string {
       fail(`presentation is missing hero_id "${hero.id}"`);
     }
     const lore = requireContent(data, heroLoreKey(hero.id));
-    const ultimateTitle = requireContent(data, heroUltimateTitleKey(hero.id));
-    const ultimateDesc = requireContent(data, heroUltimateDescKey(hero.id));
+    const ultimateKind = validateString(hero.ultimate_kind, `heroes["${hero.id}"].ultimate_kind`);
+    const ultimateTitle = requireContent(data, ultimateTitleKey(ultimateKind));
+    const ultimateDesc = requireContent(data, ultimateDescKey(ultimateKind));
     return `hero_presentation{${bendString(hero.id)}, ${renderPresentationAlign(presentation.name_align, `presentation["${hero.id}"].name_align`)}, ${bendString(lore)}, ${bendString(ultimateTitle)}, ${bendString(presentation.ultimate_icon)}, ${bendString(ultimateDesc)}}`;
   });
   const renderedPresentations = renderTypedListHelpers("generated_hero_presentation_items", "HeroPresentation", presentations);
