@@ -29,14 +29,14 @@ def generated_hero_0_upgrades_chunk_0() -> List(Upgrade):
 def generated_hero_1_upgrades_chunk_0() -> List(Upgrade):
   [
     upgrade{40, 13},
-    upgrade{41, 16},
-    upgrade{42, 19},
-    upgrade{43, 22},
-    upgrade{44, 25},
-    upgrade{45, 28},
-    upgrade{46, 31},
-    upgrade{47, 34},
-    upgrade{48, 37}
+    upgrade{100, 16},
+    upgrade{160, 19},
+    upgrade{220, 22},
+    upgrade{280, 25},
+    upgrade{340, 28},
+    upgrade{400, 31},
+    upgrade{460, 34},
+    upgrade{520, 37}
   ]
 
 def generated_monster_0_gold_levels_chunk_0() -> List(U32):
@@ -205,8 +205,8 @@ def generated_pack_0_pool_chunk_0() -> List(PackPoolEntry):
 
 def generated_config_heroes_chunk_0() -> List(HeroDef):
   [
-    hero_def{"adventurer", "Adventurer", "assets/player-boy.png", 12, 0, 1, generated_hero_0_upgrades_chunk_0()},
-    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 10, 45, 1, generated_hero_1_upgrades_chunk_0()}
+    hero_def{"adventurer", "Adventurer", "assets/player-boy.png", 12, 0, 1, generated_hero_0_upgrades_chunk_0(), ultimate_refill{}, 8},
+    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 10, 45, 1, generated_hero_1_upgrades_chunk_0(), ultimate_shadow_step{}, 4}
   ]
 
 def generated_config_monsters_chunk_0() -> List(MonsterDef):
@@ -246,7 +246,7 @@ def generated_config_base_deck_chunk_0() -> List(DeckEntry):
 
 def generated_config_packs_chunk_0() -> List(PackDef):
   [
-    pack_def{"Starter Booster", 10, 4, 0, generated_pack_0_pool_chunk_0()}
+    pack_def{"Starter Booster", 60, 4, 1, generated_pack_0_pool_chunk_0()}
   ]
 
 def generated_config() -> Config:

@@ -6,6 +6,7 @@ import Dungeon/Config as Config
 import Dungeon/Run as Run
 import Dungeon/SwipeResult as SwipeResult
 import Dungeon/Direction as Direction
+import Dungeon/UltimateState as UltimateState
 import Dungeon/Run/apply_to_tile/_apply_to_tile as _apply_to_tile
 import Dungeon/Board/indexing/adjacent_pos as adjacent_pos
 import Dungeon/Board/indexing/board_index as board_index
@@ -16,7 +17,7 @@ def _keep_run(meta_state: Meta, run_value: Run) -> SwipeResult:
 
 def apply_swipe(config_value: Config, meta_state: Meta, run_value: Run, dir: Direction) -> SwipeResult:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       _apply_swipe_target(
         config_value,
         meta_state,
@@ -33,14 +34,15 @@ def apply_swipe(config_value: Config, meta_state: Meta, run_value: Run, dir: Dir
         capacity,
         seed,
         ult_charge,
+        ultimate_state,
         dir,
         adjacent_pos(hero_index, dir)
       )
 
-def _apply_swipe_target(config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, dir: Direction, target: Maybe(Nat/V2)) -> SwipeResult:
+def _apply_swipe_target(config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState, dir: Direction, target: Maybe(Nat/V2)) -> SwipeResult:
   match target:
     case none{}:
-      _keep_run(meta_state, run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref})
+      _keep_run(meta_state, run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state})
     case some{target_pos}:
       _apply_to_tile(
         config_value,
@@ -58,6 +60,7 @@ def _apply_swipe_target(config_value: Config, meta_state: Meta, dungeon_level: U
         capacity,
         seed,
         ult_charge,
+        ultimate_state,
         dir,
         board_index(target_pos),
         board_get_pos(board_value, target_pos)

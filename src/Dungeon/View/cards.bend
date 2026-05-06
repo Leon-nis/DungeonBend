@@ -1,4 +1,5 @@
 import HTML as HTML
+import String as String
 import Dungeon/HeroDef as HeroDef
 import Dungeon/Weapon as Weapon
 import Dungeon/Tile as Tile
@@ -75,6 +76,12 @@ def _tile_card(tile: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(D
         </div>,
         [padding_none{}]
       )
+    case shadow{}:
+      _standard_card_shell(
+        <div class="card card--tile card--shadow">
+          <div class="card__art-wrap card__art-wrap--stacked"></div>
+        </div>
+      )
     case monster{ref, hp, spawn_level}:
       _standard_tile_card(monster{ref, hp, spawn_level}, "card card--tile card--monster", pos, damage_overlay)
     case sword{ref, dmg}:
@@ -134,4 +141,11 @@ def _standard_tile_card(tile: Tile, class_name: String, pos: Nat/V2, damage_over
   _standard_card_shell(_tile_card_body(tile, class_name, pos, damage_overlay))
 
 def _tile_badge_node(tile: Tile) -> HTML(DungeonEvent):
-  <div class="card__badge card__badge--value">{text{_tile_badge(tile)}}</div>
+  _tile_badge_node_value(_tile_badge(tile))
+
+def _tile_badge_node_value(badge_value: String) -> HTML(DungeonEvent):
+  match String/eq(badge_value, ""):
+    case true{}:
+      text{""}
+    case false{}:
+      <div class="card__badge card__badge--value">{text{badge_value}}</div>

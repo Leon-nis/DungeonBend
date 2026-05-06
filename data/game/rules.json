@@ -1,6 +1,6 @@
 {
   "initial_seed": 1,
-  "starting_gold": 9999,
+  "starting_gold": 0,
   "starting_selected_hero_id": "adventurer",
   "starting_selection_confirmed": true,
   "starting_dungeon_level": 1,

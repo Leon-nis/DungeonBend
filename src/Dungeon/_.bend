@@ -10,8 +10,15 @@ type HeroDef {
     base_max_hp: U32,
     unlock_cost: U32,
     starts_unlocked: U32,
-    upgrades: List(Upgrade)
+    upgrades: List(Upgrade),
+    ultimate_kind: UltimateKind,
+    ultimate_charge_required: U32
   }
+}
+
+type UltimateKind {
+  ultimate_refill{}
+  ultimate_shadow_step{}
 }
 
 type PresentationAlign {
@@ -117,10 +124,17 @@ type Weapon {
 
 type Tile {
   none{}
+  shadow{}
   monster{ref: U32, hp: U32, spawn_level: U32}
   sword{ref: U32, dmg: U32}
   potion{ref: U32, heal: U32}
   gold{amount: U32}
+}
+
+type UltimateState {
+  ultimate_state_idle{}
+  ultimate_state_shadow_armed{}
+  ultimate_state_shadow_live{}
 }
 
 type Board {
@@ -206,7 +220,8 @@ type Run {
     capacity: U32,
     seed: U32,
     ult_charge: U32,
-    hero_ref: U32
+    hero_ref: U32,
+    ultimate_state: UltimateState
   }
 }
 

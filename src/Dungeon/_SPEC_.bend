@@ -47,12 +47,11 @@ assert card_potion_exists:
 # different ways inside the dungeon." Hero is represented both as
 # a CardRef variant (for decks/packs) and a HeroDef (for the
 # catalog). A concrete HeroDef anchors the contract: every HeroDef
-# has id, name, sprite, base_max_hp, unlock_cost, and upgrades.
-# (Ultimate is noted in the rulebook as not yet modeled — add a
-# field and a law when that rule lands.)
+# has id, name, sprite, base_max_hp, unlock_cost, upgrades,
+# ultimate kind, and ultimate charge requirement.
 assert hero_def_adventurer:
-  hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, []}
-    == hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, []}
+  hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8}
+    == hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8}
     :: HeroDef
 
 # "Each hero has its own progression curve: level, HP, and such."

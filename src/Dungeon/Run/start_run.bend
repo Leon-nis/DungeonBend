@@ -20,7 +20,7 @@ import Dungeon/profile_helpers/profile_hero_level as profile_hero_level
 def _start_from_board(hero_max: U32, blueprint: List(DeckEntry), capacity: U32, hero_ref: U32, stage: BoardDraw) -> Run:
   match stage:
     case board_draw{board_value, next_counts, next_remaining, next_seed_value, next_level}:
-      run{next_level, hero_max, hero_max, 4, no_weapon{}, board_value, blueprint, next_counts, next_remaining, capacity, next_seed_value, 0, hero_ref}
+      run{next_level, hero_max, hero_max, 4, no_weapon{}, board_value, blueprint, next_counts, next_remaining, capacity, next_seed_value, 0, hero_ref, ultimate_state_idle{}}
 
 def start_run(config_value: Config, meta_state: Meta, seed: U32) -> Run:
   match config_value:

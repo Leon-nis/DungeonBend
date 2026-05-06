@@ -69,7 +69,46 @@ Este arquivo junta os topicos principais trabalhados nesta branch, unificando os
 - O booster background passou a usar a flag de raridade da carta, em vez de heuristica por peso do pack.
 - No deckbuilder, `card_rarity_monster{}` e tratado visualmente como `common`.
 
-9. Observacao de consistencia
+9. Ultimate data-driven
+- A source of truth da ultimate deixou de ser implicita por heroi e passou a viver no `HeroDef`.
+- `data/game/heroes.json` agora declara:
+  - `ultimate_kind`
+  - `ultimate_charge_required`
+- O runtime passou a fazer dispatch por ultimate, nao por nome do heroi.
+- Isso permite trocar a ultimate entre herois no editor futuramente sem duplicar regra hardcoded.
+
+10. Shadow step
+- Foi implementada a base da ultimate `shadow_step`.
+- Na primeira ativacao:
+  - a cinematic normal toca
+  - a ultimate entra em estado armado
+  - a carga volta para `0`
+- No primeiro movimento valido apos armar:
+  - a origem do heroi vira `shadow{}`
+  - nao ocorre `draw_tile`
+  - `seed`, `remaining` e `draw_counts` nao mudam
+- Enquanto a shadow existir:
+  - a carga da ultimate fica congelada
+  - a shadow participa normalmente do board e do shift
+- Na segunda ativacao, ou ao mover para a shadow:
+  - o heroi retorna para a shadow
+  - a shadow e consumida
+  - a posicao antiga do heroi recebe `1` draw real
+  - a carga volta para `0`
+
+11. Estado da run e persistencia
+- `Run` ganhou `UltimateState` para modelar o ciclo especial da ultimate:
+  - `ultimate_state_idle{}`
+  - `ultimate_state_shadow_armed{}`
+  - `ultimate_state_shadow_live{}`
+- `Tile` ganhou `shadow{}` como tile real de board.
+- Save/load da run foi atualizado para serializar:
+  - o estado da ultimate
+  - o tile `shadow{}`
+- A shadow por enquanto nao usa sprite dedicado; ela renderiza como slot vazio.
+
+12. Observacao de consistencia
 - Nesta branch, so foram expostas como configuraveis no editor as regras que o runtime realmente consome.
 - `deckbuilder_target_count`, `deckbuilder_min_monster_count` e `max_hero_upgrade_level` ja estao ligados de ponta a ponta.
+- `ultimate_kind` e `ultimate_charge_required` agora tambem estao ligados de ponta a ponta.
 - A direcao mantida na branch foi evitar UI prometendo regras que o jogo ainda nao consome.

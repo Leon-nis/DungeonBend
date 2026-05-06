@@ -159,6 +159,8 @@ def _tile_name(tile: Tile) -> String:
   match tile:
     case none{}:
       Content.card_empty()
+    case shadow{}:
+      ""
     case monster{ref, hp, spawn_level}:
       _monster_name(ref)
     case sword{ref, dmg}:
@@ -172,6 +174,8 @@ def _tile_sprite(tile: Tile) -> String:
   match tile:
     case none{}:
       ""
+    case shadow{}:
+      ""
     case monster{ref, hp, spawn_level}:
       _monster_sprite(ref)
     case sword{ref, dmg}:
@@ -184,6 +188,8 @@ def _tile_sprite(tile: Tile) -> String:
 def _tile_badge(tile: Tile) -> String:
   match tile:
     case none{}:
+      ""
+    case shadow{}:
       ""
     case monster{ref, hp, spawn_level}:
       Content.stat_hp() ++ " " ++ U32/show(hp)

@@ -1,59 +1,5 @@
 [
   {
-    "hero_id": "gato_de_botas",
-    "level": 1,
-    "cost": 40,
-    "max_hp": 13
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 2,
-    "cost": 41,
-    "max_hp": 16
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 3,
-    "cost": 42,
-    "max_hp": 19
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 4,
-    "cost": 43,
-    "max_hp": 22
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 5,
-    "cost": 44,
-    "max_hp": 25
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 6,
-    "cost": 45,
-    "max_hp": 28
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 7,
-    "cost": 46,
-    "max_hp": 31
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 8,
-    "cost": 47,
-    "max_hp": 34
-  },
-  {
-    "hero_id": "gato_de_botas",
-    "level": 9,
-    "cost": 48,
-    "max_hp": 37
-  },
-  {
     "hero_id": "adventurer",
     "level": 1,
     "cost": 40,
@@ -106,5 +52,59 @@
     "level": 9,
     "cost": 360,
     "max_hp": 30
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 1,
+    "cost": 40,
+    "max_hp": 13
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 2,
+    "cost": 100,
+    "max_hp": 16
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 3,
+    "cost": 160,
+    "max_hp": 19
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 4,
+    "cost": 220,
+    "max_hp": 22
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 5,
+    "cost": 280,
+    "max_hp": 25
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 6,
+    "cost": 340,
+    "max_hp": 28
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 7,
+    "cost": 400,
+    "max_hp": 31
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 8,
+    "cost": 460,
+    "max_hp": 34
+  },
+  {
+    "hero_id": "gato_de_botas",
+    "level": 9,
+    "cost": 520,
+    "max_hp": 37
   }
 ]

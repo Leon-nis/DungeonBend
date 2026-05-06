@@ -8,6 +8,8 @@ export type RawHero = {
   base_max_hp: number;
   unlock_cost: number;
   starts_unlocked: boolean;
+  ultimate_kind: string;
+  ultimate_charge_required: number;
 };
 
 export type RawHeroUpgrade = {
@@ -264,6 +266,17 @@ function renderConsumableCardRarity(value: string, label: string): string {
   return `card_rarity_consumable{${renderLootRarity(value, label)}}`;
 }
 
+function renderUltimateKind(value: string, label: string): string {
+  switch (value) {
+    case "refill":
+      return "ultimate_refill{}";
+    case "shadow_step":
+      return "ultimate_shadow_step{}";
+    default:
+      fail(`${label} must be one of: refill, shadow_step`);
+  }
+}
+
 function fail(message: string): never {
   throw new Error(`Dungeon data error: ${message}`);
 }
@@ -504,6 +517,11 @@ export function getGameDataErrors(data: GameData): string[] {
     addPositiveIntError(errors, hero?.base_max_hp, `heroes[${index}].base_max_hp`);
     addNonNegativeIntError(errors, hero?.unlock_cost, `heroes[${index}].unlock_cost`);
     addBooleanError(errors, hero?.starts_unlocked, `heroes[${index}].starts_unlocked`);
+    addStringError(errors, hero?.ultimate_kind, `heroes[${index}].ultimate_kind`);
+    if (typeof hero?.ultimate_kind === "string" && !["refill", "shadow_step"].includes(hero.ultimate_kind)) {
+      errors.push(`heroes[${index}].ultimate_kind must be one of: refill, shadow_step`);
+    }
+    addPositiveIntError(errors, hero?.ultimate_charge_required, `heroes[${index}].ultimate_charge_required`);
   });
 
   const cardIds = new Map<string, CardKind>();
@@ -958,6 +976,14 @@ export function renderConfigModule(data: GameData): string {
     validateString(hero.sprite, `heroes[${index}].sprite`);
     validatePositiveInt(hero.base_max_hp, `heroes[${index}].base_max_hp`);
     validateNonNegativeInt(hero.unlock_cost, `heroes[${index}].unlock_cost`);
+    const ultimateKind = renderUltimateKind(
+      validateString(hero.ultimate_kind, `heroes[${index}].ultimate_kind`),
+      `heroes[${index}].ultimate_kind`,
+    );
+    const ultimateChargeRequired = validatePositiveInt(
+      hero.ultimate_charge_required,
+      `heroes[${index}].ultimate_charge_required`,
+    );
     const upgrades = heroUpgradesFor(data, heroId).map((upgrade, upgradeIndex) => {
       validatePositiveInt(upgrade.cost, `hero_upgrades["${heroId}"][${upgradeIndex}].cost`);
       validatePositiveInt(upgrade.max_hp, `hero_upgrades["${heroId}"][${upgradeIndex}].max_hp`);
@@ -965,7 +991,7 @@ export function renderConfigModule(data: GameData): string {
     });
     const renderedUpgrades = renderTypedListHelpers(`generated_hero_${index}_upgrades`, "Upgrade", upgrades);
     helperDefs.push(...renderedUpgrades.defs);
-    return `hero_def{${bendString(heroId)}, ${bendString(heroName)}, ${bendString(hero.sprite)}, ${hero.base_max_hp}, ${hero.unlock_cost}, ${hero.starts_unlocked ? 1 : 0}, ${renderedUpgrades.expr}}`;
+    return `hero_def{${bendString(heroId)}, ${bendString(heroName)}, ${bendString(hero.sprite)}, ${hero.base_max_hp}, ${hero.unlock_cost}, ${hero.starts_unlocked ? 1 : 0}, ${renderedUpgrades.expr}, ${ultimateKind}, ${ultimateChargeRequired}}`;
   });
 
   const monsterDefs = data.monsters.map((monster, index) => {

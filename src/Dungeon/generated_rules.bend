@@ -2,7 +2,7 @@ def generated_initial_seed() -> U32:
   1
 
 def generated_starting_gold() -> U32:
-  9999
+  0
 
 def generated_starting_selected_hero() -> U32:
   0
@@ -12,6 +12,9 @@ def generated_starting_selection_confirmed() -> U32:
 
 def generated_starting_dungeon_level() -> U32:
   1
+
+def generated_max_hero_upgrade_level() -> U32:
+  10
 
 def generated_deckbuilder_target_count() -> U32:
   20

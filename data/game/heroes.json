@@ -5,7 +5,9 @@
     "sprite": "assets/player-boy.png",
     "base_max_hp": 12,
     "unlock_cost": 0,
-    "starts_unlocked": true
+    "starts_unlocked": true,
+    "ultimate_charge_required": 8,
+    "ultimate_kind": "refill"
   },
   {
     "id": "gato_de_botas",
@@ -13,6 +15,8 @@
     "sprite": "assets/player-gato-de-botas.png",
     "base_max_hp": 10,
     "unlock_cost": 45,
-    "starts_unlocked": true
+    "starts_unlocked": true,
+    "ultimate_kind": "shadow_step",
+    "ultimate_charge_required": 4
   }
 ]
