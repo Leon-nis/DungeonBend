@@ -9,11 +9,15 @@ import Dungeon/Config as Config
 import Dungeon/Run as Run
 import Dungeon/SwipeResult as SwipeResult
 import Dungeon/Direction as Direction
+import Dungeon/UltimateState as UltimateState
 import Dungeon/Deck/spawn_and_draw/draw_tile as draw_tile
 import Dungeon/Board/shift_after_move as shift_after_move
 import Dungeon/Combat/resolve_and_apply/resolve_monster as resolve_monster
 import Dungeon/profile_helpers/meta_gold as meta_gold
 import Dungeon/profile_helpers/set_meta_gold as set_meta_gold
+import Dungeon/shadow_step_helpers/board_with_shadow_origin as board_with_shadow_origin
+import Dungeon/shadow_step_helpers/board_after_shadow_return as board_after_shadow_return
+import Dungeon/ultimate_helpers/ultimate_state_is_shadow_armed as ultimate_state_is_shadow_armed
 
 def _min_u32(a: U32, b: U32) -> U32:
   _min_u32_flag(a < b, a, b)
@@ -34,29 +38,18 @@ def _keep_run(meta_state: Meta, run_value: Run) -> SwipeResult:
 def _end_run(meta_state: Meta, run_value: Run) -> SwipeResult:
   swipe_result{meta_state, end_run{run_value}}
 
-def _move_after_collect_from_draw(meta_state: Meta, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), capacity: U32, ult_charge: U32, result: DrawResult, dir: Direction) -> SwipeResult:
+def _run_value(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState) -> Run:
+  run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}
+
+def _move_after_collect_from_draw(meta_state: Meta, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), capacity: U32, ult_charge: U32, ultimate_state: UltimateState, result: DrawResult, dir: Direction) -> SwipeResult:
   match result:
     case draw_result{spawn, next_counts, next_remaining, next_seed_value, next_level}:
       _keep_run(
         meta_state,
-        run{
-          next_level,
-          hero_hp,
-          hero_max_hp,
-          target_index,
-          weapon_value,
-          shift_after_move(board_value, hero_index, target_index, dir, spawn),
-          deck_blueprint,
-          next_counts,
-          next_remaining,
-          capacity,
-          next_seed_value,
-          ult_charge,
-          hero_ref
-        }
+        _run_value(next_level, hero_hp, hero_max_hp, hero_ref, target_index, weapon_value, shift_after_move(board_value, hero_index, target_index, dir, spawn), deck_blueprint, next_counts, next_remaining, capacity, next_seed_value, ult_charge, ultimate_state)
       )
 
-def _move_after_collect(config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, dir: Direction) -> SwipeResult:
+def _move_after_collect(config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState, dir: Direction) -> SwipeResult:
   _move_after_collect_from_draw(
     meta_state,
     hero_hp,
@@ -69,25 +62,39 @@ def _move_after_collect(config_value: Config, meta_state: Meta, dungeon_level: U
     deck_blueprint,
     capacity,
     ult_charge,
+    ultimate_state,
     draw_tile(config_value, deck_blueprint, draw_counts, remaining, seed, dungeon_level),
     dir
   )
 
-def _combat_run(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32) -> Run:
-  run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}
+def _move_after_shadow_collect(meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32) -> SwipeResult:
+  _keep_run(meta_state, _run_value(dungeon_level, hero_hp, hero_max_hp, hero_ref, target_index, weapon_value, board_with_shadow_origin(board_value, hero_index, target_index), deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state_shadow_live{}))
 
-def _from_combat(meta_state: Meta, dungeon_level: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, result: CombatResult) -> SwipeResult:
+def _move_to_shadow_from_draw(meta_state: Meta, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, shadow_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), capacity: U32, result: DrawResult) -> SwipeResult:
+  match result:
+    case draw_result{spawn, next_counts, next_remaining, next_seed_value, next_level}:
+      _keep_run(meta_state, _run_value(next_level, hero_hp, hero_max_hp, hero_ref, shadow_index, weapon_value, board_after_shadow_return(board_value, hero_index, shadow_index, spawn), deck_blueprint, next_counts, next_remaining, capacity, next_seed_value, 0, ultimate_state_idle{}))
+
+def _move_to_shadow(config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, shadow_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32) -> SwipeResult:
+  _move_to_shadow_from_draw(meta_state, hero_hp, hero_max_hp, hero_ref, hero_index, shadow_index, weapon_value, board_value, deck_blueprint, capacity, draw_tile(config_value, deck_blueprint, draw_counts, remaining, seed, dungeon_level))
+
+def _combat_run(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState) -> Run:
+  _run_value(dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state)
+
+def _from_combat(meta_state: Meta, dungeon_level: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState, result: CombatResult) -> SwipeResult:
   match result:
     case combat_result{next_hp, next_weapon, next_board, combat_continue{}}:
-      _keep_run(meta_state, _combat_run(dungeon_level, next_hp, hero_max_hp, hero_ref, hero_index, next_weapon, next_board, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge))
+      _keep_run(meta_state, _combat_run(dungeon_level, next_hp, hero_max_hp, hero_ref, hero_index, next_weapon, next_board, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state))
     case combat_result{next_hp, next_weapon, next_board, combat_game_over{}}:
-      _end_run(meta_state, _combat_run(dungeon_level, next_hp, hero_max_hp, hero_ref, hero_index, next_weapon, next_board, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge))
+      _end_run(meta_state, _combat_run(dungeon_level, next_hp, hero_max_hp, hero_ref, hero_index, next_weapon, next_board, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state))
 
-def _apply_to_tile(config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, dir: Direction, target_index: U32, tile_value: Tile) -> SwipeResult:
+def _apply_to_tile(config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState, dir: Direction, target_index: U32, tile_value: Tile) -> SwipeResult:
   match tile_value:
     case none{}:
-      _keep_run(meta_state, run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref})
-    case monster{ref, hp}:
+      _keep_run(meta_state, _run_value(dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state))
+    case shadow{}:
+      _move_to_shadow(config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed)
+    case monster{ref, hp, spawn_level}:
       _from_combat(
         meta_state,
         dungeon_level,
@@ -100,11 +107,19 @@ def _apply_to_tile(config_value: Config, meta_state: Meta, dungeon_level: U32, h
         capacity,
         seed,
         ult_charge,
-        resolve_monster(config_value, board_value, hero_hp, weapon_value, target_index, ref, hp)
+        ultimate_state,
+        resolve_monster(config_value, board_value, hero_hp, weapon_value, target_index, ref, hp, spawn_level)
       )
     case sword{ref, dmg}:
-      _move_after_collect(config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon{ref, dmg}, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, dir)
+      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon{ref, dmg}, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, dir)
     case potion{ref, heal}:
-      _move_after_collect(config_value, meta_state, dungeon_level, _min_u32(hero_max_hp, hero_hp + heal), hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, dir)
+      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, meta_state, dungeon_level, _min_u32(hero_max_hp, hero_hp + heal), hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, dir)
     case gold{amount}:
-      _move_after_collect(config_value, _add_gold(meta_state, amount), dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, dir)
+      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, _add_gold(meta_state, amount), dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, dir)
+
+def _apply_collect_shadow(shadow_armed: U32, config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState, dir: Direction) -> SwipeResult:
+  match shadow_armed:
+    case 0:
+      _move_after_collect(config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, dir)
+    case _:
+      _move_after_shadow_collect(meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge)

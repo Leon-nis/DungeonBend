@@ -1,5 +1,6 @@
 import Dungeon/Upgrade as Upgrade
 import Dungeon/HeroDef as HeroDef
+import Dungeon/UltimateKind as UltimateKind
 import Dungeon/Config as Config
 
 def hero_count(config_value: Config) -> U32:
@@ -11,7 +12,7 @@ def _hero_count_from_list(heroes: List(HeroDef)) -> U32:
   match heroes:
     case []:
       0
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}<>rest:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}<>rest:
       1 + _hero_count_from_list(rest)
 
 def normalize_hero_ref(config_value: Config, hero_ref: U32) -> U32:
@@ -39,11 +40,11 @@ def hero_at(config_value: Config, hero_ref: U32) -> HeroDef:
 def _hero_at_from_list(heroes: List(HeroDef), hero_ref: U32) -> HeroDef:
   match heroes:
     case []:
-      hero_def{"hero", "Hero", "", 1, 0, 1, []}
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}<>rest:
+      hero_def{"hero", "Hero", "", 1, 0, 1, [], ultimate_refill{}, 1}
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}<>rest:
       match hero_ref:
         case 0:
-          hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}
+          hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}
         case _:
           _hero_at_from_list(rest, hero_ref - 1)
 
@@ -87,35 +88,45 @@ def _prev_hero_ref_at_start(at_start: U32, count: U32, hero_ref: U32) -> U32:
 
 def hero_id(hero_value: HeroDef) -> String:
   match hero_value:
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
       id
 
 def hero_name(hero_value: HeroDef) -> String:
   match hero_value:
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
       name
 
 def hero_sprite(hero_value: HeroDef) -> String:
   match hero_value:
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
       sprite
 
 def hero_base_max_hp(hero_value: HeroDef) -> U32:
   match hero_value:
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
       base_max_hp
 
 def hero_unlock_cost(hero_value: HeroDef) -> U32:
   match hero_value:
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
       unlock_cost
 
 def hero_starts_unlocked(hero_value: HeroDef) -> U32:
   match hero_value:
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
       starts_unlocked
 
 def hero_upgrades(hero_value: HeroDef) -> List(Upgrade):
   match hero_value:
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades}:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
       upgrades
+
+def hero_ultimate_kind(hero_value: HeroDef) -> UltimateKind:
+  match hero_value:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
+      ultimate_kind
+
+def hero_ultimate_charge_required(hero_value: HeroDef) -> U32:
+  match hero_value:
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}:
+      ultimate_charge_required

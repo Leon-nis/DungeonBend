@@ -8,6 +8,8 @@ export type RawHero = {
   base_max_hp: number;
   unlock_cost: number;
   starts_unlocked: boolean;
+  ultimate_kind: string;
+  ultimate_charge_required: number;
 };
 
 export type RawHeroUpgrade = {
@@ -21,7 +23,10 @@ export type RawMonster = {
   id: string;
   name: string;
   sprite: string;
-  gold_drop: number;
+  class: string;
+  rarity: string;
+  tier: number;
+  gold_by_level: number[];
   hp_by_level: number[];
 };
 
@@ -29,6 +34,7 @@ export type RawWeapon = {
   id: string;
   name: string;
   sprite: string;
+  rarity: string;
   dmg: number;
 };
 
@@ -36,6 +42,7 @@ export type RawPotion = {
   id: string;
   name: string;
   sprite: string;
+  rarity: string;
   heal: number;
 };
 
@@ -73,6 +80,9 @@ export type RawRules = {
   starting_selected_hero_id: string;
   starting_selection_confirmed: boolean;
   starting_dungeon_level: number;
+  max_hero_upgrade_level: number;
+  deckbuilder_target_count: number;
+  deckbuilder_min_monster_count: number;
   dungeon_level_increment_per_refill: number;
   ultimate_charge_required: number;
   ultimate_charge_per_move: number;
@@ -211,6 +221,60 @@ function potionNameKey(id: string): string {
 
 function boosterNameKey(id: string): string {
   return `booster.${id}.name`;
+}
+
+function renderMonsterClass(value: string, label: string): string {
+  switch (value) {
+    case "normal":
+      return "monster_normal{}";
+    case "champion":
+      return "monster_champion{}";
+    case "boss":
+      return "monster_boss{}";
+    default:
+      fail(`${label} must be one of: normal, champion, boss`);
+  }
+}
+
+function renderLootRarity(value: string, label: string): string {
+  switch (value) {
+    case "common":
+      return "loot_common{}";
+    case "uncommon":
+      return "loot_uncommon{}";
+    case "rare":
+      return "loot_rare{}";
+    case "epic":
+      return "loot_epic{}";
+    default:
+      fail(`${label} must be one of: common, uncommon, rare, epic`);
+  }
+}
+
+function renderMonsterCardRarity(value: string, label: string): string {
+  if (value !== "monster") {
+    fail(`${label} must be "monster"`);
+  }
+  return "card_rarity_monster{}";
+}
+
+function renderEquipmentCardRarity(value: string, label: string): string {
+  return `card_rarity_equipment{${renderLootRarity(value, label)}}`;
+}
+
+function renderConsumableCardRarity(value: string, label: string): string {
+  return `card_rarity_consumable{${renderLootRarity(value, label)}}`;
+}
+
+function renderUltimateKind(value: string, label: string): string {
+  switch (value) {
+    case "refill":
+      return "ultimate_refill{}";
+    case "shadow_step":
+      return "ultimate_shadow_step{}";
+    default:
+      fail(`${label} must be one of: refill, shadow_step`);
+  }
 }
 
 function fail(message: string): never {
@@ -453,6 +517,11 @@ export function getGameDataErrors(data: GameData): string[] {
     addPositiveIntError(errors, hero?.base_max_hp, `heroes[${index}].base_max_hp`);
     addNonNegativeIntError(errors, hero?.unlock_cost, `heroes[${index}].unlock_cost`);
     addBooleanError(errors, hero?.starts_unlocked, `heroes[${index}].starts_unlocked`);
+    addStringError(errors, hero?.ultimate_kind, `heroes[${index}].ultimate_kind`);
+    if (typeof hero?.ultimate_kind === "string" && !["refill", "shadow_step"].includes(hero.ultimate_kind)) {
+      errors.push(`heroes[${index}].ultimate_kind must be one of: refill, shadow_step`);
+    }
+    addPositiveIntError(errors, hero?.ultimate_charge_required, `heroes[${index}].ultimate_charge_required`);
   });
 
   const cardIds = new Map<string, CardKind>();
@@ -473,18 +542,36 @@ export function getGameDataErrors(data: GameData): string[] {
     pushCardId(monster?.id, "monster", `monsters[${index}].id`);
     addStringError(errors, monster?.name, `monsters[${index}].name`);
     addStringError(errors, monster?.sprite, `monsters[${index}].sprite`);
-    addPositiveIntError(errors, monster?.gold_drop, `monsters[${index}].gold_drop`);
+    addStringError(errors, monster?.class, `monsters[${index}].class`);
+    addStringError(errors, monster?.rarity, `monsters[${index}].rarity`);
+    if (typeof monster?.class === "string" && !["normal", "champion", "boss"].includes(monster.class)) {
+      errors.push(`monsters[${index}].class must be one of: normal, champion, boss`);
+    }
+    if (typeof monster?.rarity === "string" && monster.rarity !== "monster") {
+      errors.push(`monsters[${index}].rarity must be "monster"`);
+    }
+    addPositiveIntError(errors, monster?.tier, `monsters[${index}].tier`);
     const hpByLevel = requireArray<number>(errors, monster?.hp_by_level, `monsters[${index}].hp_by_level`);
+    const goldByLevel = requireArray<number>(errors, monster?.gold_by_level, `monsters[${index}].gold_by_level`);
     if (hpByLevel.length === 0) {
       errors.push(`monsters[${index}].hp_by_level must have at least one entry`);
+    }
+    if (goldByLevel.length === 0) {
+      errors.push(`monsters[${index}].gold_by_level must have at least one entry`);
     }
     if (hpLevelCount === null) {
       hpLevelCount = hpByLevel.length;
     } else if (hpByLevel.length !== hpLevelCount) {
       errors.push(`monsters[${index}].hp_by_level must contain ${hpLevelCount} levels`);
     }
+    if (goldByLevel.length !== hpByLevel.length) {
+      errors.push(`monsters[${index}].gold_by_level must contain ${hpByLevel.length} levels`);
+    }
     hpByLevel.forEach((value, levelIndex) => {
       addPositiveIntError(errors, value, `monsters[${index}].hp_by_level[${levelIndex}]`);
+    });
+    goldByLevel.forEach((value, levelIndex) => {
+      addPositiveIntError(errors, value, `monsters[${index}].gold_by_level[${levelIndex}]`);
     });
   });
 
@@ -492,6 +579,10 @@ export function getGameDataErrors(data: GameData): string[] {
     pushCardId(weapon?.id, "weapon", `weapons[${index}].id`);
     addStringError(errors, weapon?.name, `weapons[${index}].name`);
     addStringError(errors, weapon?.sprite, `weapons[${index}].sprite`);
+    addStringError(errors, weapon?.rarity, `weapons[${index}].rarity`);
+    if (typeof weapon?.rarity === "string" && !["common", "uncommon", "rare", "epic"].includes(weapon.rarity)) {
+      errors.push(`weapons[${index}].rarity must be one of: common, uncommon, rare, epic`);
+    }
     addPositiveIntError(errors, weapon?.dmg, `weapons[${index}].dmg`);
   });
 
@@ -499,6 +590,10 @@ export function getGameDataErrors(data: GameData): string[] {
     pushCardId(potion?.id, "potion", `potions[${index}].id`);
     addStringError(errors, potion?.name, `potions[${index}].name`);
     addStringError(errors, potion?.sprite, `potions[${index}].sprite`);
+    addStringError(errors, potion?.rarity, `potions[${index}].rarity`);
+    if (typeof potion?.rarity === "string" && !["common", "uncommon", "rare", "epic"].includes(potion.rarity)) {
+      errors.push(`potions[${index}].rarity must be one of: common, uncommon, rare, epic`);
+    }
     addPositiveIntError(errors, potion?.heal, `potions[${index}].heal`);
   });
 
@@ -528,6 +623,16 @@ export function getGameDataErrors(data: GameData): string[] {
         errors.push(`hero "${hero.id}" upgrades must use contiguous levels starting at 1`);
       }
     });
+    if (
+      typeof data.rules?.max_hero_upgrade_level === "number" &&
+      Number.isInteger(data.rules.max_hero_upgrade_level) &&
+      data.rules.max_hero_upgrade_level > 0 &&
+      rows.length + 1 < data.rules.max_hero_upgrade_level
+    ) {
+      errors.push(
+        `hero "${hero.id}" must define at least ${data.rules.max_hero_upgrade_level - 1} upgrades to support rules.max_hero_upgrade_level=${data.rules.max_hero_upgrade_level}`,
+      );
+    }
   });
 
   let heroEntryCount = 0;
@@ -625,6 +730,9 @@ export function getGameDataErrors(data: GameData): string[] {
   }
   addBooleanError(errors, data.rules?.starting_selection_confirmed, "rules.starting_selection_confirmed");
   addPositiveIntError(errors, data.rules?.starting_dungeon_level, "rules.starting_dungeon_level");
+  addPositiveIntError(errors, data.rules?.max_hero_upgrade_level, "rules.max_hero_upgrade_level");
+  addPositiveIntError(errors, data.rules?.deckbuilder_target_count, "rules.deckbuilder_target_count");
+  addPositiveIntError(errors, data.rules?.deckbuilder_min_monster_count, "rules.deckbuilder_min_monster_count");
   addPositiveIntError(errors, data.rules?.dungeon_level_increment_per_refill, "rules.dungeon_level_increment_per_refill");
   addPositiveIntError(errors, data.rules?.ultimate_charge_required, "rules.ultimate_charge_required");
   addPositiveIntError(errors, data.rules?.ultimate_charge_per_move, "rules.ultimate_charge_per_move");
@@ -868,6 +976,14 @@ export function renderConfigModule(data: GameData): string {
     validateString(hero.sprite, `heroes[${index}].sprite`);
     validatePositiveInt(hero.base_max_hp, `heroes[${index}].base_max_hp`);
     validateNonNegativeInt(hero.unlock_cost, `heroes[${index}].unlock_cost`);
+    const ultimateKind = renderUltimateKind(
+      validateString(hero.ultimate_kind, `heroes[${index}].ultimate_kind`),
+      `heroes[${index}].ultimate_kind`,
+    );
+    const ultimateChargeRequired = validatePositiveInt(
+      hero.ultimate_charge_required,
+      `heroes[${index}].ultimate_charge_required`,
+    );
     const upgrades = heroUpgradesFor(data, heroId).map((upgrade, upgradeIndex) => {
       validatePositiveInt(upgrade.cost, `hero_upgrades["${heroId}"][${upgradeIndex}].cost`);
       validatePositiveInt(upgrade.max_hp, `hero_upgrades["${heroId}"][${upgradeIndex}].max_hp`);
@@ -875,36 +991,45 @@ export function renderConfigModule(data: GameData): string {
     });
     const renderedUpgrades = renderTypedListHelpers(`generated_hero_${index}_upgrades`, "Upgrade", upgrades);
     helperDefs.push(...renderedUpgrades.defs);
-    return `hero_def{${bendString(heroId)}, ${bendString(heroName)}, ${bendString(hero.sprite)}, ${hero.base_max_hp}, ${hero.unlock_cost}, ${hero.starts_unlocked ? 1 : 0}, ${renderedUpgrades.expr}}`;
+    return `hero_def{${bendString(heroId)}, ${bendString(heroName)}, ${bendString(hero.sprite)}, ${hero.base_max_hp}, ${hero.unlock_cost}, ${hero.starts_unlocked ? 1 : 0}, ${renderedUpgrades.expr}, ${ultimateKind}, ${ultimateChargeRequired}}`;
   });
 
   const monsterDefs = data.monsters.map((monster, index) => {
     const monsterId = validateString(monster.id, `monsters[${index}].id`);
     const monsterName = requireContent(data, monsterNameKey(monsterId));
     validateString(monster.sprite, `monsters[${index}].sprite`);
-    validatePositiveInt(monster.gold_drop, `monsters[${index}].gold_drop`);
+    const monsterClass = renderMonsterClass(validateString(monster.class, `monsters[${index}].class`), `monsters[${index}].class`);
+    const monsterRarity = renderMonsterCardRarity(validateString(monster.rarity, `monsters[${index}].rarity`), `monsters[${index}].rarity`);
+    const monsterTier = validatePositiveInt(monster.tier, `monsters[${index}].tier`);
+    const goldLevels = monster.gold_by_level.map((value, levelIndex) =>
+      String(validatePositiveInt(value, `monsters[${index}].gold_by_level[${levelIndex}]`))
+    );
     const hpLevels = monster.hp_by_level.map((value, levelIndex) =>
       String(validatePositiveInt(value, `monsters[${index}].hp_by_level[${levelIndex}]`))
     );
+    const renderedGoldLevels = renderTypedListHelpers(`generated_monster_${index}_gold_levels`, "U32", goldLevels);
     const renderedHpLevels = renderTypedListHelpers(`generated_monster_${index}_hp_levels`, "U32", hpLevels);
+    helperDefs.push(...renderedGoldLevels.defs);
     helperDefs.push(...renderedHpLevels.defs);
-    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${monster.gold_drop}, ${renderedHpLevels.expr}}`;
+    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${monsterClass}, ${monsterTier}, ${monsterRarity}, ${renderedGoldLevels.expr}, ${renderedHpLevels.expr}}`;
   });
 
   const swordDefs = data.weapons.map((weapon, index) => {
     const weaponId = validateString(weapon.id, `weapons[${index}].id`);
     const weaponName = requireContent(data, weaponNameKey(weaponId));
     validateString(weapon.sprite, `weapons[${index}].sprite`);
+    const weaponRarity = renderEquipmentCardRarity(validateString(weapon.rarity, `weapons[${index}].rarity`), `weapons[${index}].rarity`);
     validatePositiveInt(weapon.dmg, `weapons[${index}].dmg`);
-    return `sword_def{${bendString(weaponName)}, ${bendString(weapon.sprite)}, ${weapon.dmg}}`;
+    return `sword_def{${bendString(weaponName)}, ${bendString(weapon.sprite)}, ${weaponRarity}, ${weapon.dmg}}`;
   });
 
   const potionDefs = data.potions.map((potion, index) => {
     const potionId = validateString(potion.id, `potions[${index}].id`);
     const potionName = requireContent(data, potionNameKey(potionId));
     validateString(potion.sprite, `potions[${index}].sprite`);
+    const potionRarity = renderConsumableCardRarity(validateString(potion.rarity, `potions[${index}].rarity`), `potions[${index}].rarity`);
     validatePositiveInt(potion.heal, `potions[${index}].heal`);
-    return `potion_def{${bendString(potionName)}, ${bendString(potion.sprite)}, ${potion.heal}}`;
+    return `potion_def{${bendString(potionName)}, ${bendString(potion.sprite)}, ${potionRarity}, ${potion.heal}}`;
   });
 
   const baseDeck = data.decks.base_deck.map((entry, index) => {
@@ -991,6 +1116,9 @@ export function renderConfigModule(data: GameData): string {
     "import Dungeon/Config as Config",
     "import Dungeon/HeroDef as HeroDef",
     "import Dungeon/Upgrade as Upgrade",
+    "import Dungeon/MonsterClass as MonsterClass",
+    "import Dungeon/CardRarity as CardRarity",
+    "import Dungeon/LootRarity as LootRarity",
     "import Dungeon/MonsterDef as MonsterDef",
     "import Dungeon/SwordDef as SwordDef",
     "import Dungeon/PotionDef as PotionDef",
@@ -1037,6 +1165,15 @@ export function renderRulesModule(data: GameData): string {
     "",
     "def generated_starting_dungeon_level() -> U32:",
     `  ${data.rules.starting_dungeon_level}`,
+    "",
+    "def generated_max_hero_upgrade_level() -> U32:",
+    `  ${data.rules.max_hero_upgrade_level}`,
+    "",
+    "def generated_deckbuilder_target_count() -> U32:",
+    `  ${data.rules.deckbuilder_target_count}`,
+    "",
+    "def generated_deckbuilder_min_monster_count() -> U32:",
+    `  ${data.rules.deckbuilder_min_monster_count}`,
     "",
     "def generated_dungeon_level_increment_per_refill() -> U32:",
     `  ${data.rules.dungeon_level_increment_per_refill}`,

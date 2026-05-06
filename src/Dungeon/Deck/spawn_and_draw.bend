@@ -14,7 +14,7 @@ import Dungeon/rules/dungeon_level_increment_per_refill as dungeon_level_increme
 def _spawn_tile(config_value: Config, entry: DeckEntry, level: U32) -> Tile:
   match config_value entry:
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} monster_entry{ref, count}:
-      monster{ref, _monster_hp(monsters, ref, level)}
+      monster{ref, _monster_hp(monsters, ref, level), level}
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} sword_entry{ref, count}:
       sword{ref, _sword_damage(swords, ref)}
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} potion_entry{ref, count}:

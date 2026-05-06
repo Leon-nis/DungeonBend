@@ -1,0 +1,348 @@
+Ultimate shadow_step - plano final
+
+Objetivo
+- Implementar uma ultimate de duas instancias orientada por `ultimate_kind`.
+- O heroi nao e a fonte da regra; a source of truth e a ultimate configurada em `HeroDef`.
+- Primeira ativacao: arma a sombra.
+- Primeiro movimento valido apos armar: a posicao de origem do heroi recebe uma `shadow`.
+- Segunda ativacao: o heroi retorna para a `shadow`.
+- Enquanto a sombra existir, a carga da ultimate fica congelada e nao acumula pontos.
+
+Resumo da regra
+- Custo da ultimate vem de `HeroDef.ultimate_charge_required`.
+- Para a branch atual:
+  - `adventurer`: `refill`, custo `8`
+  - `gato_de_botas`: `shadow_step`, custo `4`
+- Primeira ativacao de `shadow_step`:
+  - toca a cinematic normal
+  - `ult_charge` volta para `0`
+  - entra em estado armado
+- Primeiro movimento apos isso:
+  - nao chama `draw_tile`
+  - nao consome RNG
+  - nao altera `draw_counts`
+  - a posicao de origem recebe `shadow`
+- Enquanto a `shadow` existir:
+  - o heroi nao ganha carga de ultimate
+  - a `shadow` participa normalmente do board e do `shift`
+- Segunda ativacao:
+  - nao depende de recarregar custo
+  - teleporta o heroi para a `shadow`
+  - remove a `shadow`
+  - a posicao antiga do heroi recebe `1` carta real via `draw_tile`
+  - `ult_charge` volta para `0`
+- Se o jogador entrar na `shadow` por movimento normal:
+  - a `shadow` e consumida
+  - a posicao antiga do heroi recebe `1` carta real via `draw_tile`
+  - a carga continua em `0` e volta a acumular apenas depois que o ciclo termina
+
+Decisao de modelagem
+- A `shadow` nao deve entrar em `pick_entry`.
+- `pick_entry` e `draw_counts` continuam representando apenas cartas reais do deck.
+- A `shadow` deve existir como `Tile` real no board.
+- O custo da ultimate e o comportamento base ficam em `HeroDef`.
+- O runtime faz dispatch por `ultimate_kind`.
+- Diferenca da `shadow` para cartas normais:
+  - sua criacao nao chama `draw_tile`
+  - sua criacao nao altera `seed`
+  - sua criacao nao altera `remaining`
+  - sua criacao nao altera `draw_counts`
+- Depois de criada, ela participa normalmente do `shift` do board.
+
+Estruturas novas
+
+1. Tile
+- Adicionar em `Tile`:
+  - `shadow{}`
+
+2. Estado da ultimate no Run
+- Adicionar no `Run` um estado explicito de ultimate:
+  - `ultimate_state_idle{}`
+  - `ultimate_state_shadow_armed{}`
+  - `ultimate_state_shadow_live{}`
+- `ultimate_state_idle`:
+  - nao existe ciclo especial ativo
+- `ultimate_state_shadow_armed`:
+  - primeira ativacao ocorreu
+  - aguardando primeiro movimento valido
+- `ultimate_state_shadow_live`:
+  - a sombra esta viva no board
+  - a posicao atual dela e lida do proprio board
+
+Fluxo de runtime
+
+1. Primeira ativacao da ultimate
+- Se `ultimate_kind == ultimate_shadow_step{}` e estado for `ultimate_state_idle{}`:
+  - iniciar cinematic normal
+  - ao resolver o uso:
+    - `ult_charge = 0`
+    - `ultimate_state = ultimate_state_shadow_armed{}`
+  - nenhuma mudanca imediata no board
+
+2. Primeiro movimento apos armar
+- Quando o jogador fizer um movimento valido em estado `ultimate_state_shadow_armed{}`:
+  - o heroi resolve o alvo normalmente
+  - o alvo some do board
+  - a posicao de origem do heroi vira `shadow{}`
+  - nao ocorre o `shift_after_move(...)` normal nesse turno especial
+  - nao ocorre `draw_tile`
+  - `seed`, `remaining` e `draw_counts` permanecem identicos
+  - `ultimate_state = ultimate_state_shadow_live{}`
+
+3. Movimentos normais com shadow viva
+- Se `ultimate_state_shadow_live` estiver ativo e o jogador nao interagir com a sombra:
+  - o jogo segue normalmente
+  - `draw_tile` acontece quando o fluxo atual mandaria acontecer
+  - a `shadow` participa do `shift`
+
+4. Consumir a shadow por movimento
+- Se o jogador mover para o tile `shadow{}`:
+  - a sombra desaparece
+  - o heroi ocupa o slot da sombra
+  - a posicao antiga do heroi recebe `1` carta real via `draw_tile`
+  - `ultimate_state = ultimate_state_idle{}`
+  - a carga continua em `0`
+
+5. Segunda ativacao da ultimate
+- Se o jogador clicar `ultimate{}` enquanto `ultimate_state_shadow_live{}` estiver ativo:
+  - nao checar custo novamente
+  - nao toca a cinematic novamente
+  - teletransportar o heroi para o slot da sombra
+  - remover a `shadow`
+  - a posicao antiga do heroi recebe `1` carta real via `draw_tile`
+  - `ult_charge = 0`
+  - `ultimate_state = ultimate_state_idle{}`
+
+Regra de carga da ultimate
+- Qualquer `ultimate_kind` que nao seja `ultimate_shadow_step{}`:
+  - continuam usando a regra atual
+- `ultimate_shadow_step{}`:
+  - `ultimate_state_idle`:
+    - ganha carga normalmente
+  - `ultimate_state_shadow_armed`:
+    - carga congelada
+  - `ultimate_state_shadow_live`:
+    - carga congelada
+- Resultado:
+  - qualquer ciclo de sombra sempre termina em `0/4`
+  - os movimentos feitos entre a primeira e a segunda instancia nao acumulam pontos
+
+Relacao com RNG
+- Primeira ativacao:
+  - `0` draws
+  - `0` alteracao de RNG
+- Primeiro movimento que cria a sombra:
+  - `0` draws
+  - `0` alteracao de RNG
+- Movimentos normais enquanto a sombra existe:
+  - funcionamento normal do board
+- Consumir a sombra por movimento:
+  - `1` draw real
+- Reativar a ultimate para voltar:
+  - `1` draw real
+
+Arquivos afetados
+
+1. Tipos e estado
+- `src/Dungeon/_.bend`
+  - adicionar `shadow{}` em `Tile`
+  - adicionar `UltimateKind`
+  - adicionar `UltimateState`
+  - expandir `HeroDef` com `ultimate_kind` e `ultimate_charge_required`
+  - adicionar estado da ultimate no `Run`
+
+2. Uso da ultimate
+- `src/Dungeon/App/use_ultimate.bend`
+  - fazer dispatch por `ultimate_kind`
+
+3. Update do running
+- `src/Dungeon/App/update_running.bend`
+  - checar custo por hero data
+  - permitir segunda ativacao enquanto `ultimate_state_shadow_live`
+  - bloquear acumulo de carga durante `ultimate_state_shadow_armed` e `ultimate_state_shadow_live`
+
+4. Movimento e interacao com tiles
+- `src/Dungeon/Run/apply_to_tile.bend`
+  - branch para:
+    - primeiro movimento em `ultimate_state_shadow_armed`
+    - consumo de `shadow` por movimento
+    - retorno por segunda ativacao
+
+5. Shift do board
+- manter `shift_after_move(...)` intacto
+- a sombra passa a ser um `Tile` real e por isso ja participa do `shift`
+
+6. Persistencia
+- `src/Dungeon/run_snapshot_to_string.bend`
+- `src/Dungeon/parse_saved_run.bend`
+  - salvar/restaurar `UltimateState`
+  - salvar/restaurar `shadow{}`
+
+7. View
+- `src/Dungeon/View/cards.bend`
+- `src/Dungeon/View/board.bend`
+- `src/Dungeon/View/assets_and_labels.bend`
+  - render da `shadow` como slot vazio, sem sprite por enquanto
+  - botao de ultimate entra em modo de retorno na segunda instancia
+
+Asserts
+
+Vale a pena definir asserts?
+- Sim.
+- Esta feature cruza estado de board, RNG, draw, carga de ultimate e fluxo especial por heroi.
+- Sem asserts, e muito facil introduzir bugs sutis onde:
+  - o deck perde carta sem draw visual
+  - o RNG avanca quando nao devia
+  - a ultimate volta a acumular durante a sombra
+  - a sombra sai do board mas continua viva no estado
+  - o runtime passa a depender do heroi em vez de depender do `ultimate_kind`
+
+Asserts recomendados
+
+1. Armar sombra nao altera RNG
+- Ao usar a primeira ativacao de `ultimate_shadow_step`:
+  - `seed` nao muda
+  - `draw_counts` nao mudam
+  - `remaining` nao muda
+  - `ult_charge` vira `0`
+  - `ultimate_state = ultimate_state_shadow_armed{}`
+
+2. Primeiro movimento cria shadow sem draw
+- No primeiro movimento valido apos `ultimate_state_shadow_armed`:
+  - a origem vira `shadow{}`
+  - `seed` permanece igual
+  - `draw_counts` permanecem iguais
+  - `remaining` permanece igual
+  - `ultimate_state = ultimate_state_shadow_live{}`
+
+3. Shadow entra no shift normal
+- Se uma linha/coluna com `shadow{}` for deslocada:
+  - o tile `shadow{}` deve continuar existindo no board
+
+4. Shadow bloqueia ganho de charge
+- Em `ultimate_state_shadow_armed` e `ultimate_state_shadow_live`:
+  - movimentos nao aumentam `ult_charge`
+
+5. Consumir shadow por movimento faz draw real
+- Ao entrar na `shadow` por swipe:
+  - `shadow` desaparece
+  - o heroi ocupa o slot dela
+  - a origem do heroi recebe 1 tile real vindo de `draw_tile`
+  - `seed` avanca exatamente 1 draw
+  - `ultimate_state = ultimate_state_idle{}`
+
+6. Segunda ativacao retorna para shadow
+- Ao clicar ultimate com `ultimate_state_shadow_live`:
+  - o heroi vai para o slot da `shadow`
+  - a `shadow` desaparece
+  - a posicao antiga do heroi recebe 1 tile real
+  - `seed` avanca exatamente 1 draw
+  - `ult_charge = 0`
+  - `ultimate_state = ultimate_state_idle{}`
+
+7. Uma troca de ultimate move as regras junto
+- Se outro heroi receber `ultimate_shadow_step` nos dados:
+  - ele deve herdar:
+    - armamento
+    - freeze de carga
+    - segunda ativacao
+    - retorno via `shadow`
+- Se `gato_de_botas` receber outra ultimate:
+  - ele deve perder essas regras especiais automaticamente
+
+8. Uma ultimate nao-shadow continua intacta
+- Um heroi com `ultimate_refill`:
+  - ainda faz refill completo
+  - nao recebe estado de sombra
+
+UI
+
+View
+- A `shadow` usa `Tile.shadow{}` e aparece como um slot vazio, sem sprite, ate existir asset dedicado.
+- A sombra nao entra no deckbuilder, nem em `draw_counts`; ela e apenas runtime de board.
+
+Botao de ultimate
+- Primeira instancia:
+  - comportamento visual igual a uma ultimate normal
+  - ao resolver a cinematic, entra em modo armado
+- Segunda instancia:
+  - com `ultimate_state_shadow_live`, o botao continua habilitado mesmo em `0/x`
+  - o label deve indicar retorno em vez de progresso puro
+  - ao clicar, o heroi volta para a `shadow` e o ciclo fecha em `0/x`
+
+UI / View
+
+Objetivo visual
+- A ultimate do gato precisa comunicar claramente que e uma ultimate de duas instancias.
+- O jogador precisa entender:
+  - quando a sombra esta armada
+  - quando a sombra esta viva no board
+  - que o segundo uso retorna para a sombra
+
+1. Botao de ultimate
+- Estado normal:
+  - label atual de ultimate
+  - contador `x/4` para o gato
+- Estado `shadow_armed`:
+  - botao continua visivelmente “ativo”, mas com texto auxiliar:
+    - `Shadow armed`
+- Estado `shadow_live`:
+  - botao muda semanticamente para retorno:
+    - label: `Return`
+    - ou `Shadow Return`
+  - nao exibir progresso de carga normal durante esse estado
+
+2. Indicacao da shadow no board
+- A `shadow` deve ter sprite ou frame proprio
+- Leitura visual desejada:
+  - mais leve que uma carta real
+  - claramente provisoria
+  - reconhecivel como ancora de retorno
+- Sugestao:
+  - silhouette do heroi
+  - opacidade menor
+  - moldura distinta
+
+3. Feedback de transicao
+- Primeira ativacao:
+  - cinematic normal
+- Primeiro movimento:
+  - origem vira shadow com feedback visual curto
+- Segunda ativacao:
+  - teleporte curto do heroi para a sombra
+  - a posicao antiga recebe a nova carta
+
+4. Copy curta para o jogador
+- Descricao de ultimate sugerida:
+  - `Mark your shadow. Your next move leaves a return point. Use Ultimate again to return.`
+- Comportamento implicito:
+  - enquanto a sombra existir, a ultimate nao recarrega
+
+Exemplo operacional
+
+Estado inicial
+[m][m][m]
+[m][m][m]
+[m][h][m]
+
+Depois do primeiro uso e do primeiro movimento
+[m][m][m]
+[m][h][m]
+[m][s][m]
+
+Depois de movimentos normais com shift
+[m][h][m]
+[m][s][m]
+[m][n][m]
+
+Segunda ativacao
+- `h` volta para `s`
+- `s` desaparece
+- a antiga posicao do heroi recebe `1` carta real por `draw_tile`
+
+Decisao final
+- O melhor desenho para esta feature e:
+  - `shadow` como tile real do board
+  - estado explicito no `Run`
+  - RNG preservado pela supressao de draw apenas na criacao da sombra
+  - assert forte sobre seed, draw_counts, remaining e charge

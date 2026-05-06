@@ -1,0 +1,114 @@
+DungeonBend / branch status consolidado
+
+Este arquivo junta os topicos principais trabalhados nesta branch, unificando os blocos de texto da raiz em um resumo unico e coerente.
+
+1. Base estrutural / Bend2
+- Ajustes de build e geracao para compatibilidade com o Bend2 mais novo.
+- `scripts/build.sh`, `scripts/build.ts` e `scripts/generate-dungeon-view-css.ts` passaram a participar mais diretamente do pipeline.
+- `scripts/dungeon-data.ts` ganhou mais responsabilidade na validacao e na geracao de codigo Bend.
+- O codigo gerado em `src/Dungeon/generated_*.bend` foi reorganizado para suportar blocos auxiliares maiores.
+- Houve refactor amplo de imports, aliases e organizacao de modulos em `src/Dungeon/**` e `src/Midum/**`.
+- A camada Midum / DOM e o runtime JS gerado tambem foram ajustados para o formato novo.
+
+2. Deckbuilder
+- Foi criada uma scene de deckbuilder com dual list entre `DECK` e `ARMAZEM`.
+- O fluxo de deck salvo passou a ser usado de forma real pelo jogo.
+- O deckbuilder ganhou keymap de navegacao:
+  - `Up/Down` troca selecao
+  - `Left/Right` move 1 unidade
+  - `Tab` troca a lista ativa
+- A UI de scroll foi removida; a navegacao visual agora depende apenas de selecao e keymap.
+- O `SAVE` foi reposicionado e o layout passou por varios ajustes de espacamento.
+- As linhas das cartas agora usam coloracao por raridade via flag real da carta.
+
+3. Regras do deck
+- A validacao do deck foi centralizada em helpers dedicados.
+- O deck precisa respeitar quantidade alvo de cartas e minimo de monsters.
+- Tentativas invalidas de salvar ou adicionar cartas exibem aviso imediato no topo do painel do deck.
+- O `START` do menu tambem passou a respeitar a mesma validacao do deck salvo.
+- O bug de criar cartas ao tentar adicionar unidade esgotada no armazem foi corrigido e coberto por assert.
+
+4. Rules data-driven
+- `rules.json` agora controla regras que antes estavam hardcoded no runtime.
+- Campos atuais ligados de forma real:
+  - `max_hero_upgrade_level`
+  - `deckbuilder_target_count`
+  - `deckbuilder_min_monster_count`
+- `scripts/dungeon-data.ts` valida esses campos e gera `src/Dungeon/generated_rules.bend`.
+- `src/Dungeon/rules.bend` expoe os helpers para o restante do jogo.
+
+5. Progressao de heroi
+- O limite maximo de upgrade do heroi deixou de ser apenas implicito pelo comprimento de `hero_upgrades`.
+- Foi criada a camada `src/Dungeon/hero_progression_helpers.bend`.
+- UI, calculo de HP e fluxo de upgrade agora usam `rules.max_hero_upgrade_level`.
+- Saves antigos acima do teto sao tratados com clamp em tempo de uso.
+- O build falha se `hero_upgrades` nao tiver upgrades suficientes para sustentar o maximo configurado.
+- `data/game/hero_upgrades.json` foi ampliado para suportar 10 niveis visiveis de heroi.
+
+6. Monstros
+- `MonsterDef` foi refatorado para carregar dados mais explicitos:
+  - `class_kind`
+  - `tier`
+  - `rarity`
+  - `gold_by_level`
+  - `hp_by_level`
+- A classe do monstro deixou de depender de heuristica espalhada por `ref`.
+- O `orc` foi tratado como `monster normal`.
+
+7. Spawn level e escalas
+- Tiles de monster agora guardam `spawn_level`.
+- O drop de gold do monstro usa o `spawn_level`, nao o level atual da dungeon.
+- Isso prepara o runtime para futuras mecanicas que dependam do level de origem do monster.
+
+8. Raridade de cartas
+- A raridade deixou de ser inferida por `ref` ou por heuristicas de `weight` em pontos criticos.
+- Foram introduzidos tipos explicitos:
+  - `CardRarity`
+  - `LootRarity`
+- `MonsterDef`, `SwordDef` e `PotionDef` agora carregam essa informacao.
+- O booster background passou a usar a flag de raridade da carta, em vez de heuristica por peso do pack.
+- No deckbuilder, `card_rarity_monster{}` e tratado visualmente como `common`.
+
+9. Ultimate data-driven
+- A source of truth da ultimate deixou de ser implicita por heroi e passou a viver no `HeroDef`.
+- `data/game/heroes.json` agora declara:
+  - `ultimate_kind`
+  - `ultimate_charge_required`
+- O runtime passou a fazer dispatch por ultimate, nao por nome do heroi.
+- Isso permite trocar a ultimate entre herois no editor futuramente sem duplicar regra hardcoded.
+
+10. Shadow step
+- Foi implementada a base da ultimate `shadow_step`.
+- Na primeira ativacao:
+  - a cinematic normal toca
+  - a ultimate entra em estado armado
+  - a carga volta para `0`
+- No primeiro movimento valido apos armar:
+  - a origem do heroi vira `shadow{}`
+  - nao ocorre `draw_tile`
+  - `seed`, `remaining` e `draw_counts` nao mudam
+- Enquanto a shadow existir:
+  - a carga da ultimate fica congelada
+  - a shadow participa normalmente do board e do shift
+- Na segunda ativacao, ou ao mover para a shadow:
+  - o heroi retorna para a shadow
+  - a shadow e consumida
+  - a posicao antiga do heroi recebe `1` draw real
+  - a carga volta para `0`
+
+11. Estado da run e persistencia
+- `Run` ganhou `UltimateState` para modelar o ciclo especial da ultimate:
+  - `ultimate_state_idle{}`
+  - `ultimate_state_shadow_armed{}`
+  - `ultimate_state_shadow_live{}`
+- `Tile` ganhou `shadow{}` como tile real de board.
+- Save/load da run foi atualizado para serializar:
+  - o estado da ultimate
+  - o tile `shadow{}`
+- A shadow por enquanto nao usa sprite dedicado; ela renderiza como slot vazio.
+
+12. Observacao de consistencia
+- Nesta branch, so foram expostas como configuraveis no editor as regras que o runtime realmente consome.
+- `deckbuilder_target_count`, `deckbuilder_min_monster_count` e `max_hero_upgrade_level` ja estao ligados de ponta a ponta.
+- `ultimate_kind` e `ultimate_charge_required` agora tambem estao ligados de ponta a ponta.
+- A direcao mantida na branch foi evitar UI prometendo regras que o jogo ainda nao consome.

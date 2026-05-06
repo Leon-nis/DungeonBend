@@ -8,6 +8,7 @@ import Dungeon/App/key_event as key_event
 import Dungeon/View/assets_and_labels/_dungeon_bg as _dungeon_bg
 import Dungeon/View/menu/_render_menu as _render_menu
 import Dungeon/View/menu/_render_character_select as _render_character_select
+import Dungeon/View/deckbuilder/_render_deckbuilder as _render_deckbuilder
 import Dungeon/View/boosters/_render_boosters as _render_boosters
 import Dungeon/View/ultimate_preview/_render_ultimate_preview as _render_ultimate_preview
 import Dungeon/View/board/_render_dungeon as _render_dungeon
@@ -39,6 +40,8 @@ def _screen_root(meta_state: Meta, scene_value: Scene, ui_value: UiState) -> HTM
       _render_menu(meta_state)
     case character_select{preview_hero}:
       _render_character_select(meta_state, preview_hero)
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
+      _render_deckbuilder(meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice)
     case boosters{reward, reveal_index, return_to}:
       _render_boosters(meta_state, reward, reveal_index)
     case ultimate_preview{fx}:
@@ -67,5 +70,5 @@ def _render_ultimate_cinematic_overlay(run_value: Run) -> HTML(DungeonEvent):
 
 def _run_hero_ref(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       hero_ref

@@ -16,8 +16,11 @@ import Dungeon/App/state_helpers/_state as _state
 import Dungeon/App/ui_fx/_next_ui_from_turn as _next_ui_from_turn
 import Dungeon/App/ui_fx/_advance_with_charge as _advance_with_charge
 import Dungeon/App/ui_fx/_step_ui_fx as _step_ui_fx
+import Dungeon/App/use_ultimate as use_ultimate
 import Dungeon/UltimateCutins/duration_ticks_for_hero_ref as duration_ticks_for_hero_ref
-import Dungeon/rules/ultimate_charge_required as ultimate_charge_required
+import Dungeon/ultimate_helpers/run_ultimate_ready as run_ultimate_ready
+import Dungeon/ultimate_helpers/run_ultimate_state as run_ultimate_state
+import Dungeon/ultimate_helpers/ultimate_state_is_shadow_live as ultimate_state_is_shadow_live
 
 def _state_from_swipe(result: SwipeResult, current_run: Run, next_seed_value: U32, current_ui: UiState, dir: Direction) -> DungeonState:
   match result:
@@ -36,29 +39,14 @@ def _apply_turn(meta_state: Meta, run_value: Run, next_seed_value: U32, dir: Dir
 
 def _run_hero_ref(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       hero_ref
 
 def _start_ultimate_cinematic(meta_state: Meta, run_value: Run, next_seed_value: U32, ui_value: UiState) -> DungeonState:
   _state(meta_state, ultimate_cinematic{run_value, duration_ticks_for_hero_ref(_run_hero_ref(run_value))}, next_seed_value, ui_value)
 
-def _ultimate_ready_charge(ult_charge: U32) -> U32:
-  _ultimate_ready_charge_flag(ult_charge < ultimate_charge_required())
-
-def _ultimate_ready_charge_flag(charge_lt_required: U32) -> U32:
-  match charge_lt_required:
-    case 0:
-      1
-    case _:
-      0
-
 def _ultimate_ready(run_value: Run) -> U32:
-  _ultimate_ready_match(run_value)
-
-def _ultimate_ready_match(run_value: Run) -> U32:
-  match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
-      _ultimate_ready_charge(ult_charge)
+  run_ultimate_ready(run_value)
 
 def _update_running_ultimate(meta_state: Meta, run_value: Run, next_seed_value: U32, ui_value: UiState) -> DungeonState:
   _update_running_ultimate_ready(_ultimate_ready(run_value), meta_state, run_value, next_seed_value, ui_value)
@@ -68,7 +56,14 @@ def _update_running_ultimate_ready(ultimate_ready_value: U32, meta_state: Meta, 
     case 0:
       _state(meta_state, running{run_value}, next_seed_value, ui_value)
     case _:
+      _update_running_ultimate_live(ultimate_state_is_shadow_live(run_ultimate_state(run_value)), meta_state, run_value, next_seed_value, ui_value)
+
+def _update_running_ultimate_live(shadow_live: U32, meta_state: Meta, run_value: Run, next_seed_value: U32, ui_value: UiState) -> DungeonState:
+  match shadow_live:
+    case 0:
       _start_ultimate_cinematic(meta_state, run_value, next_seed_value, ui_value)
+    case _:
+      use_ultimate(meta_state, run_value, next_seed_value)
 
 def update_running(evt: DungeonEvent, meta_state: Meta, run_value: Run, next_seed_value: U32, ui_value: UiState) -> DungeonState:
   match evt:

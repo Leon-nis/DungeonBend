@@ -10,8 +10,15 @@ type HeroDef {
     base_max_hp: U32,
     unlock_cost: U32,
     starts_unlocked: U32,
-    upgrades: List(Upgrade)
+    upgrades: List(Upgrade),
+    ultimate_kind: UltimateKind,
+    ultimate_charge_required: U32
   }
+}
+
+type UltimateKind {
+  ultimate_refill{}
+  ultimate_shadow_step{}
 }
 
 type PresentationAlign {
@@ -31,16 +38,35 @@ type HeroPresentation {
   }
 }
 
+type MonsterClass {
+  monster_normal{}
+  monster_champion{}
+  monster_boss{}
+}
+
+type LootRarity {
+  loot_common{}
+  loot_uncommon{}
+  loot_rare{}
+  loot_epic{}
+}
+
+type CardRarity {
+  card_rarity_monster{}
+  card_rarity_consumable{loot_rarity: LootRarity}
+  card_rarity_equipment{loot_rarity: LootRarity}
+}
+
 type MonsterDef {
-  monster_def{name: String, sprite: String, gold_drop: U32, hp_levels: List(U32)}
+  monster_def{name: String, sprite: String, class_kind: MonsterClass, tier: U32, rarity: CardRarity, gold_levels: List(U32), hp_levels: List(U32)}
 }
 
 type SwordDef {
-  sword_def{name: String, sprite: String, dmg: U32}
+  sword_def{name: String, sprite: String, rarity: CardRarity, dmg: U32}
 }
 
 type PotionDef {
-  potion_def{name: String, sprite: String, heal: U32}
+  potion_def{name: String, sprite: String, rarity: CardRarity, heal: U32}
 }
 
 type DeckEntry {
@@ -98,10 +124,17 @@ type Weapon {
 
 type Tile {
   none{}
-  monster{ref: U32, hp: U32}
+  shadow{}
+  monster{ref: U32, hp: U32, spawn_level: U32}
   sword{ref: U32, dmg: U32}
   potion{ref: U32, heal: U32}
   gold{amount: U32}
+}
+
+type UltimateState {
+  ultimate_state_idle{}
+  ultimate_state_shadow_armed{}
+  ultimate_state_shadow_live{}
 }
 
 type Board {
@@ -155,6 +188,7 @@ type Meta {
     selection_confirmed: U32,
     gold: U32,
     bonus_deck: List(DeckEntry),
+    selected_deck: List(DeckEntry),
     pack_inventory: List(PackInventoryEntry),
     hero_profiles: List(HeroProfile)
   }
@@ -186,7 +220,8 @@ type Run {
     capacity: U32,
     seed: U32,
     ult_charge: U32,
-    hero_ref: U32
+    hero_ref: U32,
+    ultimate_state: UltimateState
   }
 }
 
@@ -204,9 +239,27 @@ type BoosterReturn {
   booster_return_character_select{preview_hero: U32}
 }
 
+type DeckbuilderSelection {
+  no_deckbuilder_selection{}
+  deckbuilder_selection{card: CardRef}
+}
+
+type DeckbuilderNotice {
+  no_deckbuilder_notice{}
+  deckbuilder_notice{text: String}
+}
+
 type Scene {
   setup{}
   character_select{preview_hero: U32}
+  deckbuilder{
+    draft_deck: List(DeckEntry),
+    deck_selection: DeckbuilderSelection,
+    stash_selection: DeckbuilderSelection,
+    deck_scroll: U32,
+    stash_scroll: U32,
+    action_notice: DeckbuilderNotice
+  }
   boosters{reward: PackReward, reveal_index: U32, return_to: BoosterReturn}
   ultimate_preview{fx: UltimatePreviewFx}
   ultimate_cinematic{run: Run, ticks_remaining: U32}
@@ -297,6 +350,20 @@ type DungeonEvent {
   upgrade{}
   open_character_select{}
   close_character_select{}
+  open_deckbuilder{}
+  close_deckbuilder{}
+  save_deckbuilder{}
+  deckbuilder_toggle_list{}
+  deckbuilder_select_deck{card: CardRef}
+  deckbuilder_select_stash{card: CardRef}
+  deckbuilder_scroll_deck_up{}
+  deckbuilder_scroll_deck_down{}
+  deckbuilder_scroll_stash_up{}
+  deckbuilder_scroll_stash_down{}
+  deckbuilder_add_one{}
+  deckbuilder_add_all{}
+  deckbuilder_remove_one{}
+  deckbuilder_remove_all{}
   open_ultimate_preview{}
   close_ultimate_preview{}
   preview_character{ref: U32}

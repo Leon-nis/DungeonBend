@@ -8,6 +8,7 @@ import Dungeon/DungeonState as DungeonState
 import Dungeon/default_ui as default_ui
 import Dungeon/App/update_setup as update_setup
 import Dungeon/App/update_character_select as update_character_select
+import Dungeon/App/update_deckbuilder as update_deckbuilder
 import Dungeon/App/update_boosters as update_boosters
 import Dungeon/App/update_ultimate_preview as update_ultimate_preview
 import Dungeon/App/update_running as update_running
@@ -23,6 +24,8 @@ def _next_state_scene(evt: DungeonEvent, state: DungeonState) -> DungeonState:
       update_setup(evt, meta_state, next_seed_value, ui_value)
     case dungeon{game_state{meta_state, character_select{preview_hero}, next_seed_value}, ui_value}:
       update_character_select(evt, meta_state, preview_hero, next_seed_value, ui_value)
+    case dungeon{game_state{meta_state, deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}, next_seed_value}, ui_value}:
+      update_deckbuilder(evt, meta_state, draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, next_seed_value, ui_value)
     case dungeon{game_state{meta_state, boosters{reward, reveal_index, return_to}, next_seed_value}, ui_value}:
       update_boosters(evt, meta_state, reward, reveal_index, return_to, next_seed_value, ui_value)
     case dungeon{game_state{meta_state, ultimate_preview{fx}, next_seed_value}, ui_value}:

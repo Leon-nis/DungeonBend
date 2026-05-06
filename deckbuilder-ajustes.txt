@@ -1,0 +1,31 @@
+1. Registrar os passos decididos para os ajustes do deckbuilder neste arquivo.
+2. Remover a coluna ID das listas DECK e ARMAZEM.
+3. Renomear a coluna META para TIER nas duas listas.
+4. Exibir tier de monstros na coluna TIER.
+5. Exibir "nulo" na coluna TIER para equipamentos e consumiveis.
+6. Ajustar o layout/CSS das linhas para refletir a nova estrutura das colunas.
+7. Gerar o build para validar a integracao.
+
+Atualizacoes posteriores na branch
+
+8. Remover a dependencia dos assets de botoes e scroll da scene do deckbuilder e reconstruir os controles com Midum.
+9. Corrigir a direcao dos botoes de transferencia e scroll.
+10. Remover texto de classe junto do tier visual e manter apenas estrelas para monsters.
+11. Deixar a coluna de tier vazia para equipamentos e consumiveis.
+12. Remover a coluna TIER do ARMAZEM e ampliar a largura util do painel DECK.
+13. Reposicionar o botao SAVE de acordo com o layout revisado.
+14. Adicionar keymap do deckbuilder: `Up/Down` para selecao, `Left/Right` para mover 1 unidade e `Tab` para trocar de lista.
+15. Corrigir o bug de criar cartas ao tentar adicionar unidade ja esgotada no ARMAZEM e cobrir com assert.
+16. Alterar o `orc` de `monster-champion` para `monster-normal`.
+17. Recolocar o resumo do deck com `x/20 cards`, `★ Total` e icone `deck-animation1.png`.
+18. Refatorar monsters para estrutura tipada com `MonsterClass`, `tier` explicito e helpers centrais.
+19. Adicionar `spawn_level` ao tile de monster e trocar `gold_drop` estatico por `gold_by_level`.
+20. Ampliar os upgrades de heroi para suportar nivel visivel maximo 10 pela UI.
+21. Refatorar a regra de equipamentos por raridade explicita (`common`, `uncommon`, `rare`, `epic`) em helper dedicado.
+22. Adicionar aviso contextual para bloqueio de acoes no deckbuilder.
+23. Separar feedback de acao bloqueada no topo do painel DECK e feedback de validacao do deck junto do SAVE.
+24. Introduzir a regra de minimo de 10 monsters para um deck ser considerado valido.
+25. Unificar novamente a mensagem em uma unica area no topo do DECK, incluindo tentativa de SAVE invalida.
+26. Tornar o botao SAVE clicavel mesmo com deck invalido para disparar o aviso de bloqueio imediato.
+27. Reposicionar o SAVE para a area inferior do painel DECK, alinhado a direita.
+28. Ajustar o `START` do menu para respeitar a mesma validacao do deck salvo.

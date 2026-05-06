@@ -15,8 +15,9 @@ import Dungeon/Board/indexing/adjacent_pos as adjacent_pos
 import Dungeon/Board/indexing/board_get_pos as board_get_pos
 import Dungeon/monster_damage_animation/clip as monster_damage_clip
 import Dungeon/deck_counter_animation/clip as deck_counter_clip
-import Dungeon/rules/ultimate_charge_required as ultimate_charge_required
 import Dungeon/rules/ultimate_charge_per_move as ultimate_charge_per_move
+import Dungeon/ultimate_helpers/run_ultimate_charge_required as run_ultimate_charge_required
+import Dungeon/ultimate_helpers/run_can_gain_ultimate_charge as run_can_gain_ultimate_charge
 import Midum/Image/step as image_step
 
 def _reset_image_state() -> Midum/Image/State:
@@ -24,7 +25,7 @@ def _reset_image_state() -> Midum/Image/State:
 
 def _hero_hp(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       hero_hp
 
 def _weapon_dmg(weapon_value: Weapon) -> U32:
@@ -36,21 +37,21 @@ def _weapon_dmg(weapon_value: Weapon) -> U32:
 
 def _hero_dmg(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       _weapon_dmg(weapon)
 
 def _run_ult_charge(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       ult_charge
 
 def _run_with_ult_charge(run_value: Run, next_ult_charge: U32) -> Run:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
-      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, next_ult_charge, hero_ref}
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, next_ult_charge, hero_ref, ultimate_state}
 
-def _run_charge_after_gain(current_charge: U32) -> U32:
-  _min_u32(ultimate_charge_required(), current_charge + ultimate_charge_per_move())
+def _run_charge_after_gain(run_value: Run, current_charge: U32) -> U32:
+  _min_u32(run_ultimate_charge_required(run_value), current_charge + ultimate_charge_per_move())
 
 def _min_u32(a: U32, b: U32) -> U32:
   _min_u32_flag(a < b, a, b)
@@ -64,12 +65,12 @@ def _min_u32_flag(a_lt_b: U32, a: U32, b: U32) -> U32:
 
 def _run_hero_index(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       hero_index
 
 def _run_board(run_value: Run) -> Board:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       board_value
 
 def _run_moved(current_run: Run, next_run: Run) -> U32:
@@ -90,7 +91,14 @@ def _next_ult_charge_move(did_move: U32, current_run: Run) -> U32:
     case 0:
       _run_ult_charge(current_run)
     case _:
-      _run_charge_after_gain(_run_ult_charge(current_run))
+      _next_ult_charge_gain_allowed(run_can_gain_ultimate_charge(current_run), current_run)
+
+def _next_ult_charge_gain_allowed(can_gain: U32, current_run: Run) -> U32:
+  match can_gain:
+    case 0:
+      _run_ult_charge(current_run)
+    case _:
+      _run_charge_after_gain(current_run, _run_ult_charge(current_run))
 
 def _toggle_heal_fx(hp_fx: HpFx) -> HpFx:
   match hp_fx:
@@ -192,7 +200,7 @@ def _impact_from_monster_drop(monster_took_damage: U32, target_pos: Nat/V2, curr
 
 def _impact_from_monster_next(target_pos: Nat/V2, prev_hp: U32, next_tile: Tile, current_impact: Impact) -> Impact:
   match next_tile:
-    case monster{next_ref, next_hp}:
+    case monster{next_ref, next_hp, next_spawn_level}:
       _impact_from_monster_hp(target_pos, prev_hp, next_hp, current_impact)
     case gold{amount}:
       _impact_kill(target_pos, current_impact)
@@ -201,7 +209,7 @@ def _impact_from_monster_next(target_pos: Nat/V2, prev_hp: U32, next_tile: Tile,
 
 def _impact_from_target_tile(target_pos: Nat/V2, prev_tile: Tile, next_tile: Tile, current_impact: Impact) -> Impact:
   match prev_tile:
-    case monster{ref, prev_hp}:
+    case monster{ref, prev_hp, prev_spawn_level}:
       _impact_from_monster_next(target_pos, prev_hp, next_tile, current_impact)
     case _:
       no_impact{}

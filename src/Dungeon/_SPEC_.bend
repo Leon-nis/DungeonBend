@@ -3,6 +3,8 @@ import Dungeon/HeroDef as HeroDef
 import Dungeon/Upgrade as Upgrade
 import Dungeon/HeroProfile as HeroProfile
 import Dungeon/Meta as Meta
+import Dungeon/MonsterClass as MonsterClass
+import Dungeon/CardRarity as CardRarity
 import Dungeon/MonsterDef as MonsterDef
 import Dungeon/PackDef as PackDef
 
@@ -45,12 +47,11 @@ assert card_potion_exists:
 # different ways inside the dungeon." Hero is represented both as
 # a CardRef variant (for decks/packs) and a HeroDef (for the
 # catalog). A concrete HeroDef anchors the contract: every HeroDef
-# has id, name, sprite, base_max_hp, unlock_cost, and upgrades.
-# (Ultimate is noted in the rulebook as not yet modeled — add a
-# field and a law when that rule lands.)
+# has id, name, sprite, base_max_hp, unlock_cost, upgrades,
+# ultimate kind, and ultimate charge requirement.
 assert hero_def_adventurer:
-  hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, []}
-    == hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, []}
+  hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8}
+    == hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8}
     :: HeroDef
 
 # "Each hero has its own progression curve: level, HP, and such."
@@ -73,15 +74,19 @@ assert hero_profile_shape:
 # "Gold is the primary soft currency used for player progression."
 # Gold lives in Meta.gold as a U32.
 assert meta_holds_gold:
-  meta{0, 0, 100, [], [], []} == meta{0, 0, 100, [], [], []} :: Meta
+  meta{0, 0, 100, [], [], [], []} == meta{0, 0, 100, [], [], [], []} :: Meta
 
 # "Gold is earned during runs, mainly by defeating monsters and
-# collecting their drops." MonsterDef.gold_drop is the amount
-# awarded per kill. Concrete example: a 5-gold monster.
-assert monster_def_carries_gold_drop:
-  monster_def{"slime", "assets/slime.png", 5, [1]}
-    == monster_def{"slime", "assets/slime.png", 5, [1]}
+# collecting their drops." MonsterDef.gold_levels carries the
+# drop progression by spawn level. Concrete example: a 5-gold
+# level-1 monster.
+assert monster_def_carries_gold_levels:
+  monster_def{"slime", "assets/slime.png", monster_normal{}, 2, card_rarity_monster{}, [5], [1]}
+    == monster_def{"slime", "assets/slime.png", monster_normal{}, 2, card_rarity_monster{}, [5], [1]}
     :: MonsterDef
+
+assert monster_class_exists:
+  monster_champion{} == monster_champion{} :: MonsterClass
 
 # "Gold is used to purchase booster packs and other progression-
 # related elements." PackDef.price is the gold cost.

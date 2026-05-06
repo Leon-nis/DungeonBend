@@ -7,15 +7,20 @@ import Dungeon/Weapon as Weapon
 import Dungeon/Meta as Meta
 import Dungeon/Run as Run
 import Dungeon/Scene as Scene
+import Dungeon/UltimateState as UltimateState
 import Dungeon/config as config
 import Dungeon/CardRef as CardRef
 import Dungeon/Config as Config
 import Dungeon/DeckEntry as DeckEntry
 import Dungeon/Deck/counts_pick/hero_max_hp as hero_max_hp
-import Dungeon/Deck/counts_pick/nth_upgrade as nth_upgrade
 import Dungeon/Deck/counts_pick/deck_count_for_card as deck_count_for_card
 import Dungeon/Deck/counts_pick/merge_deck_entries as merge_deck_entries
+import Dungeon/deckbuilder_helpers/deck_total_ready as deck_total_ready
+import Dungeon/hero_progression_helpers/hero_visible_max_level as hero_visible_max_level
+import Dungeon/hero_progression_helpers/clamp_hero_upgrade_level as clamp_hero_upgrade_level
+import Dungeon/hero_progression_helpers/hero_next_upgrade as hero_next_upgrade
 import Dungeon/profile_helpers/meta_bonus_deck as meta_bonus_deck
+import Dungeon/profile_helpers/meta_selected_deck as meta_selected_deck
 import Dungeon/Boosters/inventory/pack_inventory_count as pack_inventory_count
 import Dungeon/Boosters/inventory/pack_inventory_total as pack_inventory_total
 import Dungeon/Boosters/packs/active_pack as active_pack
@@ -29,7 +34,12 @@ import Dungeon/profile_helpers/selected_hero as selected_hero
 import Dungeon/profile_helpers/selection_confirmed as selection_confirmed
 import Dungeon/profile_helpers/profile_unlocked as profile_unlocked
 import Dungeon/profile_helpers/profile_hero_level as profile_hero_level
-import Dungeon/rules/ultimate_charge_required as ultimate_charge_required
+import Dungeon/ultimate_helpers/run_ultimate_charge_required as run_ultimate_charge_required
+import Dungeon/ultimate_helpers/run_ultimate_ready as run_ultimate_ready
+import Dungeon/ultimate_helpers/run_ultimate_kind as run_ultimate_kind
+import Dungeon/ultimate_helpers/run_ultimate_state as run_ultimate_state
+import Dungeon/ultimate_helpers/ultimate_kind_is_shadow as ultimate_kind_is_shadow
+import Dungeon/ultimate_helpers/ultimate_state_is_shadow_live as ultimate_state_is_shadow_live
 import Dungeon/Content as Content
 
 def meta_gold(meta_state: Meta) -> String:
@@ -39,10 +49,10 @@ def meta_pack_total(meta_state: Meta) -> String:
   U32/show(pack_inventory_total(meta_pack_inventory_value(meta_state)))
 
 def hero_level_text(profile: HeroProfile) -> String:
-  Content.ui_hero_level_prefix_long() ++ U32/show(profile_hero_level(profile))
+  Content.ui_hero_level_prefix_long() ++ U32/show(clamp_hero_upgrade_level(profile_hero_level(profile)))
 
 def hero_display_level(profile: HeroProfile) -> String:
-  U32/show(profile_hero_level(profile) + 1)
+  U32/show(clamp_hero_upgrade_level(profile_hero_level(profile)) + 1)
 
 def hero_menu_level_text(profile: HeroProfile) -> String:
   Content.ui_hero_level_prefix_short() ++ hero_display_level(profile)
@@ -51,20 +61,10 @@ def hero_level_progress_text(hero_value: HeroDef, profile: HeroProfile) -> Strin
   Content.ui_hero_level_prefix_short() ++ hero_level_ratio_text(hero_value, profile)
 
 def hero_level_ratio_text(hero_value: HeroDef, profile: HeroProfile) -> String:
-  _two_digit_value(profile_hero_level(profile) + 1) ++ "/" ++ _two_digit_value(hero_visible_max_level(hero_value))
+  _two_digit_value(clamp_hero_upgrade_level(profile_hero_level(profile)) + 1) ++ "/" ++ _two_digit_value(hero_visible_max_level())
 
 def hero_base_hp_text(hero_value: HeroDef) -> String:
   U32/show(hero_base_max_hp(hero_value))
-
-def hero_visible_max_level(hero_value: HeroDef) -> U32:
-  1 + _upgrade_count(hero_upgrades(hero_value))
-
-def _upgrade_count(upgrades: List(Upgrade)) -> U32:
-  match upgrades:
-    case []:
-      0
-    case upgrade{cost, max_hp}<>rest:
-      1 + _upgrade_count(rest)
 
 def hero_menu_current_hp_text(hero_value: HeroDef, profile: HeroProfile) -> String:
   hero_menu_max_hp_text(hero_value, profile)
@@ -74,7 +74,7 @@ def hero_menu_max_hp_text(hero_value: HeroDef, profile: HeroProfile) -> String:
 
 def _run_dungeon_level(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       dungeon_level
 
 def _two_digit_value(value: U32) -> String:
@@ -89,7 +89,7 @@ def _run_dungeon_level_text(run_value: Run) -> String:
 
 def _run_remaining_text(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       U32/show(remaining) ++ "/" ++ U32/show(capacity)
 
 def _weapon_value_from_weapon(weapon_value: Weapon) -> String:
@@ -101,31 +101,41 @@ def _weapon_value_from_weapon(weapon_value: Weapon) -> String:
 
 def _run_weapon_text(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
       _weapon_value_from_weapon(weapon)
 
 def _run_ult_label(run_value: Run) -> String:
-  match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
-      Content.ui_ultimate_label() ++ " " ++ U32/show(ult_charge) ++ "/" ++ U32/show(ultimate_charge_required())
+  _run_ult_label_shadow(_run_ult_show_return(run_value), run_value)
 
-def _run_ult_ready(run_value: Run) -> U32:
-  match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref}:
-      _run_ult_ready_flag(ult_charge < ultimate_charge_required())
-
-def _run_ult_ready_flag(charge_lt_required: U32) -> U32:
-  match charge_lt_required:
+def _run_ult_label_shadow(show_return: U32, run_value: Run) -> String:
+  match show_return:
     case 0:
-      1
+      _run_ult_charge_label(run_value)
     case _:
+      Content.ui_ultimate_label() ++ " Return"
+
+def _run_ult_charge_label(run_value: Run) -> String:
+  match run_value:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+      Content.ui_ultimate_label() ++ " " ++ U32/show(ult_charge) ++ "/" ++ U32/show(run_ultimate_charge_required(run_value))
+
+def _run_ult_show_return(run_value: Run) -> U32:
+  _run_ult_show_return_shadow(ultimate_kind_is_shadow(run_ultimate_kind(run_value)), run_ultimate_state(run_value))
+
+def _run_ult_show_return_shadow(is_shadow: U32, ultimate_state: UltimateState) -> U32:
+  match is_shadow:
+    case 0:
       0
+    case _:
+      ultimate_state_is_shadow_live(ultimate_state)
 
 def dungeon_level_value(scene_value: Scene) -> String:
   match scene_value:
     case setup{}:
       "--"
     case character_select{preview_hero}:
+      "--"
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
       "--"
     case boosters{reward, reveal_index, return_to}:
       "--"
@@ -148,6 +158,8 @@ def remaining_value(scene_value: Scene) -> String:
       "--/--"
     case character_select{preview_hero}:
       "--/--"
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
+      "--/--"
     case boosters{reward, reveal_index, return_to}:
       "--/--"
     case ultimate_preview{fx}:
@@ -169,6 +181,8 @@ def weapon_value(scene_value: Scene) -> String:
       "--"
     case character_select{preview_hero}:
       "--"
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
+      "--"
     case boosters{reward, reveal_index, return_to}:
       "--"
     case ultimate_preview{fx}:
@@ -187,13 +201,15 @@ def weapon_value(scene_value: Scene) -> String:
 def ultimate_label(scene_value: Scene) -> String:
   match scene_value:
     case setup{}:
-      Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
+      Content.ui_ultimate_label() ++ " 0/0"
     case character_select{preview_hero}:
-      Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
+      Content.ui_ultimate_label() ++ " 0/0"
+    case deckbuilder{draft_deck, deck_selection, stash_selection, deck_scroll, stash_scroll, action_notice}:
+      Content.ui_ultimate_label() ++ " 0/0"
     case boosters{reward, reveal_index, return_to}:
-      Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
+      Content.ui_ultimate_label() ++ " 0/0"
     case ultimate_preview{fx}:
-      Content.ui_ultimate_label() ++ " 0/" ++ U32/show(ultimate_charge_required())
+      Content.ui_ultimate_label() ++ " 0/0"
     case ultimate_cinematic{run_value, ticks_remaining}:
       _run_ult_label(run_value)
     case running{run_value}:
@@ -208,7 +224,7 @@ def ultimate_label(scene_value: Scene) -> String:
 def ultimate_enabled(scene_value: Scene) -> U32:
   match scene_value:
     case running{run_value}:
-      _run_ult_ready(run_value)
+      run_ultimate_ready(run_value)
     case _:
       0
 
@@ -218,6 +234,9 @@ def start_enabled(scene_value: Scene) -> U32:
       1
     case _:
       0
+
+def menu_start_enabled(meta_state: Meta) -> U32:
+  deck_total_ready(meta_selected_deck(meta_state))
 
 def can_upgrade(scene_value: Scene) -> U32:
   start_enabled(scene_value)
@@ -259,10 +278,10 @@ def _upgrade_cost_or_zero(step: Upgrade) -> U32:
           cost
 
 def hero_max_hp_value(hero_value: HeroDef, profile: HeroProfile) -> U32:
-  hero_max_hp(hero_base_max_hp(hero_value), hero_upgrades(hero_value), profile_hero_level(profile))
+  hero_max_hp(hero_base_max_hp(hero_value), hero_upgrades(hero_value), clamp_hero_upgrade_level(profile_hero_level(profile)))
 
 def next_upgrade_cost(hero_value: HeroDef, profile: HeroProfile) -> U32:
-  _upgrade_cost_or_zero(nth_upgrade(hero_upgrades(hero_value), profile_hero_level(profile)))
+  _upgrade_cost_or_zero(hero_next_upgrade(hero_value, profile_hero_level(profile)))
 
 def menu_upgrade_visible(meta_state: Meta, hero_value: HeroDef, profile: HeroProfile) -> U32:
   upgrade_enabled(meta_state, setup{}, next_upgrade_cost(hero_value, profile))

@@ -3,6 +3,9 @@ import Dungeon/generated_rules/generated_starting_gold as generated_starting_gol
 import Dungeon/generated_rules/generated_starting_selected_hero as generated_starting_selected_hero
 import Dungeon/generated_rules/generated_starting_selection_confirmed as generated_starting_selection_confirmed
 import Dungeon/generated_rules/generated_starting_dungeon_level as generated_starting_dungeon_level
+import Dungeon/generated_rules/generated_max_hero_upgrade_level as generated_max_hero_upgrade_level
+import Dungeon/generated_rules/generated_deckbuilder_target_count as generated_deckbuilder_target_count
+import Dungeon/generated_rules/generated_deckbuilder_min_monster_count as generated_deckbuilder_min_monster_count
 import Dungeon/generated_rules/generated_dungeon_level_increment_per_refill as generated_dungeon_level_increment_per_refill
 import Dungeon/generated_rules/generated_ultimate_charge_required as generated_ultimate_charge_required
 import Dungeon/generated_rules/generated_ultimate_charge_per_move as generated_ultimate_charge_per_move
@@ -21,6 +24,15 @@ def starting_selection_confirmed() -> U32:
 
 def starting_dungeon_level() -> U32:
   generated_starting_dungeon_level()
+
+def max_hero_upgrade_level() -> U32:
+  generated_max_hero_upgrade_level()
+
+def deckbuilder_target_count() -> U32:
+  generated_deckbuilder_target_count()
+
+def deckbuilder_min_monster_count() -> U32:
+  generated_deckbuilder_min_monster_count()
 
 def dungeon_level_increment_per_refill() -> U32:
   generated_dungeon_level_increment_per_refill()

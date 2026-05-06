@@ -3,18 +3,21 @@
     "id": "sword_1",
     "name": "Sword A",
     "sprite": "assets/item-sword.png",
+    "rarity": "common",
     "dmg": 5
   },
   {
     "id": "sword_2",
     "name": "Sword S",
     "sprite": "assets/item-sword.png",
+    "rarity": "uncommon",
     "dmg": 7
   },
   {
     "id": "sword_3",
     "name": "Sword S+",
     "sprite": "assets/item-sword.png",
+    "rarity": "rare",
     "dmg": 9
   }
 ]

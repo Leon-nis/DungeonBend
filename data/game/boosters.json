@@ -3,9 +3,9 @@
     {
       "id": "starter_booster",
       "name": "Starter Booster",
-      "price": 100,
+      "price": 60,
       "reveal_count": 4,
-      "allow_duplicates": false
+      "allow_duplicates": true
     }
   ],
   "pool": [

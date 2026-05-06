@@ -147,16 +147,16 @@ def hero_max_hp(base_hp: U32, upgrades: List(Upgrade), hero_level: U32) -> U32:
     case _:
       _from_upgrade(nth_upgrade(upgrades, hero_level - 1), base_hp)
 
-def monster_gold(monsters: List(MonsterDef), idx: U32) -> U32:
+def monster_gold(monsters: List(MonsterDef), idx: U32, level: U32) -> U32:
   match monsters:
     case []:
       0
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, rarity, gold_levels, hp_levels}<>rest:
       match idx:
         case 0:
-          gold_drop
+          _nth_u32(gold_levels, level - 1, 0)
         case _:
-          monster_gold(rest, idx - 1)
+          monster_gold(rest, idx - 1, level)
 
 def _remove_hero_entry(count: U32, rest: List(DeckEntry)) -> List(DeckEntry):
   match count:
@@ -233,7 +233,7 @@ def _monster_hp(monsters: List(MonsterDef), idx: U32, level: U32) -> U32:
   match monsters:
     case []:
       1
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, class_kind, tier, rarity, gold_levels, hp_levels}<>rest:
       match idx:
         case 0:
           _nth_u32(hp_levels, level - 1, 1)
@@ -244,7 +244,7 @@ def _sword_damage(swords: List(SwordDef), idx: U32) -> U32:
   match swords:
     case []:
       1
-    case sword_def{name, sprite, dmg}<>rest:
+    case sword_def{name, sprite, rarity, dmg}<>rest:
       match idx:
         case 0:
           dmg
@@ -255,7 +255,7 @@ def _potion_heal(potions: List(PotionDef), idx: U32) -> U32:
   match potions:
     case []:
       1
-    case potion_def{name, sprite, heal}<>rest:
+    case potion_def{name, sprite, rarity, heal}<>rest:
       match idx:
         case 0:
           heal
