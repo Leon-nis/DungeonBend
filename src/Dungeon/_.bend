@@ -197,6 +197,22 @@ type HeroProfile {
   }
 }
 
+type RunStats {
+  run_stats{
+    gold_collected: U32,
+    items_collected: U32,
+    weapon_damage_gained: U32,
+    potion_heal_effective: U32,
+    monsters_defeated: U32,
+    damage_dealt: U32,
+    monster_level_sum: U32,
+    monster_level_count: U32,
+    path_center: U32,
+    path_edge: U32,
+    path_corner: U32
+  }
+}
+
 type Meta {
   meta{
     selected_hero: U32,
@@ -236,7 +252,8 @@ type Run {
     seed: U32,
     ult_charge: U32,
     hero_ref: U32,
-    ultimate_state: UltimateState
+    ultimate_state: UltimateState,
+    stats: RunStats
   }
 }
 

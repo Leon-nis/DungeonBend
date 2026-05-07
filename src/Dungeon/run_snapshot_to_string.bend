@@ -5,11 +5,12 @@ import Dungeon/DeckEntry as DeckEntry
 import Dungeon/Tile as Tile
 import Dungeon/UltimateState as UltimateState
 import Dungeon/WeaponClass as WeaponClass
+import Dungeon/RunStats as RunStats
 import Dungeon/Board/indexing/board_get as board_get
 
 def run_core_string(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       String/join(
         [
           U32/show(dungeon_level),
@@ -21,14 +22,15 @@ def run_core_string(run_value: Run) -> String:
           U32/show(seed),
           U32/show(ult_charge),
           U32/show(hero_ref),
-          _ultimate_state_string(ultimate_state)
+          _ultimate_state_string(ultimate_state),
+          _run_stats_string(stats)
         ],
         "~"
       )
 
 def run_weapon_string(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       _weapon_string(weapon_value)
 
 def _weapon_string(weapon_value: Weapon) -> String:
@@ -49,7 +51,7 @@ def _weapon_class_string(class_kind: WeaponClass) -> String:
 
 def run_board_string(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       String/join(_board_tile_strings(board_value, 0), ";")
 
 def _board_tile_strings(board_value: Board, idx: U32) -> List(String):
@@ -76,12 +78,12 @@ def _tile_string(tile_value: Tile) -> String:
 
 def run_blueprint_string(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       deck_entries_string(deck_blueprint)
 
 def run_counts_string(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       deck_entries_string(draw_counts)
 
 def _ultimate_state_string(ultimate_state: UltimateState) -> String:
@@ -92,6 +94,26 @@ def _ultimate_state_string(ultimate_state: UltimateState) -> String:
       "1"
     case ultimate_state_shadow_live{}:
       "2"
+
+def _run_stats_string(stats: RunStats) -> String:
+  match stats:
+    case run_stats{gold_collected, items_collected, weapon_damage_gained, potion_heal_effective, monsters_defeated, damage_dealt, monster_level_sum, monster_level_count, path_center, path_edge, path_corner}:
+      String/join(
+        [
+          U32/show(gold_collected),
+          U32/show(items_collected),
+          U32/show(weapon_damage_gained),
+          U32/show(potion_heal_effective),
+          U32/show(monsters_defeated),
+          U32/show(damage_dealt),
+          U32/show(monster_level_sum),
+          U32/show(monster_level_count),
+          U32/show(path_center),
+          U32/show(path_edge),
+          U32/show(path_corner)
+        ],
+        "~"
+      )
 
 def deck_entries_string(entries: List(DeckEntry)) -> String:
   String/join(_deck_entry_strings(entries), ";")

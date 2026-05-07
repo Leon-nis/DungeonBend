@@ -6,7 +6,7 @@ import Dungeon/hero_helpers/hero_passive as hero_passive
 
 def _run_hero_ref(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       hero_ref
 
 def run_passive(run_value: Run) -> PassiveDef:

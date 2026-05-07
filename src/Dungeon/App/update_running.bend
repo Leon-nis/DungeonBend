@@ -39,7 +39,7 @@ def _apply_turn(meta_state: Meta, run_value: Run, next_seed_value: U32, dir: Dir
 
 def _run_hero_ref(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       hero_ref
 
 def _start_ultimate_cinematic(meta_state: Meta, run_value: Run, next_seed_value: U32, ui_value: UiState) -> DungeonState:

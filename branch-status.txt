@@ -152,3 +152,21 @@ Este arquivo junta os topicos principais trabalhados nesta branch, unificando os
   - weapons de classe diferente continuam substituindo
 - A scene de personagens/upgrades agora exibe a passiva logo abaixo da ultimate quando o heroi tiver uma passiva real.
 - Herois sem passiva continuam sem esse bloco na UI e sem alteracao de regra no runtime.
+
+16. Base de RunStats
+- `Run` agora carrega `RunStats` como parte do estado da run.
+- `RunStats` acumula:
+  - gold coletado
+  - items coletados
+  - dano bruto adquirido por weapons
+  - cura efetiva recebida por potions
+  - monsters derrotados
+  - dano total causado
+  - soma e contagem do `spawn_level` dos monsters derrotados
+  - pathing em centro, lateral e canto
+- Os pontos de update foram ligados em:
+  - pickups de gold, weapon e potion
+  - combate contra monsters
+  - movimentos validos do heroi, incluindo retorno para `shadow`
+- Saves da run foram atualizados para serializar `RunStats` com fallback para saves antigos sem esse bloco.
+- Foi criado `src/Dungeon/Run/_SPEC_.bend` para concentrar asserts da feature antes da futura scene de relatorio pos-run.

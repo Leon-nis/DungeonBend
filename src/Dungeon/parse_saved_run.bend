@@ -6,8 +6,10 @@ import Dungeon/DeckEntry as DeckEntry
 import Dungeon/Tile as Tile
 import Dungeon/UltimateState as UltimateState
 import Dungeon/WeaponClass as WeaponClass
+import Dungeon/RunStats as RunStats
 import Dungeon/Board/indexing/empty_board as empty_board
 import Dungeon/Board/indexing/board_set as board_set
+import Dungeon/run_stats_helpers/empty_run_stats as empty_run_stats
 
 def parse_saved_run(core: String, weapon: String, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
   _parse_run_core(String/split(core, '~'), weapon, board_snapshot, blueprint, draw_counts)
@@ -44,6 +46,7 @@ def _parse_run_core(parts: List(String), weapon: String, board_snapshot: String,
                                             String/to_u32(ult_charge_str),
                                             String/to_u32(hero_ref_str),
                                             some{ultimate_state_idle{}},
+                                            some{empty_run_stats()},
                                             weapon,
                                             board_snapshot,
                                             blueprint,
@@ -59,13 +62,14 @@ def _parse_run_core(parts: List(String), weapon: String, board_snapshot: String,
                                                 String/to_u32(hero_index_str),
                                                 String/to_u32(remaining_str),
                                                 String/to_u32(capacity_str),
-                                                String/to_u32(seed_str),
-                                                String/to_u32(ult_charge_str),
-                                                String/to_u32(hero_ref_str),
-                                                _parse_saved_ultimate_state(String/to_u32(ultimate_state_str)),
-                                                weapon,
-                                                board_snapshot,
-                                                blueprint,
+                                              String/to_u32(seed_str),
+                                              String/to_u32(ult_charge_str),
+                                              String/to_u32(hero_ref_str),
+                                              _parse_saved_ultimate_state(String/to_u32(ultimate_state_str)),
+                                              _parse_saved_run_stats(rest9),
+                                              weapon,
+                                              board_snapshot,
+                                              blueprint,
                                                 draw_counts
                                               )
                                             case _:
@@ -89,38 +93,38 @@ def _parse_run_core(parts: List(String), weapon: String, board_snapshot: String,
     case _:
       none{}
 
-def _parse_run_values(dungeon_level_maybe: Maybe(U32), hero_hp_maybe: Maybe(U32), hero_max_hp_maybe: Maybe(U32), hero_index_maybe: Maybe(U32), remaining_maybe: Maybe(U32), capacity_maybe: Maybe(U32), seed_maybe: Maybe(U32), ult_charge_maybe: Maybe(U32), hero_ref_maybe: Maybe(U32), ultimate_state_maybe: Maybe(UltimateState), weapon: String, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
-  match dungeon_level_maybe hero_hp_maybe hero_max_hp_maybe hero_index_maybe remaining_maybe capacity_maybe seed_maybe ult_charge_maybe hero_ref_maybe ultimate_state_maybe:
-    case some{dungeon_level} some{hero_hp} some{hero_max_hp} some{hero_index} some{remaining} some{capacity} some{seed} some{ult_charge} some{hero_ref} some{ultimate_state}:
-      _parse_run_with_core_values(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, weapon, board_snapshot, blueprint, draw_counts)
-    case _ _ _ _ _ _ _ _ _ _:
+def _parse_run_values(dungeon_level_maybe: Maybe(U32), hero_hp_maybe: Maybe(U32), hero_max_hp_maybe: Maybe(U32), hero_index_maybe: Maybe(U32), remaining_maybe: Maybe(U32), capacity_maybe: Maybe(U32), seed_maybe: Maybe(U32), ult_charge_maybe: Maybe(U32), hero_ref_maybe: Maybe(U32), ultimate_state_maybe: Maybe(UltimateState), stats_maybe: Maybe(RunStats), weapon: String, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
+  match dungeon_level_maybe hero_hp_maybe hero_max_hp_maybe hero_index_maybe remaining_maybe capacity_maybe seed_maybe ult_charge_maybe hero_ref_maybe ultimate_state_maybe stats_maybe:
+    case some{dungeon_level} some{hero_hp} some{hero_max_hp} some{hero_index} some{remaining} some{capacity} some{seed} some{ult_charge} some{hero_ref} some{ultimate_state} some{stats}:
+      _parse_run_with_core_values(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats, weapon, board_snapshot, blueprint, draw_counts)
+    case _ _ _ _ _ _ _ _ _ _ _:
       none{}
 
-def _parse_run_with_core_values(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, weapon: String, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
+def _parse_run_with_core_values(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, stats: RunStats, weapon: String, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
   match _parse_saved_weapon(String/split(weapon, '~')):
     case some{weapon_value}:
-      _parse_run_with_weapon(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, weapon_value, board_snapshot, blueprint, draw_counts)
+      _parse_run_with_weapon(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats, weapon_value, board_snapshot, blueprint, draw_counts)
     case none{}:
       none{}
 
-def _parse_run_with_weapon(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, weapon_value: Weapon, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
+def _parse_run_with_weapon(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, stats: RunStats, weapon_value: Weapon, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
   match _parse_saved_board(String/split(board_snapshot, ';'), 0, dungeon_level, empty_board()):
     case some{current_board}:
-      _parse_run_with_board(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, weapon_value, current_board, blueprint, draw_counts)
+      _parse_run_with_board(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats, weapon_value, current_board, blueprint, draw_counts)
     case none{}:
       none{}
 
-def _parse_run_with_board(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, weapon_value: Weapon, current_board: Board, blueprint: String, draw_counts: String) -> Maybe(Run):
+def _parse_run_with_board(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, stats: RunStats, weapon_value: Weapon, current_board: Board, blueprint: String, draw_counts: String) -> Maybe(Run):
   match _parse_saved_deck_entries(String/split(blueprint, ';')):
     case some{deck_blueprint}:
-      _parse_run_with_blueprint(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, weapon_value, current_board, deck_blueprint, draw_counts)
+      _parse_run_with_blueprint(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats, weapon_value, current_board, deck_blueprint, draw_counts)
     case none{}:
       none{}
 
-def _parse_run_with_blueprint(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, weapon_value: Weapon, current_board: Board, deck_blueprint: List(DeckEntry), draw_counts: String) -> Maybe(Run):
+def _parse_run_with_blueprint(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, stats: RunStats, weapon_value: Weapon, current_board: Board, deck_blueprint: List(DeckEntry), draw_counts: String) -> Maybe(Run):
   match _parse_saved_deck_entries(String/split(draw_counts, ';')):
     case some{counts_value}:
-      some{run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, current_board, deck_blueprint, counts_value, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}}
+      some{run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, current_board, deck_blueprint, counts_value, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}}
     case none{}:
       none{}
 
@@ -185,6 +189,78 @@ def _parse_saved_weapon_class(class_maybe: Maybe(U32)) -> Maybe(WeaponClass):
     case some{12}:
       some{weapon_bow{}}
     case _:
+      none{}
+
+def _parse_saved_run_stats(parts: List(String)) -> Maybe(RunStats):
+  match parts:
+    case []:
+      some{empty_run_stats()}
+    case gold_str<>rest:
+      match rest:
+        case items_str<>rest1:
+          match rest1:
+            case weapon_dmg_str<>rest2:
+              match rest2:
+                case heal_str<>rest3:
+                  match rest3:
+                    case defeated_str<>rest4:
+                      match rest4:
+                        case damage_str<>rest5:
+                          match rest5:
+                            case level_sum_str<>rest6:
+                              match rest6:
+                                case level_count_str<>rest7:
+                                  match rest7:
+                                    case path_center_str<>rest8:
+                                      match rest8:
+                                        case path_edge_str<>rest9:
+                                          match rest9:
+                                            case path_corner_str<>rest10:
+                                              match rest10:
+                                                case []:
+                                                  _parse_saved_run_stats_values(
+                                                    String/to_u32(gold_str),
+                                                    String/to_u32(items_str),
+                                                    String/to_u32(weapon_dmg_str),
+                                                    String/to_u32(heal_str),
+                                                    String/to_u32(defeated_str),
+                                                    String/to_u32(damage_str),
+                                                    String/to_u32(level_sum_str),
+                                                    String/to_u32(level_count_str),
+                                                    String/to_u32(path_center_str),
+                                                    String/to_u32(path_edge_str),
+                                                    String/to_u32(path_corner_str)
+                                                  )
+                                                case _:
+                                                  none{}
+                                            case _:
+                                              none{}
+                                        case _:
+                                          none{}
+                                    case _:
+                                      none{}
+                                case _:
+                                  none{}
+                            case _:
+                              none{}
+                        case _:
+                          none{}
+                    case _:
+                      none{}
+                case _:
+                  none{}
+            case _:
+              none{}
+        case _:
+          none{}
+    case _:
+      none{}
+
+def _parse_saved_run_stats_values(gold_maybe: Maybe(U32), items_maybe: Maybe(U32), weapon_dmg_maybe: Maybe(U32), heal_maybe: Maybe(U32), defeated_maybe: Maybe(U32), damage_maybe: Maybe(U32), level_sum_maybe: Maybe(U32), level_count_maybe: Maybe(U32), path_center_maybe: Maybe(U32), path_edge_maybe: Maybe(U32), path_corner_maybe: Maybe(U32)) -> Maybe(RunStats):
+  match gold_maybe items_maybe weapon_dmg_maybe heal_maybe defeated_maybe damage_maybe level_sum_maybe level_count_maybe path_center_maybe path_edge_maybe path_corner_maybe:
+    case some{gold_collected} some{items_collected} some{weapon_damage_gained} some{potion_heal_effective} some{monsters_defeated} some{damage_dealt} some{monster_level_sum} some{monster_level_count} some{path_center} some{path_edge} some{path_corner}:
+      some{run_stats{gold_collected, items_collected, weapon_damage_gained, potion_heal_effective, monsters_defeated, damage_dealt, monster_level_sum, monster_level_count, path_center, path_edge, path_corner}}
+    case _ _ _ _ _ _ _ _ _ _ _:
       none{}
 
 def _parse_saved_board(parts: List(String), idx: U32, dungeon_level: U32, current_board: Board) -> Maybe(Board):

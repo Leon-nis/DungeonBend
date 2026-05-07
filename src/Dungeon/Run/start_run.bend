@@ -8,6 +8,7 @@ import Dungeon/Deck/counts_pick/hero_max_hp as hero_max_hp
 import Dungeon/Deck/counts_pick/sum_counts as sum_counts
 import Dungeon/Board/indexing/empty_board as empty_board
 import Dungeon/Run/refill/_refill_non_hero_slots as _refill_non_hero_slots
+import Dungeon/run_stats_helpers/empty_run_stats as empty_run_stats
 import Dungeon/hero_helpers/hero_at as hero_at
 import Dungeon/hero_helpers/hero_base_max_hp as hero_base_max_hp
 import Dungeon/hero_helpers/hero_upgrades as hero_upgrades
@@ -20,7 +21,7 @@ import Dungeon/profile_helpers/profile_hero_level as profile_hero_level
 def _start_from_board(hero_max: U32, blueprint: List(DeckEntry), capacity: U32, hero_ref: U32, stage: BoardDraw) -> Run:
   match stage:
     case board_draw{board_value, next_counts, next_remaining, next_seed_value, next_level}:
-      run{next_level, hero_max, hero_max, 4, no_weapon{}, board_value, blueprint, next_counts, next_remaining, capacity, next_seed_value, 0, hero_ref, ultimate_state_idle{}}
+      run{next_level, hero_max, hero_max, 4, no_weapon{}, board_value, blueprint, next_counts, next_remaining, capacity, next_seed_value, 0, hero_ref, ultimate_state_idle{}, empty_run_stats()}
 
 def start_run(config_value: Config, meta_state: Meta, seed: U32) -> Run:
   match config_value:

@@ -10,12 +10,12 @@ import Dungeon/shadow_step_helpers/find_shadow_index as find_shadow_index
 
 def _run_hero_ref(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       hero_ref
 
 def _run_board(run_value: Run) -> Board:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       board_value
 
 def run_ultimate_kind(run_value: Run) -> UltimateKind:
@@ -26,23 +26,23 @@ def run_ultimate_charge_required(run_value: Run) -> U32:
 
 def run_ultimate_state(run_value: Run) -> UltimateState:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       ultimate_state
 
 def run_with_ultimate_charge(run_value: Run, next_ult_charge: U32) -> Run:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
-      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, next_ult_charge, hero_ref, ultimate_state}
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
+      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, next_ult_charge, hero_ref, ultimate_state, stats}
 
 def run_with_ultimate_state(run_value: Run, next_ultimate_state: UltimateState) -> Run:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
-      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, next_ultimate_state}
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
+      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, next_ultimate_state, stats}
 
 def run_with_ultimate_values(run_value: Run, next_ult_charge: U32, next_ultimate_state: UltimateState) -> Run:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
-      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, next_ult_charge, hero_ref, next_ultimate_state}
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
+      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, next_ult_charge, hero_ref, next_ultimate_state, stats}
 
 def ultimate_kind_is_shadow(ultimate_kind: UltimateKind) -> U32:
   match ultimate_kind:
@@ -87,7 +87,7 @@ def run_ultimate_ready(run_value: Run) -> U32:
 
 def _run_ult_charge(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       ult_charge
 
 def _run_ultimate_ready_shadow(is_shadow: U32, ultimate_state: UltimateState, required_charge: U32, current_charge: U32) -> U32:

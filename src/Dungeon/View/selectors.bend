@@ -74,7 +74,7 @@ def hero_menu_max_hp_text(hero_value: HeroDef, profile: HeroProfile) -> String:
 
 def _run_dungeon_level(run_value: Run) -> U32:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       dungeon_level
 
 def _two_digit_value(value: U32) -> String:
@@ -89,7 +89,7 @@ def _run_dungeon_level_text(run_value: Run) -> String:
 
 def _run_remaining_text(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       U32/show(remaining) ++ "/" ++ U32/show(capacity)
 
 def _weapon_value_from_weapon(weapon_value: Weapon) -> String:
@@ -101,7 +101,7 @@ def _weapon_value_from_weapon(weapon_value: Weapon) -> String:
 
 def _run_weapon_text(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       _weapon_value_from_weapon(weapon)
 
 def _run_ult_label(run_value: Run) -> String:
@@ -116,7 +116,7 @@ def _run_ult_label_shadow(show_return: U32, run_value: Run) -> String:
 
 def _run_ult_charge_label(run_value: Run) -> String:
   match run_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       Content.ui_ultimate_label() ++ " " ++ U32/show(ult_charge) ++ "/" ++ U32/show(run_ultimate_charge_required(run_value))
 
 def _run_ult_show_return(run_value: Run) -> U32:
