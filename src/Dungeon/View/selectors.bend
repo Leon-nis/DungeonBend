@@ -96,7 +96,7 @@ def _weapon_value_from_weapon(weapon_value: Weapon) -> String:
   match weapon_value:
     case no_weapon{}:
       Content.ui_hero_unarmed()
-    case weapon{ref, dmg}:
+    case weapon{class_kind, dmg}:
       Content.stat_dmg() ++ " " ++ U32/show(dmg)
 
 def _run_weapon_text(run_value: Run) -> String:

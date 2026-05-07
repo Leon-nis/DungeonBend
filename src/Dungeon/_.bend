@@ -51,6 +51,12 @@ type LootRarity {
   loot_epic{}
 }
 
+type WeaponClass {
+  weapon_sword{}
+  weapon_axe{}
+  weapon_bow{}
+}
+
 type CardRarity {
   card_rarity_monster{}
   card_rarity_consumable{loot_rarity: LootRarity}
@@ -62,7 +68,7 @@ type MonsterDef {
 }
 
 type SwordDef {
-  sword_def{name: String, sprite: String, rarity: CardRarity, dmg: U32}
+  sword_def{name: String, sprite: String, rarity: CardRarity, class_kind: WeaponClass, dmg: U32}
 }
 
 type PotionDef {
@@ -119,7 +125,7 @@ type Direction {
 
 type Weapon {
   no_weapon{}
-  weapon{ref: U32, dmg: U32}
+  weapon{class_kind: WeaponClass, dmg: U32}
 }
 
 type Tile {

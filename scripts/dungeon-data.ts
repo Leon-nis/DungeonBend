@@ -35,6 +35,7 @@ export type RawWeapon = {
   name: string;
   sprite: string;
   rarity: string;
+  weapon_class: string;
   dmg: number;
 };
 
@@ -264,6 +265,19 @@ function renderEquipmentCardRarity(value: string, label: string): string {
 
 function renderConsumableCardRarity(value: string, label: string): string {
   return `card_rarity_consumable{${renderLootRarity(value, label)}}`;
+}
+
+function renderWeaponClass(value: string, label: string): string {
+  switch (value) {
+    case "sword":
+      return "weapon_sword{}";
+    case "axe":
+      return "weapon_axe{}";
+    case "bow":
+      return "weapon_bow{}";
+    default:
+      fail(`${label} must be one of: sword, axe, bow`);
+  }
 }
 
 function renderUltimateKind(value: string, label: string): string {
@@ -582,8 +596,12 @@ export function getGameDataErrors(data: GameData): string[] {
     addStringError(errors, weapon?.name, `weapons[${index}].name`);
     addStringError(errors, weapon?.sprite, `weapons[${index}].sprite`);
     addStringError(errors, weapon?.rarity, `weapons[${index}].rarity`);
+    addStringError(errors, weapon?.weapon_class, `weapons[${index}].weapon_class`);
     if (typeof weapon?.rarity === "string" && !["common", "uncommon", "rare", "epic"].includes(weapon.rarity)) {
       errors.push(`weapons[${index}].rarity must be one of: common, uncommon, rare, epic`);
+    }
+    if (typeof weapon?.weapon_class === "string" && !["sword", "axe", "bow"].includes(weapon.weapon_class)) {
+      errors.push(`weapons[${index}].weapon_class must be one of: sword, axe, bow`);
     }
     addPositiveIntError(errors, weapon?.dmg, `weapons[${index}].dmg`);
   });
@@ -1021,8 +1039,9 @@ export function renderConfigModule(data: GameData): string {
     const weaponName = requireContent(data, weaponNameKey(weaponId));
     validateString(weapon.sprite, `weapons[${index}].sprite`);
     const weaponRarity = renderEquipmentCardRarity(validateString(weapon.rarity, `weapons[${index}].rarity`), `weapons[${index}].rarity`);
+    const weaponClass = renderWeaponClass(validateString(weapon.weapon_class, `weapons[${index}].weapon_class`), `weapons[${index}].weapon_class`);
     validatePositiveInt(weapon.dmg, `weapons[${index}].dmg`);
-    return `sword_def{${bendString(weaponName)}, ${bendString(weapon.sprite)}, ${weaponRarity}, ${weapon.dmg}}`;
+    return `sword_def{${bendString(weaponName)}, ${bendString(weapon.sprite)}, ${weaponRarity}, ${weaponClass}, ${weapon.dmg}}`;
   });
 
   const potionDefs = data.potions.map((potion, index) => {

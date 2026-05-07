@@ -4,6 +4,7 @@
     "name": "Sword A",
     "sprite": "assets/item-sword.png",
     "rarity": "common",
+    "weapon_class": "sword",
     "dmg": 5
   },
   {
@@ -11,6 +12,7 @@
     "name": "Sword S",
     "sprite": "assets/item-sword.png",
     "rarity": "uncommon",
+    "weapon_class": "sword",
     "dmg": 7
   },
   {
@@ -18,6 +20,7 @@
     "name": "Sword S+",
     "sprite": "assets/item-sword.png",
     "rarity": "rare",
+    "weapon_class": "sword",
     "dmg": 9
   }
 ]

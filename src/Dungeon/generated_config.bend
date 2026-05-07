@@ -219,9 +219,9 @@ def generated_config_monsters_chunk_0() -> List(MonsterDef):
 
 def generated_config_swords_chunk_0() -> List(SwordDef):
   [
-    sword_def{"Sword A", "assets/item-sword.png", card_rarity_equipment{loot_common{}}, 5},
-    sword_def{"Sword S", "assets/item-sword.png", card_rarity_equipment{loot_uncommon{}}, 7},
-    sword_def{"Sword S+", "assets/item-sword.png", card_rarity_equipment{loot_rare{}}, 9}
+    sword_def{"Sword A", "assets/item-sword.png", card_rarity_equipment{loot_common{}}, weapon_sword{}, 5},
+    sword_def{"Sword S", "assets/item-sword.png", card_rarity_equipment{loot_uncommon{}}, weapon_sword{}, 7},
+    sword_def{"Sword S+", "assets/item-sword.png", card_rarity_equipment{loot_rare{}}, weapon_sword{}, 9}
   ]
 
 def generated_config_potions_chunk_0() -> List(PotionDef):

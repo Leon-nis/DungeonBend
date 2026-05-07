@@ -4,6 +4,7 @@ import Dungeon/Board as Board
 import Dungeon/DeckEntry as DeckEntry
 import Dungeon/Tile as Tile
 import Dungeon/UltimateState as UltimateState
+import Dungeon/WeaponClass as WeaponClass
 import Dungeon/Board/indexing/board_get as board_get
 
 def run_core_string(run_value: Run) -> String:
@@ -34,8 +35,17 @@ def _weapon_string(weapon_value: Weapon) -> String:
   match weapon_value:
     case no_weapon{}:
       "0"
-    case weapon{ref, dmg}:
-      String/join(["1", U32/show(ref), U32/show(dmg)], "~")
+    case weapon{class_kind, dmg}:
+      String/join(["1", _weapon_class_string(class_kind), U32/show(dmg)], "~")
+
+def _weapon_class_string(class_kind: WeaponClass) -> String:
+  match class_kind:
+    case weapon_sword{}:
+      "10"
+    case weapon_axe{}:
+      "11"
+    case weapon_bow{}:
+      "12"
 
 def run_board_string(run_value: Run) -> String:
   match run_value:

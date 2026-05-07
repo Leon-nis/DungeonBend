@@ -32,7 +32,7 @@ def _weapon_dmg(weapon_value: Weapon) -> U32:
   match weapon_value:
     case no_weapon{}:
       0
-    case weapon{ref, dmg}:
+    case weapon{class_kind, dmg}:
       dmg
 
 def _hero_dmg(run_value: Run) -> U32:

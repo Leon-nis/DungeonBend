@@ -5,6 +5,7 @@ import Dungeon/Board as Board
 import Dungeon/DeckEntry as DeckEntry
 import Dungeon/Tile as Tile
 import Dungeon/UltimateState as UltimateState
+import Dungeon/WeaponClass as WeaponClass
 import Dungeon/Board/indexing/empty_board as empty_board
 import Dungeon/Board/indexing/board_set as board_set
 
@@ -148,12 +149,12 @@ def _parse_saved_no_weapon(rest: List(String)) -> Maybe(Weapon):
 
 def _parse_saved_weapon_values(rest: List(String)) -> Maybe(Weapon):
   match rest:
-    case ref_str<>rest1:
+    case first_str<>rest1:
       match rest1:
         case dmg_str<>rest2:
           match rest2:
             case []:
-              _parse_saved_weapon_result(String/to_u32(ref_str), String/to_u32(dmg_str))
+              _parse_saved_weapon_result(String/to_u32(first_str), String/to_u32(dmg_str))
             case _:
               none{}
         case _:
@@ -161,11 +162,29 @@ def _parse_saved_weapon_values(rest: List(String)) -> Maybe(Weapon):
     case _:
       none{}
 
-def _parse_saved_weapon_result(ref_maybe: Maybe(U32), dmg_maybe: Maybe(U32)) -> Maybe(Weapon):
-  match ref_maybe dmg_maybe:
-    case some{ref} some{dmg}:
-      some{weapon{ref, dmg}}
+def _parse_saved_weapon_result(first_maybe: Maybe(U32), dmg_maybe: Maybe(U32)) -> Maybe(Weapon):
+  match _parse_saved_weapon_class(first_maybe) dmg_maybe:
+    case some{class_kind} some{dmg}:
+      some{weapon{class_kind, dmg}}
     case _ _:
+      _parse_saved_legacy_weapon(first_maybe, dmg_maybe)
+
+def _parse_saved_legacy_weapon(ref_maybe: Maybe(U32), dmg_maybe: Maybe(U32)) -> Maybe(Weapon):
+  match ref_maybe dmg_maybe:
+    case some{_ref} some{dmg}:
+      some{weapon{weapon_sword{}, dmg}}
+    case _ _:
+      none{}
+
+def _parse_saved_weapon_class(class_maybe: Maybe(U32)) -> Maybe(WeaponClass):
+  match class_maybe:
+    case some{10}:
+      some{weapon_sword{}}
+    case some{11}:
+      some{weapon_axe{}}
+    case some{12}:
+      some{weapon_bow{}}
+    case _:
       none{}
 
 def _parse_saved_board(parts: List(String), idx: U32, dungeon_level: U32, current_board: Board) -> Maybe(Board):

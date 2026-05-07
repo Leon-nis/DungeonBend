@@ -150,7 +150,7 @@ def _sword_cards(swords: List(SwordDef), ref: U32) -> List(CardRef):
   match swords:
     case []:
       []
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       sword_card{ref}<>_sword_cards(rest, ref + 1)
 
 def _potion_cards(potions: List(PotionDef), ref: U32) -> List(CardRef):

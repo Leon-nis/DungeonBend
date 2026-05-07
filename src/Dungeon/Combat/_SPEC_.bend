@@ -20,7 +20,7 @@ assert combat_can_game_over:
 # "The hero fights with either no weapon or a weapon carrying
 # damage." (Derived from the Weapon type.)
 assert weapon_carries_damage:
-  weapon{0, 5} == weapon{0, 5} :: Weapon
+  weapon{weapon_sword{}, 5} == weapon{weapon_sword{}, 5} :: Weapon
 
 assert no_weapon_is_distinct:
   no_weapon{} == no_weapon{} :: Weapon

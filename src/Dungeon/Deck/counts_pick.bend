@@ -244,7 +244,7 @@ def _sword_damage(swords: List(SwordDef), idx: U32) -> U32:
   match swords:
     case []:
       1
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       match idx:
         case 0:
           dmg

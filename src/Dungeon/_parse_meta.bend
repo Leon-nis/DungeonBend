@@ -862,7 +862,7 @@ def _parse_sword_bonus(swords: List(SwordDef), counts: List(String), idx: U32) -
   match swords:
     case []:
       []
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       _sword_bonus_entry(
         _count_from_head(counts),
         idx,

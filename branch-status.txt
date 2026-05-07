@@ -112,3 +112,21 @@ Este arquivo junta os topicos principais trabalhados nesta branch, unificando os
 - `deckbuilder_target_count`, `deckbuilder_min_monster_count` e `max_hero_upgrade_level` ja estao ligados de ponta a ponta.
 - `ultimate_kind` e `ultimate_charge_required` agora tambem estao ligados de ponta a ponta.
 - A direcao mantida na branch foi evitar UI prometendo regras que o jogo ainda nao consome.
+
+13. Preparacao para passivas e classes de weapon
+- Foi introduzido `WeaponClass` como ADT no runtime:
+  - `weapon_sword{}`
+  - `weapon_axe{}`
+  - `weapon_bow{}`
+- `data/game/weapons.json` agora declara `weapon_class` por weapon.
+- `SwordDef` passou a carregar `class_kind` alem dos campos anteriores.
+- A arma equipada deixou de carregar `ref` da ultima sword e passou a guardar:
+  - `class_kind`
+  - `dmg`
+- Foi criado `src/Dungeon/weapon_helpers.bend` para centralizar:
+  - leitura da classe da weapon por card
+  - comparacao de classes
+  - hook de pickup de weapon
+- O pickup atual continua com a regra antiga de substituir a arma equipada, mas essa regra agora passa pelo hook `apply_weapon_pickup_rule(...)`.
+- O objetivo dessa etapa foi preparar o runtime para futuras passivas data-driven que modifiquem a regra de pickup por classe, sem ainda introduzir a passiva em si.
+- Save/load da run foi atualizado para serializar a arma equipada pelo `WeaponClass`, com fallback de leitura para saves antigos baseados em `ref`.

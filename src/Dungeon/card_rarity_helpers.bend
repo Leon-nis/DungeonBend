@@ -52,7 +52,7 @@ def _sword_card_rarity_from_list(swords: List(SwordDef), ref: U32) -> CardRarity
   match swords:
     case []:
       card_rarity_equipment{loot_common{}}
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       match ref:
         case 0:
           rarity

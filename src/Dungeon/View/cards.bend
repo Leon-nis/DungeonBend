@@ -60,7 +60,7 @@ def _hero_damage_attr(weapon_value: Weapon) -> String:
   match weapon_value:
     case no_weapon{}:
       ""
-    case weapon{ref, dmg}:
+    case weapon{class_kind, dmg}:
       Content.stat_dmg() ++ " " ++ U32/show(dmg)
 
 def _monster_fx_overrides() -> List(Midum/Image/Override):

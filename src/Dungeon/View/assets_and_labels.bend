@@ -91,7 +91,7 @@ def _sword_name_from_list(swords: List(SwordDef), ref: U32) -> String:
   match swords:
     case []:
       Content.fallback_weapon_name()
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       match ref:
         case 0:
           name
@@ -110,7 +110,7 @@ def _sword_sprite_from_list(swords: List(SwordDef), ref: U32) -> String:
   match swords:
     case []:
       ""
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       match ref:
         case 0:
           sprite
@@ -308,7 +308,7 @@ def _sword_damage_from_list(swords: List(SwordDef), ref: U32) -> U32:
   match swords:
     case []:
       1
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       match ref:
         case 0:
           dmg

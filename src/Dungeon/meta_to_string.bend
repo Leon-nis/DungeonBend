@@ -69,7 +69,7 @@ def _sword_bonus_counts(swords: List(SwordDef), bonus_deck: List(DeckEntry), idx
   match swords:
     case []:
       []
-    case sword_def{name, sprite, rarity, dmg}<>rest:
+    case sword_def{name, sprite, rarity, class_kind, dmg}<>rest:
       U32/show(deck_count_for_card(bonus_deck, sword_card{idx}))<>_sword_bonus_counts(rest, bonus_deck, idx + 1)
 
 def _potion_bonus_counts(potions: List(PotionDef), bonus_deck: List(DeckEntry), idx: U32) -> List(String):
