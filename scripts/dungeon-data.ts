@@ -213,6 +213,14 @@ function ultimateDescKey(ultimateKind: string): string {
   return `ultimate.${ultimateKind}.desc`;
 }
 
+function passiveTitleKey(passiveKind: string): string {
+  return `passive.${passiveKind}.title`;
+}
+
+function passiveDescKey(passiveKind: string): string {
+  return `passive.${passiveKind}.desc`;
+}
+
 function monsterNameKey(id: string): string {
   return `monster.${id}.name`;
 }
@@ -300,8 +308,10 @@ function renderPassiveDef(value: RawPassive, label: string): string {
   switch (value.kind) {
     case "none":
       return "passive_none{}";
+    case "weapon_accumulator_same_class":
+      return "passive_weapon_accumulator_same_class{}";
     default:
-      fail(`${label}.kind must be one of: none`);
+      fail(`${label}.kind must be one of: none, weapon_accumulator_same_class`);
   }
 }
 
@@ -471,6 +481,10 @@ function requiredContentKeys(data: GameData): string[] {
       keys.add(ultimateTitleKey(hero.ultimate_kind));
       keys.add(ultimateDescKey(hero.ultimate_kind));
     }
+    if (typeof hero?.passive?.kind === "string" && hero.passive.kind.trim() !== "" && hero.passive.kind !== "none") {
+      keys.add(passiveTitleKey(hero.passive.kind));
+      keys.add(passiveDescKey(hero.passive.kind));
+    }
   });
   (Array.isArray(data.monsters) ? data.monsters : []).forEach((monster) => {
     if (typeof monster?.id === "string" && monster.id.trim() !== "") {
@@ -556,8 +570,8 @@ export function getGameDataErrors(data: GameData): string[] {
       errors.push(`heroes[${index}].passive must be an object`);
     } else {
       addStringError(errors, hero.passive.kind, `heroes[${index}].passive.kind`);
-      if (typeof hero.passive.kind === "string" && !["none"].includes(hero.passive.kind)) {
-        errors.push(`heroes[${index}].passive.kind must be one of: none`);
+      if (typeof hero.passive.kind === "string" && !["none", "weapon_accumulator_same_class"].includes(hero.passive.kind)) {
+        errors.push(`heroes[${index}].passive.kind must be one of: none, weapon_accumulator_same_class`);
       }
     }
   });
@@ -1255,7 +1269,11 @@ export function renderHeroPresentationModule(data: GameData): string {
     const ultimateKind = validateString(hero.ultimate_kind, `heroes["${hero.id}"].ultimate_kind`);
     const ultimateTitle = requireContent(data, ultimateTitleKey(ultimateKind));
     const ultimateDesc = requireContent(data, ultimateDescKey(ultimateKind));
-    return `hero_presentation{${bendString(hero.id)}, ${renderPresentationAlign(presentation.name_align, `presentation["${hero.id}"].name_align`)}, ${bendString(lore)}, ${bendString(ultimateTitle)}, ${bendString(presentation.ultimate_icon)}, ${bendString(ultimateDesc)}}`;
+    const passiveKind = validateString(hero.passive.kind, `heroes["${hero.id}"].passive.kind`);
+    const hasPassive = passiveKind === "none" ? 0 : 1;
+    const passiveTitle = hasPassive === 1 ? requireContent(data, passiveTitleKey(passiveKind)) : "";
+    const passiveDesc = hasPassive === 1 ? requireContent(data, passiveDescKey(passiveKind)) : "";
+    return `hero_presentation{${bendString(hero.id)}, ${renderPresentationAlign(presentation.name_align, `presentation["${hero.id}"].name_align`)}, ${bendString(lore)}, ${bendString(ultimateTitle)}, ${bendString(presentation.ultimate_icon)}, ${bendString(ultimateDesc)}, ${hasPassive}, ${bendString(passiveTitle)}, ${bendString(passiveDesc)}}`;
   });
   const renderedPresentations = renderTypedListHelpers("generated_hero_presentation_items", "HeroPresentation", presentations);
 

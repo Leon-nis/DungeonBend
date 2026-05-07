@@ -5,6 +5,8 @@
   "hero.adventurer.ultimateDesc": "Refills the dungeon with new cards while keeping the hero in place.",
   "ultimate.refill.title": "Ultimate",
   "ultimate.refill.desc": "Refills the dungeon with new cards while keeping the hero in place.",
+  "passive.weapon_accumulator_same_class.title": "Weapon Mastery",
+  "passive.weapon_accumulator_same_class.desc": "Weapons of the same class stack their damage.",
   "hero.gato_de_botas.name": "Gato de Botas",
   "hero.gato_de_botas.lore": "A sly duelist who turns quick moves into clean wins.",
   "hero.gato_de_botas.ultimateTitle": "Ultimate",

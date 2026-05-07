@@ -112,7 +112,7 @@ def _apply_to_tile(config_value: Config, meta_state: Meta, dungeon_level: U32, h
         resolve_monster(config_value, board_value, hero_hp, weapon_value, target_index, ref, hp, spawn_level)
       )
     case sword{ref, dmg}:
-      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, apply_weapon_pickup_rule(config_value, weapon_value, ref, dmg), board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, dir)
+      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, apply_weapon_pickup_rule(config_value, hero_ref, weapon_value, ref, dmg), board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, dir)
     case potion{ref, heal}:
       _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, meta_state, dungeon_level, _min_u32(hero_max_hp, hero_hp + heal), hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, dir)
     case gold{amount}:

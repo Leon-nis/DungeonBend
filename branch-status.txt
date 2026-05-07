@@ -139,3 +139,16 @@ Este arquivo junta os topicos principais trabalhados nesta branch, unificando os
 - `scripts/dungeon-data.ts` passou a validar e gerar esse campo no config.
 - Foi criado `src/Dungeon/passive_helpers.bend` para expor a passiva atual da run sem ainda alterar regras de gameplay.
 - Nesta etapa, a passiva continua sem efeito pratico; a mudanca serve para preparar o hook de regra da proxima iteracao.
+
+15. Primeira passiva real
+- Foi adicionada a variante `passive_weapon_accumulator_same_class{}` em `PassiveDef`.
+- O `gato_de_botas` agora usa essa passiva em `data/game/heroes.json`.
+- O hook `apply_weapon_pickup_rule(...)` passou a consultar a passiva do heroi atual.
+- Com `passive_none{}`:
+  - a regra continua igual ao comportamento antigo
+  - coletar weapon substitui a arma equipada
+- Com `passive_weapon_accumulator_same_class{}`:
+  - weapons da mesma `WeaponClass` somam dano
+  - weapons de classe diferente continuam substituindo
+- A scene de personagens/upgrades agora exibe a passiva logo abaixo da ultimate quando o heroi tiver uma passiva real.
+- Herois sem passiva continuam sem esse bloco na UI e sem alteracao de regra no runtime.

@@ -7,6 +7,9 @@ import Dungeon/MonsterClass as MonsterClass
 import Dungeon/CardRarity as CardRarity
 import Dungeon/MonsterDef as MonsterDef
 import Dungeon/PackDef as PackDef
+import Dungeon/Weapon as Weapon
+import Dungeon/config as config
+import Dungeon/weapon_helpers/apply_weapon_pickup_rule as apply_weapon_pickup_rule
 
 # === Dungeon System — laws mirroring design-rules.md §"Dungeon System" ===
 #
@@ -94,3 +97,25 @@ assert pack_def_carries_price:
   pack_def{"basic", 50, 3, 0, []}
     == pack_def{"basic", 50, 3, 0, []}
     :: PackDef
+
+# "A hero may have no passive; in that case, the standard weapon
+# pickup rule remains replace-on-pickup."
+assert passive_none_preserves_weapon_replace:
+  apply_weapon_pickup_rule(config(), 0, weapon{weapon_sword{}, 2}, 0, 5)
+    == weapon{weapon_sword{}, 5}
+    :: Weapon
+
+# "A passive may alter a rule without affecting heroes that do not
+# have it." The current weapon-accumulator passive stacks damage
+# when the equipped and picked weapon classes match.
+assert passive_same_class_weapon_stack:
+  apply_weapon_pickup_rule(config(), 1, weapon{weapon_sword{}, 2}, 0, 5)
+    == weapon{weapon_sword{}, 7}
+    :: Weapon
+
+# "Class-sensitive stacking must not merge different weapon
+# classes." A class mismatch still replaces the equipped weapon.
+assert passive_weapon_mismatch_replaces:
+  apply_weapon_pickup_rule(config(), 1, weapon{weapon_bow{}, 2}, 0, 5)
+    == weapon{weapon_sword{}, 5}
+    :: Weapon

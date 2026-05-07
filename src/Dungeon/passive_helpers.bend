@@ -18,3 +18,10 @@ def passive_is_none(passive_value: PassiveDef) -> U32:
       1
     case _:
       0
+
+def passive_can_stack_same_class_weapons(passive_value: PassiveDef) -> U32:
+  match passive_value:
+    case passive_weapon_accumulator_same_class{}:
+      1
+    case _:
+      0

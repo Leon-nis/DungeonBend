@@ -14,6 +14,9 @@ import Dungeon/hero_presentation/hero_presentation_at as hero_presentation_at
 import Dungeon/hero_presentation/hero_presentation_lore as hero_presentation_lore
 import Dungeon/hero_presentation/hero_presentation_ultimate_description as hero_presentation_ultimate_description
 import Dungeon/hero_presentation/hero_presentation_ultimate_icon as hero_presentation_ultimate_icon
+import Dungeon/hero_presentation/hero_presentation_passive_description as hero_presentation_passive_description
+import Dungeon/hero_presentation/hero_presentation_passive_title as hero_presentation_passive_title
+import Dungeon/hero_presentation/hero_presentation_passive_visible as hero_presentation_passive_visible
 import Dungeon/hero_presentation/hero_presentation_ultimate_title as hero_presentation_ultimate_title
 import Dungeon/profile_helpers/selected_hero as selected_hero
 import Dungeon/profile_helpers/selection_confirmed as selection_confirmed
@@ -209,6 +212,7 @@ def _character_info_column(meta_state: Meta, preview_hero: U32, hero_value: Hero
       {_character_stats_row(hero_value, profile)}
       {_character_locked_slot(profile)}
       {_character_ultimate_slot(presentation)}
+      {_character_passive_slot(presentation)}
       {_character_upgrade_slot(meta_state, hero_value, profile)}
     </div>
   </div>
@@ -265,6 +269,26 @@ def _character_ultimate_slot(presentation: HeroPresentation) -> HTML(DungeonEven
   <div class="character-detail__ultimate-slot">
     {_character_ultimate_block(presentation)}
   </div>
+
+def _character_passive_block(presentation: HeroPresentation) -> HTML(DungeonEvent):
+  <section class="character-passive">
+    {text_label(DungeonEvent, left{}, "Passive", [])}
+    <div class="character-passive__body">
+      <div class="character-passive__description">
+        <p class="character-passive__title">{text{hero_presentation_passive_title(presentation)}}</p>
+        {text_body(DungeonEvent, left{}, hero_presentation_passive_description(presentation), [])}
+      </div>
+    </div>
+  </section>
+
+def _character_passive_slot(presentation: HeroPresentation) -> HTML(DungeonEvent):
+  match hero_presentation_passive_visible(presentation):
+    case 0:
+      text{""}
+    case _:
+      <div class="character-detail__passive-slot">
+        {_character_passive_block(presentation)}
+      </div>
 
 def _character_upgrade_block(meta_state: Meta, hero_value: HeroDef, profile: HeroProfile) -> HTML(DungeonEvent):
   match profile_unlocked(profile):

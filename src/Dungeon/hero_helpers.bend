@@ -136,3 +136,10 @@ def hero_passive(hero_value: HeroDef) -> PassiveDef:
   match hero_value:
     case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required, passive}:
       passive
+
+def hero_has_passive(hero_value: HeroDef) -> U32:
+  match hero_passive(hero_value):
+    case passive_none{}:
+      0
+    case _:
+      1

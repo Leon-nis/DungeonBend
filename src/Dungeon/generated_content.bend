@@ -52,6 +52,12 @@ def monster_spider_name() -> String:
 def monster_venom_spider_name() -> String:
   "Venom Spider"
 
+def passive_weapon_accumulator_same_class_desc() -> String:
+  "Weapons of the same class stack their damage."
+
+def passive_weapon_accumulator_same_class_title() -> String:
+  "Weapon Mastery"
+
 def potion_potion_1_name() -> String:
   "Health Potion"
 

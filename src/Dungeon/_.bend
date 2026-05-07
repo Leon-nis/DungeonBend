@@ -19,6 +19,7 @@ type HeroDef {
 
 type PassiveDef {
   passive_none{}
+  passive_weapon_accumulator_same_class{}
 }
 
 type UltimateKind {
@@ -39,7 +40,10 @@ type HeroPresentation {
     lore: String,
     ultimate_title: String,
     ultimate_icon: String,
-    ultimate_description: String
+    ultimate_description: String,
+    passive_visible: U32,
+    passive_title: String,
+    passive_description: String
   }
 }
 
