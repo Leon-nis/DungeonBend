@@ -7,7 +7,8 @@
     "unlock_cost": 0,
     "starts_unlocked": true,
     "ultimate_charge_required": 8,
-    "ultimate_kind": "refill"
+    "ultimate_kind": "refill",
+    "passive": { "kind": "none" }
   },
   {
     "id": "gato_de_botas",
@@ -17,6 +18,7 @@
     "unlock_cost": 0,
     "starts_unlocked": true,
     "ultimate_kind": "shadow_step",
-    "ultimate_charge_required": 4
+    "ultimate_charge_required": 4,
+    "passive": { "kind": "none" }
   }
 ]

@@ -105,8 +105,8 @@ def _default_hero_profiles_from_list(heroes: List(HeroDef), hero_ref: U32) -> Li
   match heroes:
     case []:
       []
-    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required}<>rest:
-      default_profile_from_hero(hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required})<>_default_hero_profiles_from_list(rest, hero_ref + 1)
+    case hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required, passive}<>rest:
+      default_profile_from_hero(hero_def{id, name, sprite, base_max_hp, unlock_cost, starts_unlocked, upgrades, ultimate_kind, ultimate_charge_required, passive})<>_default_hero_profiles_from_list(rest, hero_ref + 1)
 
 def selected_hero(meta_state: Meta) -> U32:
   match meta_state:

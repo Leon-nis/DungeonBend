@@ -48,10 +48,10 @@ assert card_potion_exists:
 # a CardRef variant (for decks/packs) and a HeroDef (for the
 # catalog). A concrete HeroDef anchors the contract: every HeroDef
 # has id, name, sprite, base_max_hp, unlock_cost, upgrades,
-# ultimate kind, and ultimate charge requirement.
+# ultimate kind, ultimate charge requirement, and passive data.
 assert hero_def_adventurer:
-  hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8}
-    == hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8}
+  hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8, passive_none{}}
+    == hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8, passive_none{}}
     :: HeroDef
 
 # "Each hero has its own progression curve: level, HP, and such."

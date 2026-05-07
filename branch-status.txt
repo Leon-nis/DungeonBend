@@ -130,3 +130,12 @@ Este arquivo junta os topicos principais trabalhados nesta branch, unificando os
 - O pickup atual continua com a regra antiga de substituir a arma equipada, mas essa regra agora passa pelo hook `apply_weapon_pickup_rule(...)`.
 - O objetivo dessa etapa foi preparar o runtime para futuras passivas data-driven que modifiquem a regra de pickup por classe, sem ainda introduzir a passiva em si.
 - Save/load da run foi atualizado para serializar a arma equipada pelo `WeaponClass`, com fallback de leitura para saves antigos baseados em `ref`.
+
+14. Moldura data-driven de passiva
+- `HeroDef` agora carrega tambem um campo `passive`.
+- Foi introduzido `PassiveDef` no runtime, por enquanto com a variante neutra:
+  - `passive_none{}`
+- `data/game/heroes.json` agora declara a passiva de cada heroi explicitamente.
+- `scripts/dungeon-data.ts` passou a validar e gerar esse campo no config.
+- Foi criado `src/Dungeon/passive_helpers.bend` para expor a passiva atual da run sem ainda alterar regras de gameplay.
+- Nesta etapa, a passiva continua sem efeito pratico; a mudanca serve para preparar o hook de regra da proxima iteracao.

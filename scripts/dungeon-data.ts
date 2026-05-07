@@ -10,6 +10,11 @@ export type RawHero = {
   starts_unlocked: boolean;
   ultimate_kind: string;
   ultimate_charge_required: number;
+  passive: RawPassive;
+};
+
+export type RawPassive = {
+  kind: string;
 };
 
 export type RawHeroUpgrade = {
@@ -291,6 +296,15 @@ function renderUltimateKind(value: string, label: string): string {
   }
 }
 
+function renderPassiveDef(value: RawPassive, label: string): string {
+  switch (value.kind) {
+    case "none":
+      return "passive_none{}";
+    default:
+      fail(`${label}.kind must be one of: none`);
+  }
+}
+
 function fail(message: string): never {
   throw new Error(`Dungeon data error: ${message}`);
 }
@@ -538,6 +552,14 @@ export function getGameDataErrors(data: GameData): string[] {
       errors.push(`heroes[${index}].ultimate_kind must be one of: refill, shadow_step`);
     }
     addPositiveIntError(errors, hero?.ultimate_charge_required, `heroes[${index}].ultimate_charge_required`);
+    if (!isRecord(hero?.passive)) {
+      errors.push(`heroes[${index}].passive must be an object`);
+    } else {
+      addStringError(errors, hero.passive.kind, `heroes[${index}].passive.kind`);
+      if (typeof hero.passive.kind === "string" && !["none"].includes(hero.passive.kind)) {
+        errors.push(`heroes[${index}].passive.kind must be one of: none`);
+      }
+    }
   });
 
   const cardIds = new Map<string, CardKind>();
@@ -1004,6 +1026,7 @@ export function renderConfigModule(data: GameData): string {
       hero.ultimate_charge_required,
       `heroes[${index}].ultimate_charge_required`,
     );
+    const passive = renderPassiveDef(hero.passive, `heroes[${index}].passive`);
     const upgrades = heroUpgradesFor(data, heroId).map((upgrade, upgradeIndex) => {
       validatePositiveInt(upgrade.cost, `hero_upgrades["${heroId}"][${upgradeIndex}].cost`);
       validatePositiveInt(upgrade.max_hp, `hero_upgrades["${heroId}"][${upgradeIndex}].max_hp`);
@@ -1011,7 +1034,7 @@ export function renderConfigModule(data: GameData): string {
     });
     const renderedUpgrades = renderTypedListHelpers(`generated_hero_${index}_upgrades`, "Upgrade", upgrades);
     helperDefs.push(...renderedUpgrades.defs);
-    return `hero_def{${bendString(heroId)}, ${bendString(heroName)}, ${bendString(hero.sprite)}, ${hero.base_max_hp}, ${hero.unlock_cost}, ${hero.starts_unlocked ? 1 : 0}, ${renderedUpgrades.expr}, ${ultimateKind}, ${ultimateChargeRequired}}`;
+    return `hero_def{${bendString(heroId)}, ${bendString(heroName)}, ${bendString(hero.sprite)}, ${hero.base_max_hp}, ${hero.unlock_cost}, ${hero.starts_unlocked ? 1 : 0}, ${renderedUpgrades.expr}, ${ultimateKind}, ${ultimateChargeRequired}, ${passive}}`;
   });
 
   const monsterDefs = data.monsters.map((monster, index) => {
@@ -1136,6 +1159,7 @@ export function renderConfigModule(data: GameData): string {
   return [
     "import Dungeon/Config as Config",
     "import Dungeon/HeroDef as HeroDef",
+    "import Dungeon/PassiveDef as PassiveDef",
     "import Dungeon/Upgrade as Upgrade",
     "import Dungeon/MonsterClass as MonsterClass",
     "import Dungeon/CardRarity as CardRarity",

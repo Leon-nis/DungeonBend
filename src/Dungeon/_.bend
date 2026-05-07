@@ -12,8 +12,13 @@ type HeroDef {
     starts_unlocked: U32,
     upgrades: List(Upgrade),
     ultimate_kind: UltimateKind,
-    ultimate_charge_required: U32
+    ultimate_charge_required: U32,
+    passive: PassiveDef
   }
+}
+
+type PassiveDef {
+  passive_none{}
 }
 
 type UltimateKind {

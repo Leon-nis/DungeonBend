@@ -1,5 +1,6 @@
 import Dungeon/Config as Config
 import Dungeon/HeroDef as HeroDef
+import Dungeon/PassiveDef as PassiveDef
 import Dungeon/Upgrade as Upgrade
 import Dungeon/MonsterClass as MonsterClass
 import Dungeon/CardRarity as CardRarity
@@ -205,8 +206,8 @@ def generated_pack_0_pool_chunk_0() -> List(PackPoolEntry):
 
 def generated_config_heroes_chunk_0() -> List(HeroDef):
   [
-    hero_def{"adventurer", "Adventurer", "assets/player-boy.png", 12, 0, 1, generated_hero_0_upgrades_chunk_0(), ultimate_refill{}, 8},
-    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 12, 0, 1, generated_hero_1_upgrades_chunk_0(), ultimate_shadow_step{}, 4}
+    hero_def{"adventurer", "Adventurer", "assets/player-boy.png", 12, 0, 1, generated_hero_0_upgrades_chunk_0(), ultimate_refill{}, 8, passive_none{}},
+    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 12, 0, 1, generated_hero_1_upgrades_chunk_0(), ultimate_shadow_step{}, 4, passive_none{}}
   ]
 
 def generated_config_monsters_chunk_0() -> List(MonsterDef):
