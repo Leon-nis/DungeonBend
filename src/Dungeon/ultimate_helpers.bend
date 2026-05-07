@@ -91,7 +91,7 @@ def ultimate_state_is_shadow_step_live(ultimate_state: UltimateState) -> U32:
 
 def ultimate_state_is_shadow_clone_live(ultimate_state: UltimateState) -> U32:
   match ultimate_state:
-    case ultimate_state_shadow_clone_live{}:
+    case ultimate_state_shadow_clone_live{anchor_hp}:
       1
     case _:
       0
@@ -135,7 +135,7 @@ def _projection_ready(ultimate_state: UltimateState, required_charge: U32, curre
   match ultimate_state:
     case ultimate_state_shadow_step_live{}:
       1
-    case ultimate_state_shadow_clone_live{}:
+    case ultimate_state_shadow_clone_live{anchor_hp}:
       1
     case ultimate_state_projection_armed{}:
       0

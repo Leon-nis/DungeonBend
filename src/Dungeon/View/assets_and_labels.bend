@@ -17,6 +17,12 @@ def _hero_name() -> String:
 def _hero_sprite() -> String:
   hero_sprite(hero_at(config(), 0))
 
+def _hero_name_ref(ref: U32) -> String:
+  hero_name(hero_at(config(), ref))
+
+def _hero_sprite_ref(ref: U32) -> String:
+  hero_sprite(hero_at(config(), ref))
+
 def _gold_name() -> String:
   Content.item_gold_name()
 
@@ -161,6 +167,8 @@ def _tile_name(tile: Tile) -> String:
       Content.card_empty()
     case shadow{}:
       ""
+    case anchor_hero{hero_ref}:
+      _hero_name_ref(hero_ref)
     case monster{ref, hp, spawn_level}:
       _monster_name(ref)
     case sword{ref, dmg}:
@@ -176,6 +184,8 @@ def _tile_sprite(tile: Tile) -> String:
       ""
     case shadow{}:
       ""
+    case anchor_hero{hero_ref}:
+      _hero_sprite_ref(hero_ref)
     case monster{ref, hp, spawn_level}:
       _monster_sprite(ref)
     case sword{ref, dmg}:
@@ -190,6 +200,8 @@ def _tile_badge(tile: Tile) -> String:
     case none{}:
       ""
     case shadow{}:
+      ""
+    case anchor_hero{hero_ref}:
       ""
     case monster{ref, hp, spawn_level}:
       Content.stat_hp() ++ " " ++ U32/show(hp)

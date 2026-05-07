@@ -53,27 +53,23 @@ def _parse_run_core(parts: List(String), weapon: String, board_snapshot: String,
                                             draw_counts
                                           )
                                         case ultimate_state_str<>rest9:
-                                          match rest9:
-                                            case []:
-                                              _parse_run_values(
-                                                String/to_u32(dungeon_level_str),
-                                                String/to_u32(hero_hp_str),
-                                                String/to_u32(hero_max_hp_str),
-                                                String/to_u32(hero_index_str),
-                                                String/to_u32(remaining_str),
-                                                String/to_u32(capacity_str),
-                                              String/to_u32(seed_str),
-                                              String/to_u32(ult_charge_str),
-                                              String/to_u32(hero_ref_str),
-                                              _parse_saved_ultimate_state(String/to_u32(ultimate_state_str)),
-                                              _parse_saved_run_stats(rest9),
-                                              weapon,
-                                              board_snapshot,
-                                              blueprint,
-                                                draw_counts
-                                              )
-                                            case _:
-                                              none{}
+                                          _parse_run_with_saved_ultimate(
+                                            String/to_u32(dungeon_level_str),
+                                            String/to_u32(hero_hp_str),
+                                            String/to_u32(hero_max_hp_str),
+                                            String/to_u32(hero_index_str),
+                                            String/to_u32(remaining_str),
+                                            String/to_u32(capacity_str),
+                                            String/to_u32(seed_str),
+                                            String/to_u32(ult_charge_str),
+                                            String/to_u32(hero_ref_str),
+                                            String/to_u32(ultimate_state_str),
+                                            rest9,
+                                            weapon,
+                                            board_snapshot,
+                                            blueprint,
+                                            draw_counts
+                                          )
                                     case _:
                                       none{}
                                 case _:
@@ -99,6 +95,25 @@ def _parse_run_values(dungeon_level_maybe: Maybe(U32), hero_hp_maybe: Maybe(U32)
       _parse_run_with_core_values(dungeon_level, hero_hp, hero_max_hp, hero_index, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats, weapon, board_snapshot, blueprint, draw_counts)
     case _ _ _ _ _ _ _ _ _ _ _:
       none{}
+
+def _parse_run_with_saved_ultimate(dungeon_level_maybe: Maybe(U32), hero_hp_maybe: Maybe(U32), hero_max_hp_maybe: Maybe(U32), hero_index_maybe: Maybe(U32), remaining_maybe: Maybe(U32), capacity_maybe: Maybe(U32), seed_maybe: Maybe(U32), ult_charge_maybe: Maybe(U32), hero_ref_maybe: Maybe(U32), ultimate_kind_maybe: Maybe(U32), rest: List(String), weapon: String, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
+  _parse_run_values(
+    dungeon_level_maybe,
+    hero_hp_maybe,
+    hero_max_hp_maybe,
+    hero_index_maybe,
+    remaining_maybe,
+    capacity_maybe,
+    seed_maybe,
+    ult_charge_maybe,
+    hero_ref_maybe,
+    _parse_saved_ultimate_state(ultimate_kind_maybe, rest),
+    _parse_saved_run_stats_after_ultimate(ultimate_kind_maybe, rest),
+    weapon,
+    board_snapshot,
+    blueprint,
+    draw_counts
+  )
 
 def _parse_run_with_core_values(dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_index: U32, remaining: U32, capacity: U32, seed: U32, ult_charge: U32, hero_ref: U32, ultimate_state: UltimateState, stats: RunStats, weapon: String, board_snapshot: String, blueprint: String, draw_counts: String) -> Maybe(Run):
   match _parse_saved_weapon(String/split(weapon, '~')):
@@ -302,6 +317,8 @@ def _parse_saved_tile_kind(kind_maybe: Maybe(U32), rest: List(String), dungeon_l
   match kind_maybe:
     case some{0}:
       _parse_saved_none_tile(rest)
+    case some{6}:
+      _parse_saved_anchor_hero_tile(rest)
     case some{5}:
       _parse_saved_shadow_tile(rest)
     case some{1}:
@@ -419,16 +436,81 @@ def _parse_saved_gold_tile_value(amount_maybe: Maybe(U32)) -> Maybe(Tile):
     case none{}:
       none{}
 
-def _parse_saved_ultimate_state(kind_maybe: Maybe(U32)) -> Maybe(UltimateState):
+def _parse_saved_anchor_hero_tile(rest: List(String)) -> Maybe(Tile):
+  match rest:
+    case hero_ref_str<>rest1:
+      match rest1:
+        case []:
+          _parse_saved_anchor_hero_tile_value(String/to_u32(hero_ref_str))
+        case _:
+          none{}
+    case _:
+      none{}
+
+def _parse_saved_anchor_hero_tile_value(hero_ref_maybe: Maybe(U32)) -> Maybe(Tile):
+  match hero_ref_maybe:
+    case some{hero_ref}:
+      some{anchor_hero{hero_ref}}
+    case none{}:
+      none{}
+
+def _parse_saved_ultimate_state(kind_maybe: Maybe(U32), rest: List(String)) -> Maybe(UltimateState):
   match kind_maybe:
     case some{0}:
-      some{ultimate_state_idle{}}
+      _parse_saved_ultimate_state_idle(rest)
     case some{1}:
-      some{ultimate_state_projection_armed{}}
+      _parse_saved_ultimate_state_projection_armed(rest)
     case some{2}:
-      some{ultimate_state_shadow_step_live{}}
+      _parse_saved_ultimate_state_shadow_step_live(rest)
     case some{3}:
-      some{ultimate_state_shadow_clone_live{}}
+      _parse_saved_ultimate_state_shadow_clone_live(rest)
+    case _:
+      none{}
+
+def _parse_saved_ultimate_state_idle(rest: List(String)) -> Maybe(UltimateState):
+  some{ultimate_state_idle{}}
+
+def _parse_saved_ultimate_state_projection_armed(rest: List(String)) -> Maybe(UltimateState):
+  some{ultimate_state_projection_armed{}}
+
+def _parse_saved_ultimate_state_shadow_step_live(rest: List(String)) -> Maybe(UltimateState):
+  some{ultimate_state_shadow_step_live{}}
+
+def _parse_saved_ultimate_state_shadow_clone_live(rest: List(String)) -> Maybe(UltimateState):
+  match rest:
+    case anchor_hp_str<>rest1:
+      match rest1:
+        case []:
+          _parse_saved_ultimate_state_shadow_clone_hp(String/to_u32(anchor_hp_str))
+        case _:
+          none{}
+    case _:
+      none{}
+
+def _parse_saved_ultimate_state_shadow_clone_hp(anchor_hp_maybe: Maybe(U32)) -> Maybe(UltimateState):
+  match anchor_hp_maybe:
+    case some{anchor_hp}:
+      some{ultimate_state_shadow_clone_live{anchor_hp}}
+    case none{}:
+      none{}
+
+def _parse_saved_run_stats_after_ultimate(kind_maybe: Maybe(U32), rest: List(String)) -> Maybe(RunStats):
+  match kind_maybe:
+    case some{0}:
+      _parse_saved_run_stats(rest)
+    case some{1}:
+      _parse_saved_run_stats(rest)
+    case some{2}:
+      _parse_saved_run_stats(rest)
+    case some{3}:
+      _parse_saved_run_stats_after_shadow_clone(rest)
+    case _:
+      none{}
+
+def _parse_saved_run_stats_after_shadow_clone(rest: List(String)) -> Maybe(RunStats):
+  match rest:
+    case anchor_hp_str<>rest1:
+      _parse_saved_run_stats(rest1)
     case _:
       none{}
 

@@ -82,6 +82,8 @@ def _tile_card(tile: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(D
           <div class="card__art-wrap card__art-wrap--stacked"></div>
         </div>
       )
+    case anchor_hero{hero_ref}:
+      _standard_tile_card(anchor_hero{hero_ref}, "card card--tile card--anchor-hero", pos, damage_overlay)
     case monster{ref, hp, spawn_level}:
       _standard_tile_card(monster{ref, hp, spawn_level}, "card card--tile card--monster", pos, damage_overlay)
     case sword{ref, dmg}:

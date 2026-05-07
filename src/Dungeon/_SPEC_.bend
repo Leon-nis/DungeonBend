@@ -70,7 +70,7 @@ assert shadow_step_live_state_exists:
   ultimate_state_shadow_step_live{} == ultimate_state_shadow_step_live{} :: UltimateState
 
 assert shadow_clone_live_state_exists:
-  ultimate_state_shadow_clone_live{} == ultimate_state_shadow_clone_live{} :: UltimateState
+  ultimate_state_shadow_clone_live{10} == ultimate_state_shadow_clone_live{10} :: UltimateState
 
 # "Each hero has its own progression curve: level, HP, and such."
 # Upgrades encode the curve as a list of (cost, max_hp) pairs.

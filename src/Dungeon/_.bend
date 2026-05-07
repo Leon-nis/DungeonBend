@@ -141,6 +141,7 @@ type Weapon {
 type Tile {
   none{}
   shadow{}
+  anchor_hero{hero_ref: U32}
   monster{ref: U32, hp: U32, spawn_level: U32}
   sword{ref: U32, dmg: U32}
   potion{ref: U32, heal: U32}
@@ -151,7 +152,7 @@ type UltimateState {
   ultimate_state_idle{}
   ultimate_state_projection_armed{}
   ultimate_state_shadow_step_live{}
-  ultimate_state_shadow_clone_live{}
+  ultimate_state_shadow_clone_live{anchor_hp: U32}
 }
 
 type Board {
