@@ -13,8 +13,8 @@
     "id": "gato_de_botas",
     "name": "Gato de Botas",
     "sprite": "assets/player-gato-de-botas.png",
-    "base_max_hp": 10,
-    "unlock_cost": 45,
+    "base_max_hp": 12,
+    "unlock_cost": 0,
     "starts_unlocked": true,
     "ultimate_kind": "shadow_step",
     "ultimate_charge_required": 4

@@ -19,11 +19,23 @@ def hero_adventurer_lore() -> String:
 def hero_adventurer_name() -> String:
   "Adventurer"
 
+def hero_adventurer_ultimate_desc() -> String:
+  "Refills the dungeon with new cards while keeping the hero in place."
+
+def hero_adventurer_ultimate_title() -> String:
+  "Ultimate"
+
 def hero_gato_de_botas_lore() -> String:
   "A sly duelist who turns quick moves into clean wins."
 
 def hero_gato_de_botas_name() -> String:
   "Gato de Botas"
+
+def hero_gato_de_botas_ultimate_desc() -> String:
+  "Refills the dungeon with new cards while keeping the hero in place."
+
+def hero_gato_de_botas_ultimate_title() -> String:
+  "Ultimate"
 
 def item_gold_name() -> String:
   "Gold"
