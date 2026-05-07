@@ -23,6 +23,12 @@ def _hero_name_ref(ref: U32) -> String:
 def _hero_sprite_ref(ref: U32) -> String:
   hero_sprite(hero_at(config(), ref))
 
+def _shadow_step_sprite() -> String:
+  "assets/shadow-step.png"
+
+def _shadow_clone_sprite() -> String:
+  "assets/player-gato-de-botas-shadow.png"
+
 def _gold_name() -> String:
   Content.item_gold_name()
 
@@ -166,7 +172,7 @@ def _tile_name(tile: Tile) -> String:
     case none{}:
       Content.card_empty()
     case shadow{}:
-      ""
+      "Shadow"
     case anchor_hero{hero_ref}:
       _hero_name_ref(hero_ref)
     case monster{ref, hp, spawn_level}:
@@ -183,7 +189,7 @@ def _tile_sprite(tile: Tile) -> String:
     case none{}:
       ""
     case shadow{}:
-      ""
+      _shadow_step_sprite()
     case anchor_hero{hero_ref}:
       _hero_sprite_ref(hero_ref)
     case monster{ref, hp, spawn_level}:

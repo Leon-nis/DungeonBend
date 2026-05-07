@@ -5,6 +5,7 @@ import Dungeon/Tile as Tile
 import Dungeon/Meta as Meta
 import Dungeon/Run as Run
 import Dungeon/Scene as Scene
+import Dungeon/UltimateState as UltimateState
 import Dungeon/UiState as UiState
 import Dungeon/DamageOverlay as DamageOverlay
 import Dungeon/HpFx as HpFx
@@ -32,7 +33,9 @@ import Dungeon/View/assets_and_labels/_gold_icon as _gold_icon
 import Dungeon/deck_counter_frames/idle_src as deck_counter_idle_src
 import Dungeon/deck_counter_animation/clip as deck_counter_clip
 import Dungeon/View/cards/_hero_card_values as _hero_card_values
+import Dungeon/View/cards/_hero_card_values_shadow_clone as _hero_card_values_shadow_clone
 import Dungeon/View/cards/_tile_card as _tile_card
+import Dungeon/ultimate_helpers/ultimate_state_is_shadow_clone_live as ultimate_state_is_shadow_clone_live
 import Dungeon/Content as Content
 import Midum/Button/primary as button_primary
 import Midum/Button/secondary as button_secondary
@@ -267,14 +270,21 @@ def _board_idx(x: U32, y: U32) -> U32:
 def _board_card_at(run_value: Run, ui_value: UiState, hero_value: HeroDef, idx: U32, pos: Nat/V2) -> HTML(DungeonEvent):
   match run_value ui_value:
     case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats} ui_state{hp_fx, dmg_fx, impact, damage_overlay, deck_counter_fx}:
-      _board_card_identity(hero_index === idx, hero_value, hero_hp, hero_max_hp, weapon, hp_fx, dmg_fx, board_get(board_value, idx), pos, damage_overlay)
+      _board_card_identity(hero_index === idx, hero_value, hero_hp, hero_max_hp, weapon, hp_fx, dmg_fx, ultimate_state, board_get(board_value, idx), pos, damage_overlay)
 
-def _board_card_identity(is_hero: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx, tile_value: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(DungeonEvent):
+def _board_card_identity(is_hero: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx, ultimate_state: UltimateState, tile_value: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(DungeonEvent):
   match is_hero:
     case 0:
       _tile_card(tile_value, pos, damage_overlay)
     case _:
+      _hero_card_identity_state(ultimate_state_is_shadow_clone_live(ultimate_state), hero_value, hero_hp, hero_max_hp, weapon_value, hp_fx, dmg_fx)
+
+def _hero_card_identity_state(is_shadow_clone_live: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx) -> HTML(DungeonEvent):
+  match is_shadow_clone_live:
+    case 0:
       _hero_card_values(hero_value, hero_hp, hero_max_hp, weapon_value, hp_fx, dmg_fx)
+    case _:
+      _hero_card_values_shadow_clone(hero_value, hero_hp, hero_max_hp, weapon_value, hp_fx, dmg_fx)
 
 def _board_slot(run_value: Run, ui_value: UiState, hero_value: HeroDef, x: U32, y: U32) -> HTML(DungeonEvent):
   _board_slot_at(run_value, ui_value, hero_value, _board_idx(x, y), board_xy_pos(x, y))

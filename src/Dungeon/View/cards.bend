@@ -12,6 +12,7 @@ import Midum/Card/neutral as card_neutral
 import Midum/Image/animated as image_animated
 import Dungeon/hero_helpers/hero_name as hero_name
 import Dungeon/hero_helpers/hero_sprite as hero_sprite
+import Dungeon/View/assets_and_labels/_shadow_clone_sprite as _shadow_clone_sprite
 import Dungeon/View/assets_and_labels/_tile_name as _tile_name
 import Dungeon/View/assets_and_labels/_tile_sprite as _tile_sprite
 import Dungeon/View/assets_and_labels/_tile_badge as _tile_badge
@@ -19,12 +20,18 @@ import Dungeon/monster_damage_animation/clip as monster_damage_clip
 import Dungeon/Content as Content
 
 def _hero_card_values(hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx) -> HTML(DungeonEvent):
+  _hero_card_values_with_sprite(hero_name(hero_value), hero_sprite(hero_value), _hero_card_class(dmg_fx), hero_hp, hero_max_hp, weapon_value, hp_fx)
+
+def _hero_card_values_shadow_clone(hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx) -> HTML(DungeonEvent):
+  _hero_card_values_with_sprite(hero_name(hero_value), _shadow_clone_sprite(), _hero_card_class_shadow_clone(dmg_fx), hero_hp, hero_max_hp, weapon_value, hp_fx)
+
+def _hero_card_values_with_sprite(hero_name_value: String, hero_sprite_value: String, class_name: String, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx) -> HTML(DungeonEvent):
   card_neutral(
     DungeonEvent,
-    <div class={_hero_card_class(dmg_fx)} data-dmg={_hero_damage_attr(weapon_value)}>
+    <div class={class_name} data-dmg={_hero_damage_attr(weapon_value)}>
       <div class={_hero_hp_badge_class(hp_fx)}>{text{Content.stat_hp() ++ " " ++ U32/show(hero_hp) ++ "/" ++ U32/show(hero_max_hp)}}</div>
       <div class="card__art-wrap">
-        <img class="card__art" src={hero_sprite(hero_value)} alt={hero_name(hero_value)} />
+        <img class="card__art" src={hero_sprite_value} alt={hero_name_value} />
       </div>
     </div>,
     [padding_none{}]
@@ -42,6 +49,9 @@ def _hero_card_class(dmg_fx: DmgFx) -> String:
       "card card--hero card--hero-dmg-down-b"
     case _:
       "card card--hero"
+
+def _hero_card_class_shadow_clone(dmg_fx: DmgFx) -> String:
+  _hero_card_class(dmg_fx) ++ " card--hero-shadow-clone"
 
 def _hero_hp_badge_class(hp_fx: HpFx) -> String:
   match hp_fx:
@@ -77,11 +87,7 @@ def _tile_card(tile: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(D
         [padding_none{}]
       )
     case shadow{}:
-      _standard_card_shell(
-        <div class="card card--tile card--shadow">
-          <div class="card__art-wrap card__art-wrap--stacked"></div>
-        </div>
-      )
+      _standard_tile_card(shadow{}, "card card--tile card--shadow", pos, damage_overlay)
     case anchor_hero{hero_ref}:
       _standard_tile_card(anchor_hero{hero_ref}, "card card--tile card--anchor-hero", pos, damage_overlay)
     case monster{ref, hp, spawn_level}:

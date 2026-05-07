@@ -11,6 +11,16 @@ import Dungeon/Weapon as Weapon
 import Dungeon/config as config
 import Dungeon/weapon_helpers/apply_weapon_pickup_rule as apply_weapon_pickup_rule
 import Dungeon/UltimateState as UltimateState
+import Dungeon/Tile as Tile
+import Dungeon/Board/indexing/empty_board as empty_board
+import Dungeon/Board/indexing/board_set as board_set
+import Dungeon/Board/indexing/board_get as board_get
+import Dungeon/shadow_clone_helpers/board_with_anchor_origin as board_with_anchor_origin
+import Dungeon/shadow_clone_helpers/board_after_clone_return as board_after_clone_return
+import Dungeon/shadow_clone_helpers/board_after_clone_faint as board_after_clone_faint
+import Dungeon/shadow_clone_helpers/find_anchor_index as find_anchor_index
+import Dungeon/shadow_clone_helpers/merge_clone_return_hp as merge_clone_return_hp
+import Dungeon/ultimate_helpers/ultimate_state_is_projection_live as ultimate_state_is_projection_live
 
 # === Dungeon System — laws mirroring design-rules.md §"Dungeon System" ===
 #
@@ -71,6 +81,45 @@ assert shadow_step_live_state_exists:
 
 assert shadow_clone_live_state_exists:
   ultimate_state_shadow_clone_live{10} == ultimate_state_shadow_clone_live{10} :: UltimateState
+
+assert shadow_clone_live_counts_as_projection_live:
+  ultimate_state_is_projection_live(ultimate_state_shadow_clone_live{10}) == 1 :: U32
+
+assert shadow_clone_first_move_leaves_anchor:
+  board_get(board_with_anchor_origin(board_set(board_set(empty_board(), 4, gold{3}), 5, potion{0, 2}), 1, 4, 5), 4)
+    == anchor_hero{1}
+    :: Tile
+
+assert shadow_clone_first_move_consumes_target_tile:
+  board_get(board_with_anchor_origin(board_set(board_set(empty_board(), 4, gold{3}), 5, potion{0, 2}), 1, 4, 5), 5)
+    == none{}
+    :: Tile
+
+assert shadow_clone_anchor_can_be_found:
+  find_anchor_index(board_with_anchor_origin(board_set(empty_board(), 4, gold{3}), 1, 4, 5))
+    == some{4}
+    :: Maybe(U32)
+
+assert shadow_clone_return_clears_anchor_slot:
+  board_get(board_after_clone_return(board_with_anchor_origin(board_set(empty_board(), 4, gold{3}), 1, 4, 5), 5, 4, gold{9}), 4)
+    == none{}
+    :: Tile
+
+assert shadow_clone_return_fills_shadow_slot_with_real_draw:
+  board_get(board_after_clone_return(board_with_anchor_origin(board_set(empty_board(), 4, gold{3}), 1, 4, 5), 5, 4, gold{9}), 5)
+    == gold{9}
+    :: Tile
+
+assert shadow_clone_faint_clears_anchor_slot:
+  board_get(board_after_clone_faint(board_with_anchor_origin(board_set(empty_board(), 4, gold{3}), 1, 4, 5), 4), 4)
+    == none{}
+    :: Tile
+
+assert shadow_clone_return_hp_keeps_anchor_when_shadow_is_lower:
+  merge_clone_return_hp(10, 6) == 10 :: U32
+
+assert shadow_clone_return_hp_raises_when_shadow_is_higher:
+  merge_clone_return_hp(10, 14) == 14 :: U32
 
 # "Each hero has its own progression curve: level, HP, and such."
 # Upgrades encode the curve as a list of (cost, max_hp) pairs.
