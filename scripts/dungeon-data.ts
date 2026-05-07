@@ -299,8 +299,10 @@ function renderUltimateKind(value: string, label: string): string {
       return "ultimate_refill{}";
     case "shadow_step":
       return "ultimate_shadow_step{}";
+    case "shadow_clone":
+      return "ultimate_shadow_clone{}";
     default:
-      fail(`${label} must be one of: refill, shadow_step`);
+      fail(`${label} must be one of: refill, shadow_step, shadow_clone`);
   }
 }
 
@@ -562,8 +564,8 @@ export function getGameDataErrors(data: GameData): string[] {
     addNonNegativeIntError(errors, hero?.unlock_cost, `heroes[${index}].unlock_cost`);
     addBooleanError(errors, hero?.starts_unlocked, `heroes[${index}].starts_unlocked`);
     addStringError(errors, hero?.ultimate_kind, `heroes[${index}].ultimate_kind`);
-    if (typeof hero?.ultimate_kind === "string" && !["refill", "shadow_step"].includes(hero.ultimate_kind)) {
-      errors.push(`heroes[${index}].ultimate_kind must be one of: refill, shadow_step`);
+    if (typeof hero?.ultimate_kind === "string" && !["refill", "shadow_step", "shadow_clone"].includes(hero.ultimate_kind)) {
+      errors.push(`heroes[${index}].ultimate_kind must be one of: refill, shadow_step, shadow_clone`);
     }
     addPositiveIntError(errors, hero?.ultimate_charge_required, `heroes[${index}].ultimate_charge_required`);
     if (!isRecord(hero?.passive)) {

@@ -23,8 +23,8 @@ import Dungeon/run_stats_helpers/run_stats_record_potion_pickup as run_stats_rec
 import Dungeon/run_stats_helpers/run_stats_record_weapon_pickup as run_stats_record_weapon_pickup
 import Dungeon/shadow_step_helpers/board_with_shadow_origin as board_with_shadow_origin
 import Dungeon/shadow_step_helpers/board_after_shadow_return as board_after_shadow_return
-import Dungeon/ultimate_helpers/ultimate_state_is_shadow_armed as ultimate_state_is_shadow_armed
 import Dungeon/weapon_helpers/apply_weapon_pickup_rule as apply_weapon_pickup_rule
+import Dungeon/ultimate_helpers/ultimate_state_is_projection_armed as ultimate_state_is_projection_armed
 
 def _min_u32(a: U32, b: U32) -> U32:
   _min_u32_flag(a < b, a, b)
@@ -86,7 +86,7 @@ def _move_after_collect(config_value: Config, meta_state: Meta, dungeon_level: U
   )
 
 def _move_after_shadow_collect(meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, stats: RunStats) -> SwipeResult:
-  _keep_run(meta_state, _run_value(dungeon_level, hero_hp, hero_max_hp, hero_ref, target_index, weapon_value, board_with_shadow_origin(board_value, hero_index, target_index), deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state_shadow_live{}, run_stats_record_path(stats, target_index)))
+  _keep_run(meta_state, _run_value(dungeon_level, hero_hp, hero_max_hp, hero_ref, target_index, weapon_value, board_with_shadow_origin(board_value, hero_index, target_index), deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state_shadow_step_live{}, run_stats_record_path(stats, target_index)))
 
 def _move_to_shadow_from_draw(meta_state: Meta, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, shadow_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), capacity: U32, stats: RunStats, result: DrawResult) -> SwipeResult:
   match result:
@@ -135,11 +135,11 @@ def _apply_to_tile(config_value: Config, meta_state: Meta, dungeon_level: U32, h
         resolve_monster(config_value, board_value, hero_hp, weapon_value, target_index, ref, hp, spawn_level)
       )
     case sword{ref, dmg}:
-      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, apply_weapon_pickup_rule(config_value, hero_ref, weapon_value, ref, dmg), board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, run_stats_record_weapon_pickup(stats, dmg), dir)
+      _apply_collect_shadow(ultimate_state_is_projection_armed(ultimate_state), config_value, meta_state, dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, apply_weapon_pickup_rule(config_value, hero_ref, weapon_value, ref, dmg), board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, run_stats_record_weapon_pickup(stats, dmg), dir)
     case potion{ref, heal}:
-      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, meta_state, dungeon_level, _min_u32(hero_max_hp, hero_hp + heal), hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, run_stats_record_potion_pickup(stats, _effective_heal(hero_hp, hero_max_hp, heal)), dir)
+      _apply_collect_shadow(ultimate_state_is_projection_armed(ultimate_state), config_value, meta_state, dungeon_level, _min_u32(hero_max_hp, hero_hp + heal), hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, run_stats_record_potion_pickup(stats, _effective_heal(hero_hp, hero_max_hp, heal)), dir)
     case gold{amount}:
-      _apply_collect_shadow(ultimate_state_is_shadow_armed(ultimate_state), config_value, _add_gold(meta_state, amount), dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, run_stats_add_gold(stats, amount), dir)
+      _apply_collect_shadow(ultimate_state_is_projection_armed(ultimate_state), config_value, _add_gold(meta_state, amount), dungeon_level, hero_hp, hero_max_hp, hero_ref, hero_index, target_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, ultimate_state, run_stats_add_gold(stats, amount), dir)
 
 def _apply_collect_shadow(shadow_armed: U32, config_value: Config, meta_state: Meta, dungeon_level: U32, hero_hp: U32, hero_max_hp: U32, hero_ref: U32, hero_index: U32, target_index: U32, weapon_value: Weapon, board_value: Board, deck_blueprint: List(DeckEntry), draw_counts: List(DeckEntry), remaining: U32, capacity: U32, seed: U32, ult_charge: U32, ultimate_state: UltimateState, stats: RunStats, dir: Direction) -> SwipeResult:
   match shadow_armed:

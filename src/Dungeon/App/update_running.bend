@@ -20,7 +20,7 @@ import Dungeon/App/use_ultimate as use_ultimate
 import Dungeon/UltimateCutins/duration_ticks_for_hero_ref as duration_ticks_for_hero_ref
 import Dungeon/ultimate_helpers/run_ultimate_ready as run_ultimate_ready
 import Dungeon/ultimate_helpers/run_ultimate_state as run_ultimate_state
-import Dungeon/ultimate_helpers/ultimate_state_is_shadow_live as ultimate_state_is_shadow_live
+import Dungeon/ultimate_helpers/ultimate_state_is_projection_live as ultimate_state_is_projection_live
 
 def _state_from_swipe(result: SwipeResult, current_run: Run, next_seed_value: U32, current_ui: UiState, dir: Direction) -> DungeonState:
   match result:
@@ -56,10 +56,10 @@ def _update_running_ultimate_ready(ultimate_ready_value: U32, meta_state: Meta, 
     case 0:
       _state(meta_state, running{run_value}, next_seed_value, ui_value)
     case _:
-      _update_running_ultimate_live(ultimate_state_is_shadow_live(run_ultimate_state(run_value)), meta_state, run_value, next_seed_value, ui_value)
+      _update_running_ultimate_live(ultimate_state_is_projection_live(run_ultimate_state(run_value)), meta_state, run_value, next_seed_value, ui_value)
 
-def _update_running_ultimate_live(shadow_live: U32, meta_state: Meta, run_value: Run, next_seed_value: U32, ui_value: UiState) -> DungeonState:
-  match shadow_live:
+def _update_running_ultimate_live(projection_live: U32, meta_state: Meta, run_value: Run, next_seed_value: U32, ui_value: UiState) -> DungeonState:
+  match projection_live:
     case 0:
       _start_ultimate_cinematic(meta_state, run_value, next_seed_value, ui_value)
     case _:

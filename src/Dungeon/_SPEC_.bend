@@ -10,6 +10,7 @@ import Dungeon/PackDef as PackDef
 import Dungeon/Weapon as Weapon
 import Dungeon/config as config
 import Dungeon/weapon_helpers/apply_weapon_pickup_rule as apply_weapon_pickup_rule
+import Dungeon/UltimateState as UltimateState
 
 # === Dungeon System — laws mirroring design-rules.md §"Dungeon System" ===
 #
@@ -56,6 +57,20 @@ assert hero_def_adventurer:
   hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8, passive_none{}}
     == hero_def{"001", "Adventurer", "assets/player-boy.png", 11, 0, 1, [], ultimate_refill{}, 8, passive_none{}}
     :: HeroDef
+
+assert hero_def_shadow_clone_kind_exists:
+  hero_def{"002", "Shadow Clone", "assets/player-boy.png", 11, 0, 1, [], ultimate_shadow_clone{}, 4, passive_none{}}
+    == hero_def{"002", "Shadow Clone", "assets/player-boy.png", 11, 0, 1, [], ultimate_shadow_clone{}, 4, passive_none{}}
+    :: HeroDef
+
+assert projection_armed_state_exists:
+  ultimate_state_projection_armed{} == ultimate_state_projection_armed{} :: UltimateState
+
+assert shadow_step_live_state_exists:
+  ultimate_state_shadow_step_live{} == ultimate_state_shadow_step_live{} :: UltimateState
+
+assert shadow_clone_live_state_exists:
+  ultimate_state_shadow_clone_live{} == ultimate_state_shadow_clone_live{} :: UltimateState
 
 # "Each hero has its own progression curve: level, HP, and such."
 # Upgrades encode the curve as a list of (cost, max_hp) pairs.

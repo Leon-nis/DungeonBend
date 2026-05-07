@@ -424,9 +424,11 @@ def _parse_saved_ultimate_state(kind_maybe: Maybe(U32)) -> Maybe(UltimateState):
     case some{0}:
       some{ultimate_state_idle{}}
     case some{1}:
-      some{ultimate_state_shadow_armed{}}
+      some{ultimate_state_projection_armed{}}
     case some{2}:
-      some{ultimate_state_shadow_live{}}
+      some{ultimate_state_shadow_step_live{}}
+    case some{3}:
+      some{ultimate_state_shadow_clone_live{}}
     case _:
       none{}
 

@@ -25,6 +25,7 @@ type PassiveDef {
 type UltimateKind {
   ultimate_refill{}
   ultimate_shadow_step{}
+  ultimate_shadow_clone{}
 }
 
 type PresentationAlign {
@@ -148,8 +149,9 @@ type Tile {
 
 type UltimateState {
   ultimate_state_idle{}
-  ultimate_state_shadow_armed{}
-  ultimate_state_shadow_live{}
+  ultimate_state_projection_armed{}
+  ultimate_state_shadow_step_live{}
+  ultimate_state_shadow_clone_live{}
 }
 
 type Board {

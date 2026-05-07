@@ -26,7 +26,7 @@ def _ultimate_run_from_values(hero_hp: U32, hero_max_hp: U32, hero_index: U32, w
 def _shadow_armed_run(run_value: Run) -> Run:
   match run_value:
     case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
-      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, 0, hero_ref, ultimate_state_shadow_armed{}, stats}
+      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, 0, hero_ref, ultimate_state_projection_armed{}, stats}
 
 def _shadow_idle_run(run_value: Run) -> Run:
   match run_value:
@@ -40,7 +40,7 @@ def _shadow_return_run(run_value: Run, shadow_index: U32, result: DrawResult) ->
 
 def _use_shadow_ultimate(meta_state: Meta, run_value: Run, next_seed_value: U32) -> DungeonState:
   match run_ultimate_state(run_value):
-    case ultimate_state_shadow_live{}:
+    case ultimate_state_shadow_step_live{}:
       _use_shadow_return(meta_state, run_value, next_seed_value, run_shadow_index(run_value))
     case _:
       _state(meta_state, running{_shadow_armed_run(run_value)}, next_seed_value, default_ui())
@@ -61,6 +61,8 @@ def use_ultimate(meta_state: Meta, run_value: Run, next_seed_value: U32) -> Dung
   match run_ultimate_kind(run_value):
     case ultimate_shadow_step{}:
       _use_shadow_ultimate(meta_state, run_value, next_seed_value)
+    case ultimate_shadow_clone{}:
+      _state(meta_state, running{run_value}, next_seed_value, default_ui())
     case _:
       match run_value:
         case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:

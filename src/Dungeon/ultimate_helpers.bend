@@ -44,12 +44,29 @@ def run_with_ultimate_values(run_value: Run, next_ult_charge: U32, next_ultimate
     case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, next_ult_charge, hero_ref, next_ultimate_state, stats}
 
-def ultimate_kind_is_shadow(ultimate_kind: UltimateKind) -> U32:
+def ultimate_kind_is_shadow_step(ultimate_kind: UltimateKind) -> U32:
   match ultimate_kind:
     case ultimate_shadow_step{}:
       1
     case _:
       0
+
+def ultimate_kind_is_shadow_clone(ultimate_kind: UltimateKind) -> U32:
+  match ultimate_kind:
+    case ultimate_shadow_clone{}:
+      1
+    case _:
+      0
+
+def ultimate_kind_uses_projection(ultimate_kind: UltimateKind) -> U32:
+  _ultimate_kind_projection_match(ultimate_kind_is_shadow_step(ultimate_kind), ultimate_kind_is_shadow_clone(ultimate_kind))
+
+def _ultimate_kind_projection_match(is_shadow_step: U32, is_shadow_clone: U32) -> U32:
+  match is_shadow_step:
+    case 1:
+      1
+    case _:
+      is_shadow_clone
 
 def ultimate_state_is_idle(ultimate_state: UltimateState) -> U32:
   match ultimate_state:
@@ -58,50 +75,69 @@ def ultimate_state_is_idle(ultimate_state: UltimateState) -> U32:
     case _:
       0
 
-def ultimate_state_is_shadow_armed(ultimate_state: UltimateState) -> U32:
+def ultimate_state_is_projection_armed(ultimate_state: UltimateState) -> U32:
   match ultimate_state:
-    case ultimate_state_shadow_armed{}:
+    case ultimate_state_projection_armed{}:
       1
     case _:
       0
 
-def ultimate_state_is_shadow_live(ultimate_state: UltimateState) -> U32:
+def ultimate_state_is_shadow_step_live(ultimate_state: UltimateState) -> U32:
   match ultimate_state:
-    case ultimate_state_shadow_live{}:
+    case ultimate_state_shadow_step_live{}:
       1
     case _:
       0
+
+def ultimate_state_is_shadow_clone_live(ultimate_state: UltimateState) -> U32:
+  match ultimate_state:
+    case ultimate_state_shadow_clone_live{}:
+      1
+    case _:
+      0
+
+def ultimate_state_is_projection_live(ultimate_state: UltimateState) -> U32:
+  _ultimate_state_projection_live_match(ultimate_state_is_shadow_step_live(ultimate_state), ultimate_state_is_shadow_clone_live(ultimate_state))
+
+def _ultimate_state_projection_live_match(is_shadow_step_live: U32, is_shadow_clone_live: U32) -> U32:
+  match is_shadow_step_live:
+    case 1:
+      1
+    case _:
+      is_shadow_clone_live
 
 def run_can_gain_ultimate_charge(run_value: Run) -> U32:
-  _run_can_gain_shadow(ultimate_kind_is_shadow(run_ultimate_kind(run_value)), run_ultimate_state(run_value))
+  _run_can_gain_projection(ultimate_kind_uses_projection(run_ultimate_kind(run_value)), run_ultimate_state(run_value))
 
-def _run_can_gain_shadow(is_shadow: U32, ultimate_state: UltimateState) -> U32:
-  match is_shadow:
+def _run_can_gain_projection(uses_projection: U32, ultimate_state: UltimateState) -> U32:
+  match uses_projection:
     case 0:
       1
     case _:
       ultimate_state_is_idle(ultimate_state)
 
 def run_ultimate_ready(run_value: Run) -> U32:
-  _run_ultimate_ready_shadow(ultimate_kind_is_shadow(run_ultimate_kind(run_value)), run_ultimate_state(run_value), run_ultimate_charge_required(run_value), _run_ult_charge(run_value))
+  _run_ultimate_ready_projection(ultimate_kind_uses_projection(run_ultimate_kind(run_value)), run_ultimate_state(run_value), run_ultimate_charge_required(run_value), _run_ult_charge(run_value))
 
 def _run_ult_charge(run_value: Run) -> U32:
   match run_value:
     case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       ult_charge
 
-def _run_ultimate_ready_shadow(is_shadow: U32, ultimate_state: UltimateState, required_charge: U32, current_charge: U32) -> U32:
-  match is_shadow:
+def _run_ultimate_ready_projection(uses_projection: U32, ultimate_state: UltimateState, required_charge: U32, current_charge: U32) -> U32:
+  match uses_projection:
     case 0:
       _charge_ready(required_charge, current_charge)
     case _:
-      _shadow_ready(ultimate_state, required_charge, current_charge)
+      _projection_ready(ultimate_state, required_charge, current_charge)
 
-def _shadow_ready(ultimate_state: UltimateState, required_charge: U32, current_charge: U32) -> U32:
+def _projection_ready(ultimate_state: UltimateState, required_charge: U32, current_charge: U32) -> U32:
   match ultimate_state:
-    case ultimate_state_shadow_live{}:
+    case ultimate_state_shadow_step_live{}:
       1
-    case ultimate_state_shadow_armed{}:
+    case ultimate_state_shadow_clone_live{}:
+      1
+    case ultimate_state_projection_armed{}:
       0
     case ultimate_state_idle{}:
       _charge_ready(required_charge, current_charge)

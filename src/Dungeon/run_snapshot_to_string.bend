@@ -90,10 +90,12 @@ def _ultimate_state_string(ultimate_state: UltimateState) -> String:
   match ultimate_state:
     case ultimate_state_idle{}:
       "0"
-    case ultimate_state_shadow_armed{}:
+    case ultimate_state_projection_armed{}:
       "1"
-    case ultimate_state_shadow_live{}:
+    case ultimate_state_shadow_step_live{}:
       "2"
+    case ultimate_state_shadow_clone_live{}:
+      "3"
 
 def _run_stats_string(stats: RunStats) -> String:
   match stats:

@@ -38,8 +38,8 @@ import Dungeon/ultimate_helpers/run_ultimate_charge_required as run_ultimate_cha
 import Dungeon/ultimate_helpers/run_ultimate_ready as run_ultimate_ready
 import Dungeon/ultimate_helpers/run_ultimate_kind as run_ultimate_kind
 import Dungeon/ultimate_helpers/run_ultimate_state as run_ultimate_state
-import Dungeon/ultimate_helpers/ultimate_kind_is_shadow as ultimate_kind_is_shadow
-import Dungeon/ultimate_helpers/ultimate_state_is_shadow_live as ultimate_state_is_shadow_live
+import Dungeon/ultimate_helpers/ultimate_kind_uses_projection as ultimate_kind_uses_projection
+import Dungeon/ultimate_helpers/ultimate_state_is_projection_live as ultimate_state_is_projection_live
 import Dungeon/Content as Content
 
 def meta_gold(meta_state: Meta) -> String:
@@ -120,14 +120,14 @@ def _run_ult_charge_label(run_value: Run) -> String:
       Content.ui_ultimate_label() ++ " " ++ U32/show(ult_charge) ++ "/" ++ U32/show(run_ultimate_charge_required(run_value))
 
 def _run_ult_show_return(run_value: Run) -> U32:
-  _run_ult_show_return_shadow(ultimate_kind_is_shadow(run_ultimate_kind(run_value)), run_ultimate_state(run_value))
+  _run_ult_show_return_shadow(ultimate_kind_uses_projection(run_ultimate_kind(run_value)), run_ultimate_state(run_value))
 
-def _run_ult_show_return_shadow(is_shadow: U32, ultimate_state: UltimateState) -> U32:
-  match is_shadow:
+def _run_ult_show_return_shadow(uses_projection: U32, ultimate_state: UltimateState) -> U32:
+  match uses_projection:
     case 0:
       0
     case _:
-      ultimate_state_is_shadow_live(ultimate_state)
+      ultimate_state_is_projection_live(ultimate_state)
 
 def dungeon_level_value(scene_value: Scene) -> String:
   match scene_value:
