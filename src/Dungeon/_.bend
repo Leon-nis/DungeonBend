@@ -298,6 +298,7 @@ type Scene {
   running{run: Run}
   paused{run: Run}
   resume_prompt{run: Run}
+  run_report{run: Run}
   game_over{run: Run}
 }
 

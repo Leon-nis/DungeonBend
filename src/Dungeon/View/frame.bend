@@ -12,6 +12,7 @@ import Dungeon/View/deckbuilder/_render_deckbuilder as _render_deckbuilder
 import Dungeon/View/boosters/_render_boosters as _render_boosters
 import Dungeon/View/ultimate_preview/_render_ultimate_preview as _render_ultimate_preview
 import Dungeon/View/board/_render_dungeon as _render_dungeon
+import Dungeon/View/run_report/_render_run_report as _render_run_report
 import Dungeon/UltimateCutins/cutin_spec_for_hero_ref as cutin_spec_for_hero_ref
 import Dungeon/UltimateCutins/_render_ultimate_cutin as _render_ultimate_cutin
 import Midum/screen as screen
@@ -54,6 +55,8 @@ def _screen_root(meta_state: Meta, scene_value: Scene, ui_value: UiState) -> HTM
       _render_dungeon(meta_state, paused{run_value}, run_value, ui_value)
     case resume_prompt{run_value}:
       _render_dungeon(meta_state, resume_prompt{run_value}, run_value, ui_value)
+    case run_report{run_value}:
+      _render_run_report(meta_state, run_value)
     case game_over{run_value}:
       _render_dungeon(meta_state, game_over{run_value}, run_value, ui_value)
 

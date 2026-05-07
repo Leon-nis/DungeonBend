@@ -32,7 +32,7 @@ def _state_from_advance(advance: RunAdvance, next_meta: Meta, current_run: Run, 
     case keep_running{next_run}:
       _state(next_meta, running{next_run}, next_seed_value, _next_ui_from_turn(current_run, next_run, current_ui, dir))
     case end_run{next_run}:
-      _state(next_meta, game_over{next_run}, next_seed_value, _next_ui_from_turn(current_run, next_run, current_ui, dir))
+      _state(next_meta, run_report{next_run}, next_seed_value, _next_ui_from_turn(current_run, next_run, current_ui, dir))
 
 def _apply_turn(meta_state: Meta, run_value: Run, next_seed_value: U32, dir: Direction, current_ui: UiState) -> DungeonState:
   _state_from_swipe(apply_swipe(config(), meta_state, run_value, dir), run_value, next_seed_value, current_ui, dir)

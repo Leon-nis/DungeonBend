@@ -199,6 +199,8 @@ def _board_modal_layer(scene_value: Scene) -> HTML(DungeonEvent):
       layout_center(DungeonEvent, _pause_modal(scene_value))
     case resume_prompt{run_value}:
       layout_center(DungeonEvent, _resume_prompt_modal(scene_value))
+    case run_report{run_value}:
+      text{""}
     case game_over{run_value}:
       layout_center(DungeonEvent, _game_over_modal(scene_value))
 

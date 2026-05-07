@@ -149,6 +149,8 @@ def dungeon_level_value(scene_value: Scene) -> String:
       _run_dungeon_level_text(run_value)
     case resume_prompt{run_value}:
       _run_dungeon_level_text(run_value)
+    case run_report{run_value}:
+      _run_dungeon_level_text(run_value)
     case game_over{run_value}:
       _run_dungeon_level_text(run_value)
 
@@ -171,6 +173,8 @@ def remaining_value(scene_value: Scene) -> String:
     case paused{run_value}:
       _run_remaining_text(run_value)
     case resume_prompt{run_value}:
+      _run_remaining_text(run_value)
+    case run_report{run_value}:
       _run_remaining_text(run_value)
     case game_over{run_value}:
       _run_remaining_text(run_value)
@@ -195,6 +199,8 @@ def weapon_value(scene_value: Scene) -> String:
       _run_weapon_text(run_value)
     case resume_prompt{run_value}:
       _run_weapon_text(run_value)
+    case run_report{run_value}:
+      _run_weapon_text(run_value)
     case game_over{run_value}:
       _run_weapon_text(run_value)
 
@@ -217,6 +223,8 @@ def ultimate_label(scene_value: Scene) -> String:
     case paused{run_value}:
       _run_ult_label(run_value)
     case resume_prompt{run_value}:
+      _run_ult_label(run_value)
+    case run_report{run_value}:
       _run_ult_label(run_value)
     case game_over{run_value}:
       _run_ult_label(run_value)

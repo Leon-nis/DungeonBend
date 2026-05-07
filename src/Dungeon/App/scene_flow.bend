@@ -16,6 +16,7 @@ import Dungeon/App/update_paused as update_paused
 import Dungeon/App/update_ultimate_cinematic as update_ultimate_cinematic
 import Dungeon/App/update_resume_prompt as update_resume_prompt
 import Dungeon/App/update_game_over as update_game_over
+import Dungeon/App/update_run_report as update_run_report
 import Dungeon/profile_helpers/set_selection_confirmed as set_selection_confirmed
 
 def _next_state_scene(evt: DungeonEvent, state: DungeonState) -> DungeonState:
@@ -38,6 +39,8 @@ def _next_state_scene(evt: DungeonEvent, state: DungeonState) -> DungeonState:
       update_paused(evt, meta_state, run_value, next_seed_value, ui_value)
     case dungeon{game_state{meta_state, resume_prompt{run_value}, next_seed_value}, ui_value}:
       update_resume_prompt(evt, meta_state, run_value, next_seed_value, ui_value)
+    case dungeon{game_state{meta_state, run_report{run_value}, next_seed_value}, ui_value}:
+      update_run_report(evt, meta_state, run_value, next_seed_value, ui_value)
     case dungeon{game_state{meta_state, game_over{run_value}, next_seed_value}, ui_value}:
       update_game_over(evt, meta_state, run_value, next_seed_value, ui_value)
 

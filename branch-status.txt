@@ -170,3 +170,23 @@ Este arquivo junta os topicos principais trabalhados nesta branch, unificando os
   - movimentos validos do heroi, incluindo retorno para `shadow`
 - Saves da run foram atualizados para serializar `RunStats` com fallback para saves antigos sem esse bloco.
 - Foi criado `src/Dungeon/Run/_SPEC_.bend` para concentrar asserts da feature antes da futura scene de relatorio pos-run.
+
+17. Scene de relatorio pos-run
+- A morte da run agora redireciona para uma scene dedicada `run_report{run}` em vez de cair direto no fluxo antigo de `game_over`.
+- Foi criada uma nova scene de leitura simples com:
+  - heroi da run no topo
+  - grid de metricas alimentado por `RunStats`
+  - botao `OK` para retornar ao `setup`
+- O relatorio exibe:
+  - gold coletado
+  - items coletados
+  - dano adquirido por weapons
+  - cura efetiva recebida por potions
+  - monsters derrotados
+  - dano total causado
+  - nivel medio dos monsters derrotados
+  - pathing em centro, lateral e canto
+- A media de nivel usa `spawn_level` dos monsters derrotados e e formatada com uma casa decimal.
+- Foi criado `src/Dungeon/run_report_helpers.bend` para centralizar a leitura dos stats e o calculo do nivel medio.
+- A view nova ficou em `src/Dungeon/View/run_report.bend` com CSS proprio integrado ao pipeline em `src/Dungeon/View/css.bend`.
+- O fluxo de eventos da scene foi ligado em `src/Dungeon/App/update_run_report.bend` e `src/Dungeon/App/scene_flow.bend`.
