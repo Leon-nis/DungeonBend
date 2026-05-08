@@ -151,8 +151,9 @@ type Tile {
 type UltimateState {
   ultimate_state_idle{}
   ultimate_state_projection_armed{}
+  ultimate_state_shadow_clone_armed{anchor_hp: U32, anchor_weapon: Weapon}
   ultimate_state_shadow_step_live{}
-  ultimate_state_shadow_clone_live{anchor_hp: U32}
+  ultimate_state_shadow_clone_live{anchor_hp: U32, anchor_weapon: Weapon}
 }
 
 type Board {

@@ -32,6 +32,11 @@ def _shadow_armed_run(run_value: Run) -> Run:
     case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
       run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, 0, hero_ref, ultimate_state_projection_armed{}, stats}
 
+def _shadow_clone_armed_run(run_value: Run) -> Run:
+  match run_value:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
+      run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, 0, hero_ref, ultimate_state_shadow_clone_armed{hero_hp, weapon_value}, stats}
+
 def _shadow_idle_run(run_value: Run) -> Run:
   match run_value:
     case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon_value, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref, ultimate_state, stats}:
@@ -63,10 +68,12 @@ def _use_shadow_return(meta_state: Meta, run_value: Run, next_seed_value: U32, s
 
 def _use_shadow_clone_ultimate(meta_state: Meta, run_value: Run, next_seed_value: U32) -> DungeonState:
   match run_ultimate_state(run_value):
-    case ultimate_state_shadow_clone_live{anchor_hp}:
+    case ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}:
+      _state(meta_state, running{run_value}, next_seed_value, default_ui())
+    case ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}:
       _use_shadow_clone_return(meta_state, run_value, next_seed_value, anchor_hp, find_anchor_index(_run_board(run_value)))
     case _:
-      _state(meta_state, running{_shadow_armed_run(run_value)}, next_seed_value, default_ui())
+      _state(meta_state, running{_shadow_clone_armed_run(run_value)}, next_seed_value, default_ui())
 
 def _run_board(run_value: Run) -> Board:
   match run_value:

@@ -20,7 +20,7 @@
     "unlock_cost": 0,
     "starts_unlocked": true,
     "ultimate_kind": "shadow_clone",
-    "ultimate_charge_required": 4,
+    "ultimate_charge_required": 6,
     "passive": {
       "kind": "weapon_accumulator_same_class"
     }

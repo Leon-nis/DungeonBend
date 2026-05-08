@@ -7,12 +7,16 @@ def board_with_anchor_origin(board_value: Board, hero_ref: U32, hero_index: U32,
   board1 = board_set(board_value, target_index, none{});
   board_set(board1, hero_index, anchor_hero{hero_ref})
 
+def board_with_anchor_slot(board_value: Board, hero_ref: U32, hero_index: U32) -> Board:
+  board_set(board_value, hero_index, anchor_hero{hero_ref})
+
 def board_after_clone_return(board_value: Board, shadow_index: U32, anchor_index: U32, spawn: Tile) -> Board:
   board1 = board_set(board_value, anchor_index, none{});
   board_set(board1, shadow_index, spawn)
 
-def board_after_clone_faint(board_value: Board, anchor_index: U32) -> Board:
-  board_set(board_value, anchor_index, none{})
+def board_after_clone_faint(board_value: Board, shadow_index: U32, anchor_index: U32, spawn: Tile) -> Board:
+  board1 = board_set(board_value, anchor_index, none{});
+  board_set(board1, shadow_index, spawn)
 
 def find_anchor_index(board_value: Board) -> Maybe(U32):
   _find_anchor_index(board_value, 0)

@@ -76,14 +76,17 @@ assert hero_def_shadow_clone_kind_exists:
 assert projection_armed_state_exists:
   ultimate_state_projection_armed{} == ultimate_state_projection_armed{} :: UltimateState
 
+assert shadow_clone_armed_state_exists:
+  ultimate_state_shadow_clone_armed{10, no_weapon{}} == ultimate_state_shadow_clone_armed{10, no_weapon{}} :: UltimateState
+
 assert shadow_step_live_state_exists:
   ultimate_state_shadow_step_live{} == ultimate_state_shadow_step_live{} :: UltimateState
 
 assert shadow_clone_live_state_exists:
-  ultimate_state_shadow_clone_live{10} == ultimate_state_shadow_clone_live{10} :: UltimateState
+  ultimate_state_shadow_clone_live{10, no_weapon{}} == ultimate_state_shadow_clone_live{10, no_weapon{}} :: UltimateState
 
 assert shadow_clone_live_counts_as_projection_live:
-  ultimate_state_is_projection_live(ultimate_state_shadow_clone_live{10}) == 1 :: U32
+  ultimate_state_is_projection_live(ultimate_state_shadow_clone_live{10, no_weapon{}}) == 1 :: U32
 
 assert shadow_clone_first_move_leaves_anchor:
   board_get(board_with_anchor_origin(board_set(board_set(empty_board(), 4, gold{3}), 5, potion{0, 2}), 1, 4, 5), 4)
@@ -111,8 +114,13 @@ assert shadow_clone_return_fills_shadow_slot_with_real_draw:
     :: Tile
 
 assert shadow_clone_faint_clears_anchor_slot:
-  board_get(board_after_clone_faint(board_with_anchor_origin(board_set(empty_board(), 4, gold{3}), 1, 4, 5), 4), 4)
+  board_get(board_after_clone_faint(board_with_anchor_origin(board_set(empty_board(), 4, gold{3}), 1, 4, 5), 5, 4, gold{9}), 4)
     == none{}
+    :: Tile
+
+assert shadow_clone_faint_fills_shadow_slot_with_real_draw:
+  board_get(board_after_clone_faint(board_with_anchor_origin(board_set(empty_board(), 4, gold{3}), 1, 4, 5), 5, 4, gold{9}), 5)
+    == gold{9}
     :: Tile
 
 assert shadow_clone_return_hp_keeps_anchor_when_shadow_is_lower:

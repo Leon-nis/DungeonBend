@@ -105,10 +105,12 @@ def _ultimate_state_parts(ultimate_state: UltimateState) -> List(String):
       ["0"]
     case ultimate_state_projection_armed{}:
       ["1"]
+    case ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}:
+      ["4", U32/show(anchor_hp), _weapon_string(anchor_weapon)]
     case ultimate_state_shadow_step_live{}:
       ["2"]
-    case ultimate_state_shadow_clone_live{anchor_hp}:
-      ["3", U32/show(anchor_hp)]
+    case ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}:
+      ["3", U32/show(anchor_hp), _weapon_string(anchor_weapon)]
 
 def _run_stats_parts(stats: RunStats) -> List(String):
   match stats:

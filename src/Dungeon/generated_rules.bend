@@ -2,7 +2,7 @@ def generated_initial_seed() -> U32:
   1
 
 def generated_starting_gold() -> U32:
-  0
+  800
 
 def generated_starting_selected_hero() -> U32:
   0

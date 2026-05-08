@@ -82,6 +82,13 @@ def ultimate_state_is_projection_armed(ultimate_state: UltimateState) -> U32:
     case _:
       0
 
+def ultimate_state_is_shadow_clone_armed(ultimate_state: UltimateState) -> U32:
+  match ultimate_state:
+    case ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}:
+      1
+    case _:
+      0
+
 def ultimate_state_is_shadow_step_live(ultimate_state: UltimateState) -> U32:
   match ultimate_state:
     case ultimate_state_shadow_step_live{}:
@@ -91,7 +98,7 @@ def ultimate_state_is_shadow_step_live(ultimate_state: UltimateState) -> U32:
 
 def ultimate_state_is_shadow_clone_live(ultimate_state: UltimateState) -> U32:
   match ultimate_state:
-    case ultimate_state_shadow_clone_live{anchor_hp}:
+    case ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}:
       1
     case _:
       0
@@ -114,7 +121,21 @@ def _run_can_gain_projection(uses_projection: U32, ultimate_state: UltimateState
     case 0:
       1
     case _:
-      ultimate_state_is_idle(ultimate_state)
+      _run_can_gain_projection_idle(ultimate_state_is_idle(ultimate_state), ultimate_state_is_shadow_clone_armed(ultimate_state))
+
+def _run_can_gain_projection_idle(is_idle: U32, is_shadow_clone_armed: U32) -> U32:
+  match is_idle:
+    case 1:
+      _run_can_gain_projection_shadow_clone_armed(is_shadow_clone_armed)
+    case _:
+      0
+
+def _run_can_gain_projection_shadow_clone_armed(is_shadow_clone_armed: U32) -> U32:
+  match is_shadow_clone_armed:
+    case 1:
+      0
+    case _:
+      1
 
 def run_ultimate_ready(run_value: Run) -> U32:
   _run_ultimate_ready_projection(ultimate_kind_uses_projection(run_ultimate_kind(run_value)), run_ultimate_state(run_value), run_ultimate_charge_required(run_value), _run_ult_charge(run_value))
@@ -135,7 +156,9 @@ def _projection_ready(ultimate_state: UltimateState, required_charge: U32, curre
   match ultimate_state:
     case ultimate_state_shadow_step_live{}:
       1
-    case ultimate_state_shadow_clone_live{anchor_hp}:
+    case ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}:
+      0
+    case ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}:
       1
     case ultimate_state_projection_armed{}:
       0

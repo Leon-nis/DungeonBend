@@ -5,7 +5,7 @@
       "name": "Starter Booster",
       "price": 60,
       "reveal_count": 4,
-      "allow_duplicates": true
+      "allow_duplicates": false
     }
   ],
   "pool": [

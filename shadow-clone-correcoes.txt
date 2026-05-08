@@ -1,0 +1,90 @@
+Ultimate shadow_clone - correcoes aplicadas
+
+Contexto
+- A implementacao inicial da `shadow_clone` compartilhava parte demais da semantica de `shadow_step`.
+- Isso gerou tres problemas de gameplay:
+  - o primeiro confronto estava batendo no heroi real cedo demais
+  - a ancora perdia a leitura visual de HP/weapon no board
+  - o ultimo golpe da shadow antes da morte podia ser descartado
+
+Correcoes aplicadas
+
+1. Estado armado proprio para shadow_clone
+- Foi criado `ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}`.
+- Esse estado representa:
+  - ultimate ativada
+  - stats da ancora preservados
+  - shadow ainda usando os stats correntes do `Run`
+  - ancora ainda nao materializada no board
+- Objetivo:
+  - evitar que o primeiro ataque precise criar a ancora cedo demais
+  - preservar UI da ancora sem quebrar a semantica do primeiro confronto
+
+2. Primeiro confronto da shadow nao causa dano visivel imediato no heroi real
+- O primeiro `swipe` contra `monster` em `shadow_clone_armed` agora:
+  - resolve combate com os stats correntes da shadow
+  - atualiza HP/weapon da shadow no `Run`
+  - so materializa a ancora no board quando a shadow efetivamente sai para um tile de collect/move
+- Resultado:
+  - o dano existe e conta para a shadow
+  - mas a ancora ainda nao sofre “adiantamento” de estado no board
+
+3. Ancora preserva HP e weapon visualmente
+- `ultimate_state_shadow_clone_live` passou a carregar:
+  - `anchor_hp`
+  - `anchor_weapon`
+- O board agora renderiza `anchor_hero{}` como card de heroi dessaturado, e nao como tile generico.
+- Esse card mostra:
+  - HP da ancora
+  - weapon da ancora
+- A shadow continua sendo o card heroico controlado durante a projecao.
+
+4. Morte da shadow preenche o slot abandonado com draw real
+- O retorno por morte da shadow nao deixa mais `none{}` no board.
+- Agora o slot abandonado pela shadow recebe `draw_tile(...)`, igual ao retorno de `shadow_step`.
+- Isso avanca:
+  - `seed`
+  - `draw_counts`
+  - `remaining`
+- E elimina o “tile vazio funcionalmente morto”.
+
+5. Ultimo golpe da shadow passa a contar antes do retorno
+- No caso letal sem weapon:
+  - a shadow aplica primeiro um ataque final equivalente ao HP atual
+  - depois volta para o merge
+- Isso garante que o monstro:
+  - morra, se o golpe final bastar
+  - ou ao menos perca HP antes do retorno
+
+6. Carga continua congelada durante o ciclo especial
+- Em `shadow_clone_armed` e `shadow_clone_live`:
+  - a charge nao sobe por movimento
+- O retorno continua levando o ciclo para `0`.
+
+7. Persistencia atualizada
+- Save/load da run agora suporta:
+  - `ultimate_state_shadow_clone_armed`
+  - `ultimate_state_shadow_clone_live` com `anchor_weapon`
+- O snapshot da run continua compativel com a estrutura nova.
+
+Arquivos principais afetados
+- `src/Dungeon/_.bend`
+- `src/Dungeon/ultimate_helpers.bend`
+- `src/Dungeon/App/use_ultimate.bend`
+- `src/Dungeon/Run/apply_to_tile.bend`
+- `src/Dungeon/shadow_clone_helpers.bend`
+- `src/Dungeon/run_snapshot_to_string.bend`
+- `src/Dungeon/parse_saved_run.bend`
+- `src/Dungeon/View/board.bend`
+- `src/Dungeon/View/cards.bend`
+- `src/Dungeon/View/css.bend`
+
+Validacao
+- Build executado com sucesso via `sh scripts/build-pages.sh`.
+
+Casos recomendados para teste manual
+- Ativar `shadow_clone` e atacar monstro no primeiro swipe.
+- Ativar `shadow_clone`, pegar sword/potion antes de materializar a ancora.
+- Morrer com a shadow sem weapon contra monstro de HP maior.
+- Retornar por recast com weapon parcialmente gasta.
+- Confirmar que o slot da shadow recebe draw real tanto no recast quanto na morte.

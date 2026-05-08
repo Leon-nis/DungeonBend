@@ -1,0 +1,129 @@
+Ultimate shadow_clone - plano implementacao
+
+Resumo da regra final
+- Primeira ativacao:
+  - zera a charge
+  - entra em `shadow_clone_armed`
+  - preserva `anchor_hp` e `anchor_weapon`
+- Enquanto `shadow_clone_armed`:
+  - o `Run` continua carregando os stats correntes da shadow
+  - a ancora ainda nao existe como tile no board
+  - a charge fica congelada
+- Primeiro collect/move valido apos isso:
+  - cria `anchor_hero{}` na origem
+  - move a shadow para o alvo
+  - nao faz `draw_tile`
+  - nao avanca RNG
+  - entra em `shadow_clone_live`
+- Durante `shadow_clone_live`:
+  - o board mostra a ancora como card de heroi dessaturado
+  - a shadow usa HP/weapon correntes do `Run`
+  - a charge continua congelada
+- Recast:
+  - volta para a ancora
+  - o slot abandonado pela shadow recebe `draw_tile`
+  - HP faz merge “so para cima”
+  - weapon final da shadow prevalece
+- Morte da shadow:
+  - nao e game over
+  - aplica o ultimo golpe primeiro
+  - depois retorna para a ancora
+  - o slot abandonado recebe `draw_tile`
+
+Adaptacoes necessarias em relacao ao plano inicial
+
+1. Separar `projection_armed` generico de `shadow_clone_armed`
+- O estado generico `ultimate_state_projection_armed{}` continuou bom para `shadow_step`.
+- Para `shadow_clone`, ele era insuficiente porque nao carregava:
+  - HP da ancora
+  - weapon da ancora
+- Solucao:
+  - manter o estado generico
+  - adicionar `ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}`
+
+2. Nao materializar a ancora cedo demais
+- O plano inicial considerava criar a ancora logo no primeiro confronto/saida.
+- Isso quebrou a semantica do primeiro golpe, porque o heroi real passava a “existir” cedo demais.
+- Solucao:
+  - em `shadow_clone_armed`, a ancora e so um payload logico
+  - ela so vira `anchor_hero{}` no board quando a shadow realmente sai para um collect/move
+
+3. HUD/visual da ancora deve vir do estado, nao do Run corrente
+- Em `shadow_clone_live`, o `Run` representa a shadow.
+- Logo, HP/weapon do heroi real precisam vir de outro lugar.
+- Solucao:
+  - `ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}`
+  - renderizacao do `anchor_hero{}` usando esses valores
+
+4. Morte da shadow precisa seguir a mesma familia de retorno do recast
+- O plano antigo ainda deixava espaco para um encerramento especial assimetrico.
+- Isso causava tile vazio e perda de consistencia de RNG.
+- Solucao:
+  - morte da shadow usa o mesmo principio do recast:
+    - retorno para ancora
+    - `draw_tile` no slot abandonado
+    - reset do estado especial
+
+5. “Ultimo golpe” exige regra propria
+- O combate padrao do heroi mata imediatamente quando o HP zera.
+- Para a shadow, isso nao bastava: o golpe final precisava existir antes do retorno.
+- Solucao:
+  - branch propria para confronto letal da shadow
+  - aplicar o ataque final
+  - depois encerrar a projecao
+
+Arquitetura final
+
+Estados
+- `ultimate_state_idle{}`
+- `ultimate_state_projection_armed{}`
+- `ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}`
+- `ultimate_state_shadow_step_live{}`
+- `ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}`
+
+Camada compartilhada com shadow_step
+- ultimate data-driven em `HeroDef`
+- `charge freeze`
+- retorno com `draw_tile` no slot abandonado
+- leitura de `projection live` para o botao/UX
+- save/load do estado especial
+
+Camada especifica de shadow_clone
+- estado armado proprio com payload da ancora
+- ainda sem ancora fisica no board
+- transicao para `shadow_clone_live` apenas no primeiro collect/move
+- render de ancora dessaturada
+- merge de HP “so para cima”
+- weapon da shadow prevalece no retorno
+- branch de ultimo golpe antes da morte
+
+Arquivos principais
+- `src/Dungeon/_.bend`
+- `src/Dungeon/ultimate_helpers.bend`
+- `src/Dungeon/App/use_ultimate.bend`
+- `src/Dungeon/Run/apply_to_tile.bend`
+- `src/Dungeon/shadow_clone_helpers.bend`
+- `src/Dungeon/run_snapshot_to_string.bend`
+- `src/Dungeon/parse_saved_run.bend`
+- `src/Dungeon/View/board.bend`
+- `src/Dungeon/View/cards.bend`
+- `src/Dungeon/View/css.bend`
+
+Riscos que ficaram controlados
+- Adiantar dano/weapon da shadow para o heroi real antes da hora.
+- Deixar tile `none{}` funcional no retorno.
+- Perder o ultimo golpe da shadow em morte letal.
+- Misturar a regra especifica de `shadow_clone` com `shadow_step`.
+
+Asserts recomendados daqui para frente
+- `shadow_clone_armed` existe e serializa corretamente.
+- Primeiro confronto em `shadow_clone_armed` nao cria ancora fisica no board.
+- Primeiro collect em `shadow_clone_armed` cria ancora e entra em `shadow_clone_live`.
+- Morte da shadow gera `draw_tile` no slot abandonado.
+- Recast continua gerando `draw_tile` no slot abandonado.
+- Merge de HP sobe apenas quando a shadow retorna com HP maior.
+- Weapon da shadow prevalece no retorno.
+
+Estado atual da implementacao
+- O runtime ja segue esse plano atualizado.
+- O plano antigo do `shadow_step` continua util como referencia da infraestrutura compartilhada, mas nao descreve mais corretamente o ciclo completo de `shadow_clone`.

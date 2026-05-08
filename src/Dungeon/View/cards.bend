@@ -25,6 +25,9 @@ def _hero_card_values(hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapo
 def _hero_card_values_shadow_clone(hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx) -> HTML(DungeonEvent):
   _hero_card_values_with_sprite(hero_name(hero_value), _shadow_clone_sprite(), _hero_card_class_shadow_clone(dmg_fx), hero_hp, hero_max_hp, weapon_value, hp_fx)
 
+def _hero_card_values_anchor(hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon) -> HTML(DungeonEvent):
+  _hero_card_values_with_sprite(hero_name(hero_value), hero_sprite(hero_value), "card card--hero card--hero-anchor", hero_hp, hero_max_hp, weapon_value, hp_fx_none{})
+
 def _hero_card_values_with_sprite(hero_name_value: String, hero_sprite_value: String, class_name: String, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx) -> HTML(DungeonEvent):
   card_neutral(
     DungeonEvent,

@@ -33,8 +33,10 @@ import Dungeon/View/assets_and_labels/_gold_icon as _gold_icon
 import Dungeon/deck_counter_frames/idle_src as deck_counter_idle_src
 import Dungeon/deck_counter_animation/clip as deck_counter_clip
 import Dungeon/View/cards/_hero_card_values as _hero_card_values
+import Dungeon/View/cards/_hero_card_values_anchor as _hero_card_values_anchor
 import Dungeon/View/cards/_hero_card_values_shadow_clone as _hero_card_values_shadow_clone
 import Dungeon/View/cards/_tile_card as _tile_card
+import Dungeon/ultimate_helpers/ultimate_state_is_shadow_clone_armed as ultimate_state_is_shadow_clone_armed
 import Dungeon/ultimate_helpers/ultimate_state_is_shadow_clone_live as ultimate_state_is_shadow_clone_live
 import Dungeon/Content as Content
 import Midum/Button/primary as button_primary
@@ -275,11 +277,39 @@ def _board_card_at(run_value: Run, ui_value: UiState, hero_value: HeroDef, idx: 
 def _board_card_identity(is_hero: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx, ultimate_state: UltimateState, tile_value: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(DungeonEvent):
   match is_hero:
     case 0:
-      _tile_card(tile_value, pos, damage_overlay)
+      _board_tile_identity(hero_value, hero_max_hp, ultimate_state, tile_value, pos, damage_overlay)
     case _:
-      _hero_card_identity_state(ultimate_state_is_shadow_clone_live(ultimate_state), hero_value, hero_hp, hero_max_hp, weapon_value, hp_fx, dmg_fx)
+      _hero_card_identity_state(ultimate_state_is_shadow_clone_armed(ultimate_state), ultimate_state_is_shadow_clone_live(ultimate_state), hero_value, hero_hp, hero_max_hp, weapon_value, hp_fx, dmg_fx, ultimate_state)
 
-def _hero_card_identity_state(is_shadow_clone_live: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx) -> HTML(DungeonEvent):
+def _board_tile_identity(hero_value: HeroDef, hero_max_hp: U32, ultimate_state: UltimateState, tile_value: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(DungeonEvent):
+  match tile_value:
+    case anchor_hero{hero_ref}:
+      _anchor_hero_card_state(hero_value, hero_max_hp, ultimate_state, tile_value, pos, damage_overlay)
+    case _:
+      _tile_card(tile_value, pos, damage_overlay)
+
+def _anchor_hero_card_state(hero_value: HeroDef, hero_max_hp: U32, ultimate_state: UltimateState, tile_value: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(DungeonEvent):
+  match ultimate_state:
+    case ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}:
+      _hero_card_values_anchor(hero_value, anchor_hp, hero_max_hp, anchor_weapon)
+    case _:
+      _tile_card(tile_value, pos, damage_overlay)
+
+def _hero_card_identity_state(is_shadow_clone_armed: U32, is_shadow_clone_live: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx, ultimate_state: UltimateState) -> HTML(DungeonEvent):
+  match is_shadow_clone_armed:
+    case 1:
+      _hero_card_identity_shadow_clone_armed(hero_value, hero_max_hp, weapon_value, ultimate_state)
+    case _:
+      _hero_card_identity_live_state(is_shadow_clone_live, hero_value, hero_hp, hero_max_hp, weapon_value, hp_fx, dmg_fx)
+
+def _hero_card_identity_shadow_clone_armed(hero_value: HeroDef, hero_max_hp: U32, weapon_value: Weapon, ultimate_state: UltimateState) -> HTML(DungeonEvent):
+  match ultimate_state:
+    case ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}:
+      _hero_card_values_anchor(hero_value, anchor_hp, hero_max_hp, anchor_weapon)
+    case _:
+      _hero_card_values(hero_value, hero_max_hp, hero_max_hp, weapon_value, hp_fx_none{}, dmg_fx_none{})
+
+def _hero_card_identity_live_state(is_shadow_clone_live: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx) -> HTML(DungeonEvent):
   match is_shadow_clone_live:
     case 0:
       _hero_card_values(hero_value, hero_hp, hero_max_hp, weapon_value, hp_fx, dmg_fx)

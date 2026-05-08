@@ -464,6 +464,8 @@ def _parse_saved_ultimate_state(kind_maybe: Maybe(U32), rest: List(String)) -> M
       _parse_saved_ultimate_state_shadow_step_live(rest)
     case some{3}:
       _parse_saved_ultimate_state_shadow_clone_live(rest)
+    case some{4}:
+      _parse_saved_ultimate_state_shadow_clone_armed(rest)
     case _:
       none{}
 
@@ -473,25 +475,51 @@ def _parse_saved_ultimate_state_idle(rest: List(String)) -> Maybe(UltimateState)
 def _parse_saved_ultimate_state_projection_armed(rest: List(String)) -> Maybe(UltimateState):
   some{ultimate_state_projection_armed{}}
 
-def _parse_saved_ultimate_state_shadow_step_live(rest: List(String)) -> Maybe(UltimateState):
-  some{ultimate_state_shadow_step_live{}}
-
-def _parse_saved_ultimate_state_shadow_clone_live(rest: List(String)) -> Maybe(UltimateState):
+def _parse_saved_ultimate_state_shadow_clone_armed(rest: List(String)) -> Maybe(UltimateState):
   match rest:
-    case anchor_hp_str<>rest1:
+    case anchor_hp_str<>anchor_weapon_str<>rest1:
       match rest1:
         case []:
-          _parse_saved_ultimate_state_shadow_clone_hp(String/to_u32(anchor_hp_str))
+          _parse_saved_ultimate_state_shadow_clone_armed_values(String/to_u32(anchor_hp_str), _parse_saved_weapon(String/split(anchor_weapon_str, '~')))
         case _:
           none{}
     case _:
       none{}
 
-def _parse_saved_ultimate_state_shadow_clone_hp(anchor_hp_maybe: Maybe(U32)) -> Maybe(UltimateState):
-  match anchor_hp_maybe:
-    case some{anchor_hp}:
-      some{ultimate_state_shadow_clone_live{anchor_hp}}
-    case none{}:
+def _parse_saved_ultimate_state_shadow_clone_armed_values(anchor_hp_maybe: Maybe(U32), anchor_weapon_maybe: Maybe(Weapon)) -> Maybe(UltimateState):
+  match anchor_hp_maybe anchor_weapon_maybe:
+    case some{anchor_hp} some{anchor_weapon}:
+      some{ultimate_state_shadow_clone_armed{anchor_hp, anchor_weapon}}
+    case _ _:
+      none{}
+
+def _parse_saved_ultimate_state_shadow_step_live(rest: List(String)) -> Maybe(UltimateState):
+  some{ultimate_state_shadow_step_live{}}
+
+def _parse_saved_ultimate_state_shadow_clone_live(rest: List(String)) -> Maybe(UltimateState):
+  match rest:
+    case anchor_hp_str<>anchor_weapon_str<>rest1:
+      match rest1:
+        case []:
+          _parse_saved_ultimate_state_shadow_clone_values(String/to_u32(anchor_hp_str), _parse_saved_weapon(String/split(anchor_weapon_str, '~')))
+        case _:
+          none{}
+    case anchor_hp_str<>rest1:
+      match rest1:
+        case []:
+          _parse_saved_ultimate_state_shadow_clone_values(String/to_u32(anchor_hp_str), some{no_weapon{}})
+        case _:
+          none{}
+    case _:
+      none{}
+
+def _parse_saved_ultimate_state_shadow_clone_values(anchor_hp_maybe: Maybe(U32), anchor_weapon_maybe: Maybe(Weapon)) -> Maybe(UltimateState):
+  match anchor_hp_maybe anchor_weapon_maybe:
+    case some{anchor_hp} some{anchor_weapon}:
+      some{ultimate_state_shadow_clone_live{anchor_hp, anchor_weapon}}
+    case none{} _:
+      none{}
+    case _ none{}:
       none{}
 
 def _parse_saved_run_stats_after_ultimate(kind_maybe: Maybe(U32), rest: List(String)) -> Maybe(RunStats):
@@ -504,11 +532,15 @@ def _parse_saved_run_stats_after_ultimate(kind_maybe: Maybe(U32), rest: List(Str
       _parse_saved_run_stats(rest)
     case some{3}:
       _parse_saved_run_stats_after_shadow_clone(rest)
+    case some{4}:
+      _parse_saved_run_stats_after_shadow_clone(rest)
     case _:
       none{}
 
 def _parse_saved_run_stats_after_shadow_clone(rest: List(String)) -> Maybe(RunStats):
   match rest:
+    case anchor_hp_str<>anchor_weapon_str<>rest1:
+      _parse_saved_run_stats(rest1)
     case anchor_hp_str<>rest1:
       _parse_saved_run_stats(rest1)
     case _:
