@@ -32,7 +32,7 @@ def hero_gato_de_botas_name() -> String:
   "Gato de Botas"
 
 def hero_gato_de_botas_ultimate_desc() -> String:
-  "Refills the dungeon with new cards while keeping the hero in place."
+  "Leaves the hero anchored and sends out a shadow clone. Use it again to return to the anchor."
 
 def hero_gato_de_botas_ultimate_title() -> String:
   "Ultimate"
@@ -221,6 +221,12 @@ def ultimate_refill_desc() -> String:
   "Refills the dungeon with new cards while keeping the hero in place."
 
 def ultimate_refill_title() -> String:
+  "Ultimate"
+
+def ultimate_shadow_clone_desc() -> String:
+  "Leaves the hero anchored and sends out a shadow clone. Use it again to return to the anchor."
+
+def ultimate_shadow_clone_title() -> String:
   "Ultimate"
 
 def ultimate_shadow_step_desc() -> String:

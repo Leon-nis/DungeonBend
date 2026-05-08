@@ -8,7 +8,9 @@
     "starts_unlocked": true,
     "ultimate_charge_required": 8,
     "ultimate_kind": "refill",
-    "passive": { "kind": "none" }
+    "passive": {
+      "kind": "none"
+    }
   },
   {
     "id": "gato_de_botas",
@@ -17,8 +19,10 @@
     "base_max_hp": 12,
     "unlock_cost": 0,
     "starts_unlocked": true,
-    "ultimate_kind": "shadow_step",
+    "ultimate_kind": "shadow_clone",
     "ultimate_charge_required": 4,
-    "passive": { "kind": "weapon_accumulator_same_class" }
+    "passive": {
+      "kind": "weapon_accumulator_same_class"
+    }
   }
 ]

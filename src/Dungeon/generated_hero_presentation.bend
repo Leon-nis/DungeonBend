@@ -5,7 +5,7 @@ import List/append as append
 def generated_hero_presentation_items_chunk_0() -> List(HeroPresentation):
   [
     hero_presentation{"adventurer", presentation_center{}, "A steady explorer ready for the next dungeon.", "Ultimate", "assets/item-sword.png", "Refills the dungeon with new cards while keeping the hero in place.", 0, "", ""},
-    hero_presentation{"gato_de_botas", presentation_center{}, "A sly duelist who turns quick moves into clean wins.", "Ultimate", "assets/item-sword.png", "Arms a shadow. The next move leaves it behind, and a second use returns the hero to that spot.", 1, "Weapon Mastery", "Weapons of the same class stack their damage."}
+    hero_presentation{"gato_de_botas", presentation_center{}, "A sly duelist who turns quick moves into clean wins.", "Ultimate", "assets/item-sword.png", "Leaves the hero anchored and sends out a shadow clone. Use it again to return to the anchor.", 1, "Weapon Mastery", "Weapons of the same class stack their damage."}
   ]
 
 def generated_hero_presentation() -> List(HeroPresentation):

@@ -207,7 +207,7 @@ def generated_pack_0_pool_chunk_0() -> List(PackPoolEntry):
 def generated_config_heroes_chunk_0() -> List(HeroDef):
   [
     hero_def{"adventurer", "Adventurer", "assets/player-boy.png", 12, 0, 1, generated_hero_0_upgrades_chunk_0(), ultimate_refill{}, 8, passive_none{}},
-    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 12, 0, 1, generated_hero_1_upgrades_chunk_0(), ultimate_shadow_step{}, 4, passive_weapon_accumulator_same_class{}}
+    hero_def{"gato_de_botas", "Gato de Botas", "assets/player-gato-de-botas.png", 12, 0, 1, generated_hero_1_upgrades_chunk_0(), ultimate_shadow_clone{}, 4, passive_weapon_accumulator_same_class{}}
   ]
 
 def generated_config_monsters_chunk_0() -> List(MonsterDef):
