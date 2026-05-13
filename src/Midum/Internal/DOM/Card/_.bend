@@ -3,7 +3,7 @@
 # This module maps concrete card{...} values to the current DOM renderer and
 # theme tracks.
 
-import HTML
+import HTML as HTML
 import Nat/is_zero as is_zero_nat
 import Nat/show as show_nat
 
@@ -406,6 +406,8 @@ def surface_script_1() -> String:
       let ctx = canvas.getContext('2d');
       if (!ctx) return;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
       ctx.clearRect(0, 0, cssWidth, cssHeight);
       let sourceLeft = readNat(canvas.dataset.sourceLeft);
       let sourceRight = readNat(canvas.dataset.sourceRight);

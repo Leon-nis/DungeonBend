@@ -16,7 +16,20 @@
       "Bash(sips -g pixelWidth -g pixelHeight /tmp/old-deck2.png)",
       "Bash(sips -g pixelWidth -g pixelHeight /tmp/old-deck7.png)",
       "Bash(git show *)",
-      "Read(//tmp/**)"
+      "Read(//tmp/**)",
+      "Read(//Users/isabellaherman/Documents/HOC/Bend2/**)",
+      "Bash(python3 -m http.server 8765)",
+      "Bash(echo \"PID=$!\")",
+      "Bash(curl -s http://localhost:8765/ -o /tmp/deck-page.html)",
+      "Bash(curl -s -o /tmp/deck-page.html http://localhost:8765/)",
+      "Bash(kill 72936)",
+      "Bash(awk '/\\\\.deck-chrome/,/^}/' /Users/isabellaherman/Documents/HOC/DungeonBend/assets/generated/dungeon-view.css)",
+      "Bash(cp assets/generated/dungeon-view.css /tmp/dungeon-view.before.css)",
+      "Bash(bun scripts/generate-dungeon-view-css.ts)",
+      "Bash(cp \"/Users/isabellaherman/Downloads/GUI Pro-FantasyHero/PNG/Components/Icon_ItemIcons/512/ItemIcon_Coin_Gold.png\" /Users/isabellaherman/Documents/HOC/DungeonBend/assets/ui/topbar/icon-gold.png)",
+      "Bash(cp \"/Users/isabellaherman/Downloads/GUI Pro-FantasyHero/PNG/Components/Icon_ItemIcons/512/ItemIcon_Card_1.png\" /Users/isabellaherman/Documents/HOC/DungeonBend/assets/ui/topbar/icon-boosters.png)",
+      "Bash(scripts/build.sh)",
+      "Bash(OUT_DIR=docs scripts/build.sh)"
     ]
   }
 }

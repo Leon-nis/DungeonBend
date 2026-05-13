@@ -1,25 +1,27 @@
-import HTML
+import HTML as HTML
 import Dungeon/Meta as Meta
 import Dungeon/Run as Run
 import Dungeon/Scene as Scene
 import Dungeon/UiState as UiState
 import Dungeon/DungeonEvent as DungeonEvent
 import Dungeon/App/key_event as key_event
-import Dungeon/View/css as css
 import Dungeon/View/assets_and_labels/_dungeon_bg as _dungeon_bg
 import Dungeon/View/menu/_render_menu as _render_menu
 import Dungeon/View/menu/_render_character_select as _render_character_select
 import Dungeon/View/boosters/_render_boosters as _render_boosters
 import Dungeon/View/ultimate_preview/_render_ultimate_preview as _render_ultimate_preview
 import Dungeon/View/board/_render_dungeon as _render_dungeon
+import Dungeon/View/deck_list/_render_deck_list as _render_deck_list
+import Dungeon/View/deck_detail/_render_deck_detail as _render_deck_detail
 import Dungeon/UltimateCutins/cutin_spec_for_hero_ref as cutin_spec_for_hero_ref
 import Dungeon/UltimateCutins/_render_ultimate_cutin as _render_ultimate_cutin
 import Midum/screen as screen
+
 def _frame(body: HTML(DungeonEvent)) -> HTML(DungeonEvent):
   screen(
     DungeonEvent,
     <div class="page" tabindex="0" autofocus="autofocus" style="outline:none" on_key_down={key_event}>
-      <style>{text{css()}}</style>
+      <link rel="stylesheet" href="assets/generated/dungeon-view.css" />
       <img
         class="page-preload-image"
         src={_dungeon_bg()}
@@ -36,7 +38,7 @@ def _frame(body: HTML(DungeonEvent)) -> HTML(DungeonEvent):
 def _screen_root(meta_state: Meta, scene_value: Scene, ui_value: UiState) -> HTML(DungeonEvent):
   match scene_value:
     case setup{}:
-      _render_menu(meta_state)
+      _render_menu(meta_state, ui_value)
     case character_select{preview_hero}:
       _render_character_select(meta_state, preview_hero)
     case boosters{reward, reveal_index, return_to}:
@@ -53,6 +55,10 @@ def _screen_root(meta_state: Meta, scene_value: Scene, ui_value: UiState) -> HTM
       _render_dungeon(meta_state, resume_prompt{run_value}, run_value, ui_value)
     case game_over{run_value}:
       _render_dungeon(meta_state, game_over{run_value}, run_value, ui_value)
+    case deck_list{mode, sleeve_picker}:
+      _render_deck_list(meta_state, mode, sleeve_picker)
+    case deck_detail{deck_id, draft, picker, detail_mode, sleeve_picker}:
+      _render_deck_detail(meta_state, deck_id, draft, picker, detail_mode, sleeve_picker)
 
 def _render_ultimate_cinematic_scene(meta_state: Meta, run_value: Run, ticks_remaining: U32, ui_value: UiState) -> HTML(DungeonEvent):
   <div class="screen-root-stack">
