@@ -1,5 +1,4 @@
-import HTML
-import U32 as U32
+import HTML as HTML
 import Dungeon/HeroDef as HeroDef
 import Dungeon/Weapon as Weapon
 import Dungeon/Tile as Tile
@@ -34,53 +33,63 @@ import Dungeon/deck_counter_animation/clip as deck_counter_clip
 import Dungeon/View/cards/_hero_card_values as _hero_card_values
 import Dungeon/View/cards/_tile_card as _tile_card
 import Dungeon/Content as Content
-import Midum/Button as Button
-import Midum/Button/Size
-import Midum/Card as Card
-import Midum/Image as Image
-import Midum/Layout as Layout
+import Midum/Button/primary as button_primary
+import Midum/Button/secondary as button_secondary
+import Midum/Card/neutral as card_neutral
+import Midum/Grid/cell as grid_cell
+import Midum/Grid/view as grid_view
+import Midum/Image/view as image_view
+import Midum/Image/animated as image_animated
+import Midum/Layout/bottom as layout_bottom
+import Midum/Layout/center as layout_center
+import Midum/Layout/frame as layout_frame
+import Midum/Layout/overlay as layout_overlay
+import Midum/Layout/shell as layout_shell
+import Midum/Layout/top as layout_top
+import Midum/Layout/top_right as layout_top_right
+
 def _render_dungeon(meta_state: Meta, scene_value: Scene, run_value: Run, ui_value: UiState) -> HTML(DungeonEvent):
   hero_value = hero_at(config(), selected_hero(meta_state));
   <div every_ms={125, damage_tick{}}>
     <div class="dungeon-scene">
       {_dungeon_shell(
-        Layout.frame(
+        layout_frame(
           DungeonEvent,
-          Layout.overlay(DungeonEvent, [
-            Layout.top(DungeonEvent,
-              Layout.frame(
+          layout_overlay(DungeonEvent, [
+            layout_top(DungeonEvent,
+              layout_frame(
                 DungeonEvent,
                 _dungeon_header(meta_state, scene_value, ui_value),
-                [width_full{} height_fit{} inset_none{}]
+                [width_full{}, height_fit{}, inset_none{}]
               )
-            )
-            Layout.top_right(DungeonEvent,
+            ),
+            layout_top_right(DungeonEvent,
               _pause_action(scene_value)
-            )
-            Layout.center(DungeonEvent,
+            ),
+            layout_center(DungeonEvent,
               _board_grid(scene_value, run_value, ui_value, hero_value)
-            )
-              Layout.bottom(DungeonEvent,
-                _ultimate_action(scene_value)
-              )
-              _board_modal_layer(scene_value)
+            ),
+            layout_bottom(DungeonEvent,
+              _ultimate_action(scene_value)
+            ),
+            _board_modal_layer(scene_value)
             ]),
-            [width_full{} height_full{} inset_none{}]
+            [width_full{}, height_full{}, inset_none{}]
           )
       )}
     </div>
   </div>
 
 def _dungeon_shell(body: HTML(DungeonEvent)) -> HTML(DungeonEvent):
-  Layout.shell(
+  layout_shell(
     DungeonEvent,
     body,
     [
-      max_width_px{value: 1080n}
-      height_viewport{}
-      overflow_hidden{}
-      safe_area{}
-      inset_px{top: 24n, right: 14n, bottom: 20n, left: 14n}
+      max_width_px{value: 1080n},
+      height_viewport{},
+      overflow_hidden{},
+      safe_area{},
+      inset_px{top: 24n, right: 14n, bottom: 20n, left: 14n},
       compact_inset_px{top: 20n, right: 12n, bottom: 18n, left: 12n}
     ]
   )
@@ -90,15 +99,15 @@ def _deck_counter_overrides() -> List(Midum/Image/Override):
 
 def _deck_counter_visual(ui_value: UiState) -> HTML(DungeonEvent):
   match ui_value:
-    case ui_state{hp_fx, dmg_fx, impact, damage_overlay, deck_counter_fx}:
+    case ui_state{hp_fx, dmg_fx, impact, damage_overlay, deck_counter_fx, menu_background_state}:
       match deck_counter_fx:
         case deck_counter_idle{}:
           <div class="dungeon-resource__deck-visual">
-            {Image.view(DungeonEvent, deck_counter_idle_src(), Content.ui_topbar_cards(), _deck_counter_overrides())}
+            {image_view(DungeonEvent, deck_counter_idle_src(), Content.ui_topbar_cards(), _deck_counter_overrides())}
           </div>
         case deck_counter_playing{deck_counter_state}:
           <div class="dungeon-resource__deck-visual">
-            {Image.animated(DungeonEvent, deck_counter_state, deck_counter_clip(), Content.ui_topbar_cards(), _deck_counter_overrides())}
+            {image_animated(DungeonEvent, deck_counter_state, deck_counter_clip(), Content.ui_topbar_cards(), _deck_counter_overrides())}
           </div>
 
 def _dungeon_deck_counter(scene_value: Scene, ui_value: UiState) -> HTML(DungeonEvent):
@@ -130,21 +139,41 @@ def _dungeon_level(scene_value: Scene) -> HTML(DungeonEvent):
   <div class="dungeon-level">
     <div class="dungeon-level__badge-frame">
       <div class="dungeon-level__badge-art">
-        {Image.view(DungeonEvent, _dungeon_level_badge_backdrop(), "", [])}
+        {image_view(DungeonEvent, _dungeon_level_badge_backdrop(), "", [])}
       </div>
       <span class="dungeon-level__badge-text">{text{Content.ui_dungeon_level()}}</span>
     </div>
     <div class="dungeon-level__value-frame">
       <div class="dungeon-level__value-art">
-        {Image.view(DungeonEvent, _dungeon_level_value_backdrop(), "", [])}
+        {image_view(DungeonEvent, _dungeon_level_value_backdrop(), "", [])}
       </div>
       <strong class="dungeon-level__value-text">{text{dungeon_level_value(scene_value)}}</strong>
     </div>
   </div>
 
 def _board_grid(scene_value: Scene, run_value: Run, ui_value: UiState, hero_value: HeroDef) -> HTML(DungeonEvent):
-  cells = U32.grid(HTML(DungeonEvent), 3, 3, _board_slot(run_value, ui_value, hero_value));
-  <div class={_board_class(scene_value)}>{...cells}</div>
+  <div class={_board_class(scene_value)}>
+    {grid_view(
+      DungeonEvent,
+      [
+        _board_grid_cell(run_value, ui_value, hero_value, 0, 0),
+        _board_grid_cell(run_value, ui_value, hero_value, 1, 0),
+        _board_grid_cell(run_value, ui_value, hero_value, 2, 0),
+        _board_grid_cell(run_value, ui_value, hero_value, 0, 1),
+        _board_grid_cell(run_value, ui_value, hero_value, 1, 1),
+        _board_grid_cell(run_value, ui_value, hero_value, 2, 1),
+        _board_grid_cell(run_value, ui_value, hero_value, 0, 2),
+        _board_grid_cell(run_value, ui_value, hero_value, 1, 2),
+        _board_grid_cell(run_value, ui_value, hero_value, 2, 2)
+      ],
+      [
+        perspective{value: 16n},
+        grid_gap_x{value: 43n},
+        grid_gap_y{value: 120n},
+        max_transfer{value: 40n}
+      ]
+    )}
+  </div>
 
 def _ultimate_action(scene_value: Scene) -> HTML(DungeonEvent):
   <div class="ultimate-action">
@@ -186,15 +215,19 @@ def _board_modal_layer(scene_value: Scene) -> HTML(DungeonEvent):
     case running{run_value}:
       text{""}
     case paused{run_value}:
-      Layout.center(DungeonEvent, _pause_modal(scene_value))
+      layout_center(DungeonEvent, _pause_modal(scene_value))
     case resume_prompt{run_value}:
-      Layout.center(DungeonEvent, _resume_prompt_modal(scene_value))
+      layout_center(DungeonEvent, _resume_prompt_modal(scene_value))
     case game_over{run_value}:
-      Layout.center(DungeonEvent, _game_over_modal(scene_value))
+      layout_center(DungeonEvent, _game_over_modal(scene_value))
+    case deck_list{mode, sleeve_picker}:
+      text{""}
+    case deck_detail{deck_id, draft, picker, detail_mode, sleeve_picker}:
+      text{""}
 
 def _pause_modal(scene_value: Scene) -> HTML(DungeonEvent):
   <div class={game_over_modal_class(scene_value)}>
-    {Card.neutral(
+    {card_neutral(
       DungeonEvent,
       <div class="game-over-card">
         <p class="game-over-card__eyebrow">{text{Content.ui_pause_eyebrow()}}</p>
@@ -215,7 +248,7 @@ def _pause_modal(scene_value: Scene) -> HTML(DungeonEvent):
 
 def _resume_prompt_modal(scene_value: Scene) -> HTML(DungeonEvent):
   <div class={game_over_modal_class(scene_value)}>
-    {Card.neutral(
+    {card_neutral(
       DungeonEvent,
       <div class="game-over-card">
         <p class="game-over-card__eyebrow">{text{Content.ui_game_over_resume_eyebrow()}}</p>
@@ -236,7 +269,7 @@ def _resume_prompt_modal(scene_value: Scene) -> HTML(DungeonEvent):
 
 def _game_over_modal(scene_value: Scene) -> HTML(DungeonEvent):
   <div class={game_over_modal_class(scene_value)}>
-    {Card.neutral(
+    {card_neutral(
       DungeonEvent,
       <div class="game-over-card">
         <p class="game-over-card__eyebrow">{text{Content.ui_game_over_end_eyebrow()}}</p>
@@ -254,7 +287,7 @@ def _board_idx(x: U32, y: U32) -> U32:
 
 def _board_card_at(run_value: Run, ui_value: UiState, hero_value: HeroDef, idx: U32, pos: Nat/V2) -> HTML(DungeonEvent):
   match run_value ui_value:
-    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref} ui_state{hp_fx, dmg_fx, impact, damage_overlay, deck_counter_fx}:
+    case run{dungeon_level, hero_hp, hero_max_hp, hero_index, weapon, board_value, deck_blueprint, draw_counts, remaining, capacity, seed, ult_charge, hero_ref} ui_state{hp_fx, dmg_fx, impact, damage_overlay, deck_counter_fx, menu_background_state}:
       _board_card_identity(hero_index === idx, hero_value, hero_hp, hero_max_hp, weapon, hp_fx, dmg_fx, board_get(board_value, idx), pos, damage_overlay)
 
 def _board_card_identity(is_hero: U32, hero_value: HeroDef, hero_hp: U32, hero_max_hp: U32, weapon_value: Weapon, hp_fx: HpFx, dmg_fx: DmgFx, tile_value: Tile, pos: Nat/V2, damage_overlay: DamageOverlay) -> HTML(DungeonEvent):
@@ -267,9 +300,20 @@ def _board_card_identity(is_hero: U32, hero_value: HeroDef, hero_hp: U32, hero_m
 def _board_slot(run_value: Run, ui_value: UiState, hero_value: HeroDef, x: U32, y: U32) -> HTML(DungeonEvent):
   _board_slot_at(run_value, ui_value, hero_value, _board_idx(x, y), board_xy_pos(x, y))
 
+def _board_grid_cell(run_value: Run, ui_value: UiState, hero_value: HeroDef, x: U32, y: U32) -> Midum/Grid/Cell(DungeonEvent):
+  grid_cell(
+    DungeonEvent,
+    _board_slot(run_value, ui_value, hero_value, x, y),
+    [
+      trap_border_color{value: "rgba(255,255,255,0.82)"},
+      trap_border_width_px{value: 1n},
+      trap_fill_color{value: "transparent"}
+    ]
+  )
+
 def _board_slot_at(run_value: Run, ui_value: UiState, hero_value: HeroDef, idx: U32, pos: Nat/V2) -> HTML(DungeonEvent):
   match ui_value:
-    case ui_state{hp_fx, dmg_fx, impact_value, damage_overlay, deck_counter_fx}:
+    case ui_state{hp_fx, dmg_fx, impact_value, damage_overlay, deck_counter_fx, menu_background_state}:
       _board_slot_node(idx, pos, impact_value, _board_card_at(run_value, ui_value, hero_value, idx, pos))
 
 def _board_slot_node(idx: U32, pos: Nat/V2, impact_value: Impact, body: HTML(DungeonEvent)) -> HTML(DungeonEvent):
@@ -303,7 +347,7 @@ def _board_slot_impact_class(impact_fx: ImpactFx) -> String:
       "board-slot board-slot--kill-b"
 
 def _ultimate_button(scene_value: Scene) -> HTML(DungeonEvent):
-  Button.primary(
+  button_primary(
     DungeonEvent,
     ultimate{},
     large{},
@@ -312,16 +356,16 @@ def _ultimate_button(scene_value: Scene) -> HTML(DungeonEvent):
   )
 
 def _game_over_ok_button() -> HTML(DungeonEvent):
-  Button.primary(DungeonEvent, ok{}, medium{}, Content.ui_game_over_ok(), [width_full{}])
+  button_primary(DungeonEvent, ok{}, medium{}, Content.ui_game_over_ok(), [width_full{}])
 
 def _pause_button() -> HTML(DungeonEvent):
-  Button.secondary(DungeonEvent, pause_dungeon{}, small{}, Content.ui_dungeon_pause(), [])
+  button_secondary(DungeonEvent, pause_dungeon{}, small{}, Content.ui_dungeon_pause(), [])
 
 def _pause_resume_button() -> HTML(DungeonEvent):
-  Button.primary(DungeonEvent, resume_dungeon{}, large{}, Content.ui_pause_resume(), [width_full{}])
+  button_primary(DungeonEvent, resume_dungeon{}, large{}, Content.ui_pause_resume(), [width_full{}])
 
 def _resume_dungeon_button() -> HTML(DungeonEvent):
-  Button.primary(DungeonEvent, resume_dungeon{}, large{}, Content.ui_game_over_resume_dungeon(), [width_full{}])
+  button_primary(DungeonEvent, resume_dungeon{}, large{}, Content.ui_game_over_resume_dungeon(), [width_full{}])
 
 def _resume_menu_button() -> HTML(DungeonEvent):
-  Button.secondary(DungeonEvent, abandon_dungeon{}, medium{}, Content.ui_game_over_main_menu(), [width_full{}])
+  button_secondary(DungeonEvent, abandon_dungeon{}, medium{}, Content.ui_game_over_main_menu(), [width_full{}])
