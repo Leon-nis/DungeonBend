@@ -1,3 +1,7 @@
+type Text {
+  text__module{}
+}
+
 # Internal DOM text renderer for Midum.
 #
 # This module maps concrete text config values to the current DOM renderer.

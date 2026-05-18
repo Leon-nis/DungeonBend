@@ -1,3 +1,6 @@
+def size_css() -> Unit:
+  unit{}
+
 def action_button_size_css() -> String:
   "
   .db-action-button-wrap .bc-btn-medium,

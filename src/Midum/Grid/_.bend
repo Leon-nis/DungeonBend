@@ -1,9 +1,13 @@
+type Grid {
+  grid__module{}
+}
+
+import Midum/Internal/DOM/Grid as M__Midum_Internal_DOM_Grid
 # Public 3x3 perspective-grid API for Midum.
 #
 # Cells are provided in row-major order: r1c1, r1c2, r1c3, r2c1...
 
 import HTML as HTML
-import Midum/Internal/DOM/Grid/render as dom_render
 import Nat/compare as compare_nat
 
 MAX_PERSPECTIVE : Nat = 60n
@@ -96,4 +100,4 @@ def empty(Event: Type) -> Midum/Grid/Cell(Event):
   cell(Event, text{""}, [])
 
 def view(Event: Type, cells: List(Midum/Grid/Cell(Event)), overrides: List(Midum/Grid/Override)) -> HTML(Event):
-  dom_render(Event, cells, config(overrides))
+  Midum/Internal/DOM/Grid/render(Event, cells, config(overrides))

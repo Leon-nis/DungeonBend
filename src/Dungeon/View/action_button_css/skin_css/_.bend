@@ -1,3 +1,6 @@
+def skin_css() -> Unit:
+  unit{}
+
 def action_button_skin_css() -> String:
   "
   .db-action-button-wrap--primary {

@@ -1,52 +1,46 @@
+type Midum {
+  midum__module{}
+}
+
+import Midum/Config as M__Midum_Config
+import Midum/Internal/DOM/Card as M__Midum_Internal_DOM_Card
+import Midum/Internal/DOM/Layout as M__Midum_Internal_DOM_Layout
+import Midum/Internal/DOM/Text as M__Midum_Internal_DOM_Text
+import Midum/Internal/DOM/Theme as M__Midum_Internal_DOM_Theme
 # Public Midum entrypoint.
 #
 # The public API stays renderer-neutral. Today, screen() is implemented by the
 # internal DOM renderer.
 
 import HTML as HTML
-import Midum/Config/palette as current_palette
-import Midum/Config/style as current_style
 import Midum/Internal/DOM/Button/base_css as button_base_css
 import Midum/Internal/DOM/Button/catoon_css as button_catoon_css
 import Midum/Internal/DOM/Button/role_css as button_role_css
 import Midum/Internal/DOM/Button/style_css as button_style_css
-import Midum/Internal/DOM/Card/base_css as card_base_css
-import Midum/Internal/DOM/Card/role_css as card_role_css
-import Midum/Internal/DOM/Card/surface_script_0 as card_surface_script_0
-import Midum/Internal/DOM/Card/surface_script_1 as card_surface_script_1
-import Midum/Internal/DOM/Card/surface_script_2 as card_surface_script_2
-import Midum/Internal/DOM/Card/surface_script_3 as card_surface_script_3
-import Midum/Internal/DOM/Card/style_css as card_style_css
 import Midum/Internal/DOM/Grid/base_css as grid_css
 import Midum/Internal/DOM/Image/base_css as image_css
-import Midum/Internal/DOM/Layout/css as layout_css
-import Midum/Internal/DOM/Text/css as text_css
-import Midum/Internal/DOM/Theme/base_css as theme_base_css
-import Midum/Internal/DOM/Theme/orange_css as theme_orange_css
-import Midum/Internal/DOM/Theme/olive_css as theme_olive_css
-import Midum/Internal/DOM/Theme/root_class as root_class
 
 def screen(Event: Type, body: HTML(Event)) -> HTML(Event):
-  <main class={"bc-font-ui " ++ root_class(current_palette(), current_style())}>
-    <style>{text{theme_base_css()}}</style>
-    <style>{text{theme_orange_css()}}</style>
-    <style>{text{theme_olive_css()}}</style>
-    <style>{text{layout_css()}}</style>
+  <main class={"bc-font-ui " ++ Midum/Internal/DOM/Theme/root_class(Midum/Config/palette(), Midum/Config/style())}>
+    <style>{text{Midum/Internal/DOM/Theme/base_css()}}</style>
+    <style>{text{Midum/Internal/DOM/Theme/orange_css()}}</style>
+    <style>{text{Midum/Internal/DOM/Theme/olive_css()}}</style>
+    <style>{text{Midum/Internal/DOM/Layout/css()}}</style>
     <style>{text{grid_css()}}</style>
     <style>{text{image_css()}}</style>
-    <style>{text{card_base_css()}}</style>
-    <style>{text{card_role_css()}}</style>
-    <style>{text{card_style_css()}}</style>
+    <style>{text{Midum/Internal/DOM/Card/base_css()}}</style>
+    <style>{text{Midum/Internal/DOM/Card/role_css()}}</style>
+    <style>{text{Midum/Internal/DOM/Card/style_css()}}</style>
     <script>
-      {text{card_surface_script_0()}}
-      {text{card_surface_script_1()}}
-      {text{card_surface_script_2()}}
-      {text{card_surface_script_3()}}
+      {text{Midum/Internal/DOM/Card/surface_script_0()}}
+      {text{Midum/Internal/DOM/Card/surface_script_1()}}
+      {text{Midum/Internal/DOM/Card/surface_script_2()}}
+      {text{Midum/Internal/DOM/Card/surface_script_3()}}
     </script>
     <style>{text{button_base_css()}}</style>
     <style>{text{button_role_css()}}</style>
     <style>{text{button_style_css()}}</style>
     <style>{text{button_catoon_css()}}</style>
-    <style>{text{text_css()}}</style>
+    <style>{text{Midum/Internal/DOM/Text/css()}}</style>
     {body}
   </main>

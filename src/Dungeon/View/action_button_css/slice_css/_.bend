@@ -1,3 +1,6 @@
+def slice_css() -> Unit:
+  unit{}
+
 def action_button_slice_css() -> String:
   "
   .db-action-button-wrap .bc-btn::before {

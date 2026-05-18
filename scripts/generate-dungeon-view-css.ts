@@ -149,12 +149,15 @@ function renderDef(name: string, defs: DefMap, cache: Map<string, string>, stack
       continue;
     }
 
-    const callMatch = expr.match(/^([A-Za-z0-9_]+)\(\)$/);
+    const callMatch = expr.match(/^([A-Za-z0-9_./]+)\(\)$/);
     if (!callMatch) {
       throw new Error(`Unsupported String expression in ${name}: ${expr}`);
     }
 
-    output += renderDef(callMatch[1], defs, cache, [...stack, name]);
+    const targetName = callMatch[1]
+      .split(/[/.]/)
+      .at(-1) ?? callMatch[1];
+    output += renderDef(targetName, defs, cache, [...stack, name]);
   }
 
   cache.set(name, output);
@@ -167,8 +170,8 @@ function rewriteCssAssetUrls(renderedCss: string): string {
 
 async function main() {
   const rootDir = process.cwd();
-  const cssModulePath = path.join(rootDir, "src", "Dungeon", "View", "css.bend");
-  const assetsModulePath = path.join(rootDir, "src", "Dungeon", "View", "assets_and_labels.bend");
+  const cssModulePath = path.join(rootDir, "src", "Dungeon", "View", "css", "_.bend");
+  const assetsModulePath = path.join(rootDir, "src", "Dungeon", "View", "assets_and_labels", "_.bend");
   const cssModuleDir = path.join(rootDir, "src", "Dungeon", "View", "action_button_css");
   const outPath = path.join(rootDir, "assets", "generated", "dungeon-view.css");
 
@@ -189,7 +192,7 @@ async function main() {
   await mkdir(path.dirname(outPath), { recursive: true });
   await writeFile(
     outPath,
-    `/* Generated from src/Dungeon/View/css.bend. */\n${renderedCss}\n`,
+    `/* Generated from src/Dungeon/View/css/_.bend. */\n${renderedCss}\n`,
     "utf8",
   );
 }

@@ -1,3 +1,7 @@
+type Grid {
+  grid__module{}
+}
+
 # Internal DOM renderer for the Midum 3x3 perspective grid.
 
 import HTML as HTML
@@ -150,6 +154,15 @@ def grid_bottom_y() -> Nat:
 
 def viewbox_height() -> Nat:
   nat_add(grid_bottom_y(), VIEWBOX_BOTTOM_PAD)
+
+def grid_box_left() -> Nat:
+  PERSPECTIVE_BOTTOM_X_0
+
+def grid_box_top() -> Nat:
+  PERSPECTIVE_GUIDE_Y_0
+
+def grid_box_width() -> Nat:
+  nat_sub(PERSPECTIVE_BOTTOM_X_3, PERSPECTIVE_BOTTOM_X_0)
 
 def svg_viewbox_height() -> Nat:
   nat_sub(viewbox_height(), grid_box_top())
@@ -320,15 +333,6 @@ def cell_shape(amount: Nat) -> String:
       "rect"
     case false{}:
       "trapezoid"
-
-def grid_box_left() -> Nat:
-  PERSPECTIVE_BOTTOM_X_0
-
-def grid_box_top() -> Nat:
-  PERSPECTIVE_GUIDE_Y_0
-
-def grid_box_width() -> Nat:
-  nat_sub(PERSPECTIVE_BOTTOM_X_3, PERSPECTIVE_BOTTOM_X_0)
 
 def grid_box_height() -> Nat:
   total_row_height()

@@ -876,7 +876,7 @@ export function renderConfigModule(data: GameData): string {
       validatePositiveInt(upgrade.max_hp, `hero_upgrades["${heroId}"][${upgradeIndex}].max_hp`);
       return `upgrade{${upgrade.cost}, ${upgrade.max_hp}}`;
     });
-    const renderedUpgrades = renderTypedListHelpers(`generated_hero_${index}_upgrades`, "Upgrade", upgrades);
+    const renderedUpgrades = renderTypedListHelpers(`generated_hero_${index}_upgrades`, "Dungeon/Upgrade", upgrades);
     helperDefs.push(...renderedUpgrades.defs);
     return `hero_def{${bendString(heroId)}, ${bendString(heroName)}, ${bendString(hero.sprite)}, ${hero.base_max_hp}, ${hero.unlock_cost}, ${hero.starts_unlocked ? 1 : 0}, ${renderedUpgrades.expr}}`;
   });
@@ -969,17 +969,17 @@ export function renderConfigModule(data: GameData): string {
       }
       return `pack_pool_entry{${renderCardRef(card)}, ${entry.weight}}`;
     });
-    const renderedPackPool = renderTypedListHelpers(`generated_pack_${index}_pool`, "PackPoolEntry", renderedPool);
+    const renderedPackPool = renderTypedListHelpers(`generated_pack_${index}_pool`, "Dungeon/PackPoolEntry", renderedPool);
     helperDefs.push(...renderedPackPool.defs);
     return `pack_def{${bendString(packName)}, ${pack.price}, ${pack.reveal_count}, ${pack.allow_duplicates ? 1 : 0}, ${renderedPackPool.expr}}`;
   });
 
-  const renderedHeroes = renderTypedListHelpers("generated_config_heroes", "HeroDef", heroes);
-  const renderedMonsters = renderTypedListHelpers("generated_config_monsters", "MonsterDef", monsterDefs);
-  const renderedSwords = renderTypedListHelpers("generated_config_swords", "SwordDef", swordDefs);
-  const renderedPotions = renderTypedListHelpers("generated_config_potions", "PotionDef", potionDefs);
-  const renderedBaseDeck = renderTypedListHelpers("generated_config_base_deck", "DeckEntry", baseDeck);
-  const renderedPacks = renderTypedListHelpers("generated_config_packs", "PackDef", packs);
+  const renderedHeroes = renderTypedListHelpers("generated_config_heroes", "Dungeon/HeroDef", heroes);
+  const renderedMonsters = renderTypedListHelpers("generated_config_monsters", "Dungeon/MonsterDef", monsterDefs);
+  const renderedSwords = renderTypedListHelpers("generated_config_swords", "Dungeon/SwordDef", swordDefs);
+  const renderedPotions = renderTypedListHelpers("generated_config_potions", "Dungeon/PotionDef", potionDefs);
+  const renderedBaseDeck = renderTypedListHelpers("generated_config_base_deck", "Dungeon/DeckEntry", baseDeck);
+  const renderedPacks = renderTypedListHelpers("generated_config_packs", "Dungeon/PackDef", packs);
 
   helperDefs.push(
     ...renderedHeroes.defs,
@@ -991,20 +991,11 @@ export function renderConfigModule(data: GameData): string {
   );
 
   return [
-    "import Dungeon/Config as Config",
-    "import Dungeon/HeroDef as HeroDef",
-    "import Dungeon/Upgrade as Upgrade",
-    "import Dungeon/MonsterDef as MonsterDef",
-    "import Dungeon/SwordDef as SwordDef",
-    "import Dungeon/PotionDef as PotionDef",
-    "import Dungeon/DeckEntry as DeckEntry",
-    "import Dungeon/CardRef as CardRef",
-    "import Dungeon/PackPoolEntry as PackPoolEntry",
-    "import Dungeon/PackDef as PackDef",
+    "import Dungeon as Dungeon",
     "import List/append as append",
     "",
     ...helperDefs,
-    "def generated_config() -> Config:",
+    "def generated_config() -> Dungeon/Config:",
     "  config{",
     `    ${renderedHeroes.expr},`,
     `    ${renderedMonsters.expr},`,
@@ -1026,6 +1017,9 @@ export function renderRulesModule(data: GameData): string {
   }
 
   return [
+    "def generated_rules() -> Unit:",
+    "  unit{}",
+    "",
     "def generated_initial_seed() -> U32:",
     `  ${data.rules.initial_seed}`,
     "",
@@ -1079,15 +1073,14 @@ export function renderHeroPresentationModule(data: GameData): string {
     const ultimateDesc = requireContent(data, heroUltimateDescKey(hero.id));
     return `hero_presentation{${bendString(hero.id)}, ${renderPresentationAlign(presentation.name_align, `presentation["${hero.id}"].name_align`)}, ${bendString(presentation.portrait)}, ${bendString(ultimateTitle)}, ${bendString(presentation.ultimate_icon)}, ${bendString(ultimateDesc)}}`;
   });
-  const renderedPresentations = renderTypedListHelpers("generated_hero_presentation_items", "HeroPresentation", presentations);
+  const renderedPresentations = renderTypedListHelpers("generated_hero_presentation_items", "Dungeon/HeroPresentation", presentations);
 
   return [
-    "import Dungeon/HeroPresentation as HeroPresentation",
-    "import Dungeon/PresentationAlign as PresentationAlign",
+    "import Dungeon as Dungeon",
     "import List/append as append",
     "",
     ...renderedPresentations.defs,
-    "def generated_hero_presentation() -> List(HeroPresentation):",
+    "def generated_hero_presentation() -> List(Dungeon/HeroPresentation):",
     `  ${renderedPresentations.expr}`,
     "",
   ].join("\n");
@@ -1107,15 +1100,27 @@ export function renderContentModule(data: GameData): string {
     usedNames.add(name);
     return [`def ${name}() -> String:`, `  ${bendString(requireContent(data, key))}`].join("\n");
   });
-  return [...functions, ""].join("\n\n");
+  return [
+    "def generated_content() -> Unit:",
+    "  unit{}",
+    "",
+    ...functions,
+    "",
+  ].join("\n\n");
 }
 
 export async function generateDungeonConfig(cwd: string): Promise<void> {
   const data = await loadGameData(cwd);
   await Promise.all([
-    Bun.write(path.resolve(cwd, "src/Dungeon/generated_config.bend"), renderConfigModule(data)),
-    Bun.write(path.resolve(cwd, "src/Dungeon/generated_hero_presentation.bend"), renderHeroPresentationModule(data)),
-    Bun.write(path.resolve(cwd, "src/Dungeon/generated_rules.bend"), renderRulesModule(data)),
-    Bun.write(path.resolve(cwd, "src/Dungeon/generated_content.bend"), renderContentModule(data)),
+    fs.mkdir(path.resolve(cwd, "src/Dungeon/generated_config"), { recursive: true }),
+    fs.mkdir(path.resolve(cwd, "src/Dungeon/generated_hero_presentation"), { recursive: true }),
+    fs.mkdir(path.resolve(cwd, "src/Dungeon/generated_rules"), { recursive: true }),
+    fs.mkdir(path.resolve(cwd, "src/Dungeon/generated_content"), { recursive: true }),
+  ]);
+  await Promise.all([
+    Bun.write(path.resolve(cwd, "src/Dungeon/generated_config/_.bend"), renderConfigModule(data)),
+    Bun.write(path.resolve(cwd, "src/Dungeon/generated_hero_presentation/_.bend"), renderHeroPresentationModule(data)),
+    Bun.write(path.resolve(cwd, "src/Dungeon/generated_rules/_.bend"), renderRulesModule(data)),
+    Bun.write(path.resolve(cwd, "src/Dungeon/generated_content/_.bend"), renderContentModule(data)),
   ]);
 }

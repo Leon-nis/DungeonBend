@@ -1,3 +1,8 @@
+type Layout {
+  layout__module{}
+}
+
+import Midum/Internal/DOM/Layout as M__Midum_Internal_DOM_Layout
 # Public layout API for Midum.
 #
 # Layout stays separate from component authoring. It covers document flow and
@@ -15,14 +20,6 @@ import Midum/Layout/PageConfig as PageConfig
 import Midum/Layout/ShellConfig as ShellConfig
 import Midum/Layout/StackConfig as StackConfig
 import Midum/Internal/DOM/Layout/Arrangement as Arrangement
-import Midum/Internal/DOM/Layout/box as dom_box
-import Midum/Internal/DOM/Layout/frame as dom_frame
-import Midum/Internal/DOM/Layout/group_stack as dom_stack
-import Midum/Internal/DOM/Layout/overlay as dom_overlay
-import Midum/Internal/DOM/Layout/render_container as dom_container
-import Midum/Internal/DOM/Layout/render_document_stack as dom_document_stack
-import Midum/Internal/DOM/Layout/render_page as dom_page
-import Midum/Internal/DOM/Layout/render_shell as dom_shell
 
 def edge_insets_zero() -> Midum/Layout/EdgeInsets:
   edge_insets{top: 0n, right: 0n, bottom: 0n, left: 0n}
@@ -418,63 +415,63 @@ def stack_config(overrides: List(Midum/Layout/Override)) -> Midum/Layout/StackCo
   apply_stack_overrides(document_stack_layout{flow: column{}, gap: md{}, align: align_stretch_value{}}, overrides)
 
 def overlay(Event: Type, layers: List(HTML(Event))) -> HTML(Event):
-  dom_overlay(Event, layers)
+  Midum/Internal/DOM/Layout/overlay(Event, layers)
 
 def frame(Event: Type, body: HTML(Event), overrides: List(Midum/Layout/Override)) -> HTML(Event):
-  dom_frame(Event, frame_config(overrides), body)
+  Midum/Internal/DOM/Layout/frame(Event, frame_config(overrides), body)
 
 def shell(Event: Type, body: HTML(Event), overrides: List(Midum/Layout/Override)) -> HTML(Event):
-  dom_shell(Event, shell_config(overrides), body)
+  Midum/Internal/DOM/Layout/render_shell(Event, shell_config(overrides), body)
 
 def page(Event: Type, body: HTML(Event), overrides: List(Midum/Layout/Override)) -> HTML(Event):
-  dom_page(Event, page_config(overrides), body)
+  Midum/Internal/DOM/Layout/render_page(Event, page_config(overrides), body)
 
 def container(Event: Type, body: HTML(Event), overrides: List(Midum/Layout/Override)) -> HTML(Event):
-  dom_container(Event, container_config(overrides), body)
+  Midum/Internal/DOM/Layout/render_container(Event, container_config(overrides), body)
 
 def stack(Event: Type, kids: List(HTML(Event)), overrides: List(Midum/Layout/Override)) -> HTML(Event):
-  dom_document_stack(Event, stack_config(overrides), kids)
+  Midum/Internal/DOM/Layout/render_document_stack(Event, stack_config(overrides), kids)
 
 def group(Event: Type, kids: List(HTML(Event)), overrides: List(Midum/Layout/Override)) -> HTML(Event):
   match stack_config(overrides):
     case document_stack_layout{flow, gap, align}:
-      dom_stack(Event, flow, packed{}, gap, align, kids)
+      Midum/Internal/DOM/Layout/group_stack(Event, flow, packed{}, gap, align, kids)
 
 def top_left(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: top_left{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: top_left{}, flow: column{}, gap: none{}}, body)
 
 def top(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: top{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: top{}, flow: column{}, gap: none{}}, body)
 
 def top_right(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: top_right{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: top_right{}, flow: column{}, gap: none{}}, body)
 
 def left(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: left{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: left{}, flow: column{}, gap: none{}}, body)
 
 def center(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: center{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: center{}, flow: column{}, gap: none{}}, body)
 
 def right(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: right{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: right{}, flow: column{}, gap: none{}}, body)
 
 def bottom_left(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: bottom_left{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: bottom_left{}, flow: column{}, gap: none{}}, body)
 
 def bottom(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: bottom{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: bottom{}, flow: column{}, gap: none{}}, body)
 
 def bottom_right(Event: Type, body: HTML(Event)) -> HTML(Event):
-  dom_box(Event, layout{position: bottom_right{}, flow: column{}, gap: none{}}, body)
+  Midum/Internal/DOM/Layout/box(Event, layout{position: bottom_right{}, flow: column{}, gap: none{}}, body)
 
 def column(Event: Type, kids: List(HTML(Event))) -> HTML(Event):
-  dom_stack(Event, column{}, packed{}, md{}, align_center_value{}, kids)
+  Midum/Internal/DOM/Layout/group_stack(Event, column{}, packed{}, md{}, align_center_value{}, kids)
 
 def column_between(Event: Type, kids: List(HTML(Event))) -> HTML(Event):
-  dom_stack(Event, column{}, between{}, md{}, align_center_value{}, kids)
+  Midum/Internal/DOM/Layout/group_stack(Event, column{}, between{}, md{}, align_center_value{}, kids)
 
 def row(Event: Type, kids: List(HTML(Event))) -> HTML(Event):
-  dom_stack(Event, row{}, packed{}, md{}, align_center_value{}, kids)
+  Midum/Internal/DOM/Layout/group_stack(Event, row{}, packed{}, md{}, align_center_value{}, kids)
 
 def row_between(Event: Type, kids: List(HTML(Event))) -> HTML(Event):
-  dom_stack(Event, row{}, between{}, md{}, align_center_value{}, kids)
+  Midum/Internal/DOM/Layout/group_stack(Event, row{}, between{}, md{}, align_center_value{}, kids)
