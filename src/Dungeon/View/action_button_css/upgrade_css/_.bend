@@ -1,3 +1,6 @@
+def upgrade_css() -> Unit:
+  unit{}
+
 def action_button_upgrade_css() -> String:
   "
   .db-action-button-wrap--upgrade-available .bc-btn:not(:disabled)::after {

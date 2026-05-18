@@ -1,3 +1,3 @@
-type Map(-A: Type) {
+type Map(A: Type) {
   map{rows: List(List(A))}
 }

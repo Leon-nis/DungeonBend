@@ -1,16 +1,15 @@
+type Card {
+  card__module{}
+}
+
+import Midum/Config as M__Midum_Config
+import Midum/Internal/DOM/Card as M__Midum_Internal_DOM_Card
 # Public card API for Midum.
 #
 # Cards stay renderer-neutral. The current renderer lives under
 # /Midum/Internal/DOM/.
 
 import HTML as HTML
-import Midum/Config/card_defaults as current_card_defaults
-import Midum/Internal/DOM/Card/danger as dom_danger
-import Midum/Internal/DOM/Card/neutral as dom_neutral
-import Midum/Internal/DOM/Card/primary as dom_primary
-import Midum/Internal/DOM/Card/secondary as dom_secondary
-import Midum/Internal/DOM/Card/success as dom_success
-import Midum/Internal/DOM/Card/warning as dom_warning
 
 def apply_override(cfg: Midum/Card/Config, override: Midum/Card/Override) -> Midum/Card/Config:
   match cfg override:
@@ -74,22 +73,22 @@ def config_with_defaults(defaults: Midum/Card/Defaults, overrides: List(Midum/Ca
       apply_overrides(card{padding, radius, background: background_on{}, border: border_on{}, gradient: gradient_off{}, surface: surface_off{}}, overrides)
 
 def config(overrides: List(Midum/Card/Override)) -> Midum/Card/Config:
-  config_with_defaults(current_card_defaults(), overrides)
+  config_with_defaults(Midum/Config/card_defaults(), overrides)
 
 def primary(Event: Type, body: HTML(Event), overrides: List(Midum/Card/Override)) -> HTML(Event):
-  dom_primary(Event, body, config(overrides))
+  Midum/Internal/DOM/Card/primary(Event, body, config(overrides))
 
 def secondary(Event: Type, body: HTML(Event), overrides: List(Midum/Card/Override)) -> HTML(Event):
-  dom_secondary(Event, body, config(overrides))
+  Midum/Internal/DOM/Card/secondary(Event, body, config(overrides))
 
 def neutral(Event: Type, body: HTML(Event), overrides: List(Midum/Card/Override)) -> HTML(Event):
-  dom_neutral(Event, body, config(overrides))
+  Midum/Internal/DOM/Card/neutral(Event, body, config(overrides))
 
 def success(Event: Type, body: HTML(Event), overrides: List(Midum/Card/Override)) -> HTML(Event):
-  dom_success(Event, body, config(overrides))
+  Midum/Internal/DOM/Card/success(Event, body, config(overrides))
 
 def warning(Event: Type, body: HTML(Event), overrides: List(Midum/Card/Override)) -> HTML(Event):
-  dom_warning(Event, body, config(overrides))
+  Midum/Internal/DOM/Card/warning(Event, body, config(overrides))
 
 def danger(Event: Type, body: HTML(Event), overrides: List(Midum/Card/Override)) -> HTML(Event):
-  dom_danger(Event, body, config(overrides))
+  Midum/Internal/DOM/Card/danger(Event, body, config(overrides))

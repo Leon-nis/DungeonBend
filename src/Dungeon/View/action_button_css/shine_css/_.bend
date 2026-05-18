@@ -1,3 +1,6 @@
+def shine_css() -> Unit:
+  unit{}
+
 def action_button_shine_css() -> String:
   "
   .db-action-button-wrap .bc-btn::after {

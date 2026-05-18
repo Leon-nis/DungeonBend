@@ -1,7 +1,9 @@
+type Dungeon {
+  dungeon__module{}
+}
 type Upgrade {
   upgrade{cost: U32, max_hp: U32}
 }
-
 type HeroDef {
   hero_def{
     id: String,
@@ -13,13 +15,11 @@ type HeroDef {
     upgrades: List(Upgrade)
   }
 }
-
 type PresentationAlign {
   presentation_left{}
   presentation_center{}
   presentation_right{}
 }
-
 type HeroPresentation {
   hero_presentation{
     hero_id: String,
@@ -30,37 +30,30 @@ type HeroPresentation {
     ultimate_description: String
   }
 }
-
 type MonsterDef {
   monster_def{name: String, sprite: String, gold_drop: U32, hp_levels: List(U32)}
 }
-
 type SwordDef {
   sword_def{name: String, sprite: String, dmg: U32}
 }
-
 type PotionDef {
   potion_def{name: String, sprite: String, heal: U32}
 }
-
 type DeckEntry {
   monster_entry{ref: U32, count: U32}
   sword_entry{ref: U32, count: U32}
   potion_entry{ref: U32, count: U32}
   hero_entry{count: U32}
 }
-
 type CardRef {
   monster_card{ref: U32}
   sword_card{ref: U32}
   potion_card{ref: U32}
   hero_card{}
 }
-
 type PackPoolEntry {
   pack_pool_entry{card: CardRef, weight: U32}
 }
-
 type PackDef {
   pack_def{
     name: String,
@@ -70,32 +63,30 @@ type PackDef {
     pool: List(PackPoolEntry)
   }
 }
-
 type PackReward {
   no_pack_reward{}
   pack_reward{cards: List(CardRef)}
 }
-
 type PackOpenResult {
   pack_open_result{reward: PackReward, seed: U32}
 }
-
+type _PackPickResult {
+  no_pack_pick{pool: List(PackPoolEntry)}
+  picked_pack_entry{card: CardRef, pool: List(PackPoolEntry)}
+}
 type PackInventoryEntry {
   pack_inventory_entry{ref: U32, count: U32}
 }
-
 type Direction {
   up{}
   down{}
   left{}
   right{}
 }
-
 type Weapon {
   no_weapon{}
   weapon{ref: U32, dmg: U32}
 }
-
 type Tile {
   none{}
   monster{ref: U32, hp: U32}
@@ -103,11 +94,9 @@ type Tile {
   potion{ref: U32, heal: U32}
   gold{amount: U32}
 }
-
 type Board {
   board{cells: Nat/V2/Map(Tile)}
 }
-
 type BoardDraw {
   board_draw{
     board: Board,
@@ -117,7 +106,6 @@ type BoardDraw {
     level: U32
   }
 }
-
 type DrawResult {
   draw_result{
     tile: Tile,
@@ -127,12 +115,10 @@ type DrawResult {
     level: U32
   }
 }
-
 type CombatOutcome {
   combat_continue{}
   combat_game_over{}
 }
-
 type CombatResult {
   combat_result{
     hero_hp: U32,
@@ -141,14 +127,16 @@ type CombatResult {
     outcome: CombatOutcome
   }
 }
-
 type HeroProfile {
   hero_profile{
     unlocked: U32,
     hero_level: U32
   }
 }
-
+type DeckSleeve {
+  sleeve_blue{}
+  sleeve_chromatic{}
+}
 type DeckRecord {
   deck_record{
     id: U32,
@@ -157,12 +145,6 @@ type DeckRecord {
     entries: List(DeckEntry)
   }
 }
-
-type DeckSleeve {
-  sleeve_blue{}
-  sleeve_chromatic{}
-}
-
 type DeckQuotas {
   deck_quotas{
     monsters: U32,
@@ -172,14 +154,12 @@ type DeckQuotas {
     total: U32
   }
 }
-
 type DeckCategory {
   cat_monsters{}
   cat_swords{}
   cat_potions{}
   cat_hero{}
 }
-
 type DeckDraft {
   deck_draft{
     deck_id: U32,
@@ -189,29 +169,24 @@ type DeckDraft {
     dirty: U32
   }
 }
-
 type DeckListMode {
   deck_list_view{}
   deck_list_edit{selected_ids: List(U32)}
   deck_list_confirm_delete{selected_ids: List(U32)}
 }
-
 type DeckSleevePicker {
   sleeve_picker_closed{}
   sleeve_picker_open{deck_id: U32}
 }
-
 type DeckPickerMode {
   picker_none{}
   picker_open{category: DeckCategory}
 }
-
 type DeckDetailMode {
   detail_view{}
   detail_confirm_discard{}
   detail_pending_delete{card: CardRef, occurrence: U32}
 }
-
 type Meta {
   meta{
     selected_hero: U32,
@@ -225,7 +200,6 @@ type Meta {
     next_deck_id: U32
   }
 }
-
 type Config {
   config{
     heroes: List(HeroDef),
@@ -237,7 +211,6 @@ type Config {
     starting_dungeon_level: U32
   }
 }
-
 type Run {
   run{
     dungeon_level: U32,
@@ -255,21 +228,22 @@ type Run {
     hero_ref: U32
   }
 }
-
 type RunAdvance {
   keep_running{run: Run}
   end_run{run: Run}
 }
-
 type SwipeResult {
   swipe_result{meta: Meta, next: RunAdvance}
 }
-
 type BoosterReturn {
   booster_return_setup{}
   booster_return_character_select{preview_hero: U32}
 }
-
+type UltimatePreviewFx {
+  ultimate_preview_idle{}
+  ultimate_preview_play_a{}
+  ultimate_preview_play_b{}
+}
 type Scene {
   setup{}
   character_select{preview_hero: U32}
@@ -283,18 +257,15 @@ type Scene {
   deck_list{mode: DeckListMode, sleeve_picker: DeckSleevePicker}
   deck_detail{deck_id: U32, draft: DeckDraft, picker: DeckPickerMode, detail_mode: DeckDetailMode, sleeve_picker: DeckSleevePicker}
 }
-
 type SavedScene {
   saved_setup{}
   saved_character_select{preview_hero: U32}
   saved_boosters{reward: PackReward, reveal_index: U32}
   saved_running{run: Run}
 }
-
 type GameState {
   game_state{meta: Meta, scene: Scene, next_seed: U32}
 }
-
 type HpFx {
   hp_fx_none{}
   hp_fx_heal_a{}
@@ -302,7 +273,6 @@ type HpFx {
   hp_fx_hurt_a{}
   hp_fx_hurt_b{}
 }
-
 type DmgFx {
   dmg_fx_none{}
   dmg_fx_up_a{}
@@ -310,35 +280,24 @@ type DmgFx {
   dmg_fx_down_a{}
   dmg_fx_down_b{}
 }
-
 type ImpactFx {
   impact_hit_a{}
   impact_hit_b{}
   impact_kill_a{}
   impact_kill_b{}
 }
-
 type Impact {
   no_impact{}
   impact{pos: Nat/V2, fx: ImpactFx}
 }
-
 type DamageOverlay {
   no_damage_overlay{}
   damage_overlay{pos: Nat/V2, trigger: ImpactFx, base_tile: Tile, state: Midum/Image/State}
 }
-
 type DeckCounterFx {
   deck_counter_idle{}
   deck_counter_playing{state: Midum/Image/State}
 }
-
-type UltimatePreviewFx {
-  ultimate_preview_idle{}
-  ultimate_preview_play_a{}
-  ultimate_preview_play_b{}
-}
-
 type UltimateCutinSpec {
   ultimate_cutin_spec{
     banner_src: String,
@@ -351,7 +310,6 @@ type UltimateCutinSpec {
     sound_placeholder: String
   }
 }
-
 type UiState {
   ui_state{
     hp_fx: HpFx,
@@ -362,11 +320,9 @@ type UiState {
     menu_background_state: Midum/Image/State
   }
 }
-
 type DungeonState {
   dungeon{game: GameState, ui: UiState}
 }
-
 type DungeonEvent {
   start{}
   upgrade{}
@@ -418,13 +374,7 @@ type DungeonEvent {
   open_category_picker{category: DeckCategory}
   close_category_picker{}
 }
-
 type _PickResult {
   no_pick{counts: List(DeckEntry)}
   picked_entry{entry: DeckEntry, counts: List(DeckEntry)}
-}
-
-type _PackPickResult {
-  no_pack_pick{pool: List(PackPoolEntry)}
-  picked_pack_entry{card: CardRef, pool: List(PackPoolEntry)}
 }

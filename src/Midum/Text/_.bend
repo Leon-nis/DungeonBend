@@ -1,3 +1,8 @@
+type Text {
+  text__module{}
+}
+
+import Midum/Internal/DOM/Text as M__Midum_Internal_DOM_Text
 # Public text API for Midum.
 #
 # Text stays renderer-neutral. The current renderer lives under
@@ -5,7 +10,6 @@
 
 import HTML as HTML
 import Midum/Text/Interaction as Interaction
-import Midum/Internal/DOM/Text/render as dom_render
 
 def apply_override(Event: Type, cfg: Midum/Text/Config(Event), override: Midum/Text/Override(Event)) -> Midum/Text/Config(Event):
   match cfg override:
@@ -37,13 +41,13 @@ def config(Event: Type, variant: Midum/Text/Variant, align: Midum/Text/Align, co
   apply_overrides(Event, copy{content, variant, align, interaction: static{}, color: inherited{}}, overrides)
 
 def label(Event: Type, align: Midum/Text/Align, content: String, overrides: List(Midum/Text/Override(Event))) -> HTML(Event):
-  dom_render(Event, config(Event, label{}, align, content, overrides))
+  Midum/Internal/DOM/Text/render(Event, config(Event, label{}, align, content, overrides))
 
 def h1(Event: Type, align: Midum/Text/Align, content: String, overrides: List(Midum/Text/Override(Event))) -> HTML(Event):
-  dom_render(Event, config(Event, heading_1{}, align, content, overrides))
+  Midum/Internal/DOM/Text/render(Event, config(Event, heading_1{}, align, content, overrides))
 
 def h2(Event: Type, align: Midum/Text/Align, content: String, overrides: List(Midum/Text/Override(Event))) -> HTML(Event):
-  dom_render(Event, config(Event, heading_2{}, align, content, overrides))
+  Midum/Internal/DOM/Text/render(Event, config(Event, heading_2{}, align, content, overrides))
 
 def body(Event: Type, align: Midum/Text/Align, content: String, overrides: List(Midum/Text/Override(Event))) -> HTML(Event):
-  dom_render(Event, config(Event, body{}, align, content, overrides))
+  Midum/Internal/DOM/Text/render(Event, config(Event, body{}, align, content, overrides))

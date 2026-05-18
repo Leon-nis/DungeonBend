@@ -1,19 +1,15 @@
+type Button {
+  button__module{}
+}
+
+import Midum/Config as M__Midum_Config
+import Midum/Internal/DOM/Button as M__Midum_Internal_DOM_Button
 # Public button API for Midum.
 #
 # The public surface stays renderer-neutral. The current renderer lives under
 # /Midum/Internal/DOM/.
 
 import HTML as HTML
-import Midum/Config/button_defaults as current_button_defaults
-import Midum/Internal/DOM/Button/catoon_dark as dom_catoon_dark
-import Midum/Internal/DOM/Button/catoon_dark_counter as dom_catoon_dark_counter
-import Midum/Internal/DOM/Button/catoon_yellow as dom_catoon_yellow
-import Midum/Internal/DOM/Button/primary as dom_primary
-import Midum/Internal/DOM/Button/neutral as dom_neutral
-import Midum/Internal/DOM/Button/secondary as dom_secondary
-import Midum/Internal/DOM/Button/success as dom_success
-import Midum/Internal/DOM/Button/warning as dom_warning
-import Midum/Internal/DOM/Button/danger as dom_danger
 
 def apply_override(cfg: Midum/Button/Config, override: Midum/Button/Override) -> Midum/Button/Config:
   match cfg override:
@@ -51,19 +47,19 @@ def config_with_defaults(defaults: Midum/Button/Defaults, text: String, size: Mi
       apply_overrides(button{text, icon, shape, size, width, state}, overrides)
 
 def config(text: String, size: Midum/Button/Size, overrides: List(Midum/Button/Override)) -> Midum/Button/Config:
-  config_with_defaults(current_button_defaults(), text, size, overrides)
+  config_with_defaults(Midum/Config/button_defaults(), text, size, overrides)
 
 def primary(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_primary(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/primary(Event, evt, config(text, size, overrides))
 
 def catoon_yellow(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_catoon_yellow(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/catoon_yellow(Event, evt, config(text, size, overrides))
 
 def catoon_dark(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_catoon_dark(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/catoon_dark(Event, evt, config(text, size, overrides))
 
 def catoon_dark_counter(Event: Type, evt: Event, size: Midum/Button/Size, text: String, count: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_catoon_dark_counter(Event, evt, config(text, size, overrides), count)
+  Midum/Internal/DOM/Button/catoon_dark_counter(Event, evt, config(text, size, overrides), count)
 
 def catoon(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
   catoon_yellow(Event, evt, size, text, overrides)
@@ -72,16 +68,16 @@ def catoon_secondary(Event: Type, evt: Event, size: Midum/Button/Size, text: Str
   catoon_dark(Event, evt, size, text, overrides)
 
 def secondary(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_secondary(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/secondary(Event, evt, config(text, size, overrides))
 
 def neutral(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_neutral(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/neutral(Event, evt, config(text, size, overrides))
 
 def success(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_success(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/success(Event, evt, config(text, size, overrides))
 
 def warning(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_warning(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/warning(Event, evt, config(text, size, overrides))
 
 def danger(Event: Type, evt: Event, size: Midum/Button/Size, text: String, overrides: List(Midum/Button/Override)) -> HTML(Event):
-  dom_danger(Event, evt, config(text, size, overrides))
+  Midum/Internal/DOM/Button/danger(Event, evt, config(text, size, overrides))

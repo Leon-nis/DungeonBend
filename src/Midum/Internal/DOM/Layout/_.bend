@@ -1,3 +1,7 @@
+type Layout {
+  layout__module{}
+}
+
 # Internal DOM layout renderer for Midum.
 #
 # Layout owns placement and simple grouping. The public API remains one

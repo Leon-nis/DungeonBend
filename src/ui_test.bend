@@ -1,7 +1,7 @@
 import App as App
 import HTML as HTML
-import Midum/screen as screen
-import Midum/Card/neutral as card_neutral
+import Midum as M__Midum
+import Midum/Card as M__Midum_Card
 
 type UiTestState {
   ui_test_state{}
@@ -14,7 +14,7 @@ type UiTestEvent {
 init : App/Update(UiTestState, UiTestEvent) =
   update{ui_test_state{}, none{}}
 
-def on_event(+evt: UiTestEvent, state: UiTestState) -> App/Update(UiTestState, UiTestEvent):
+def on_event(evt: UiTestEvent, state: UiTestState) -> App/Update(UiTestState, UiTestEvent):
   update{state, none{}}
 
 def yellow_src() -> String:
@@ -24,7 +24,7 @@ def gray_src() -> String:
   "../assets/ui-test/button/button-main-gray.png"
 
 def nine_button(label: String, src: String, source_left: Nat, source_right: Nat, source_top: Nat, source_bottom: Nat, target_left: Nat, target_right: Nat, target_top: Nat, target_bottom: Nat) -> HTML(UiTestEvent):
-  card_neutral(
+  Midum/Card/neutral(
     UiTestEvent,
     <span>{text{label}}</span>,
     [
@@ -52,8 +52,8 @@ def yellow_button() -> HTML(UiTestEvent):
 def gray_button() -> HTML(UiTestEvent):
   nine_button("Disabled Style", gray_src(), 24n, 24n, 50n, 50n, 12n, 12n, 24n, 24n)
 
-def render(+state: UiTestState) -> HTML(UiTestEvent):
-  screen(
+def render(state: UiTestState) -> HTML(UiTestEvent):
+  Midum/screen(
     UiTestEvent,
     <div>
       {yellow_button()}
@@ -62,4 +62,4 @@ def render(+state: UiTestState) -> HTML(UiTestEvent):
   )
 
 main : App =
-  app{UiTestState, UiTestEvent, init, render, on_event, none{}}
+  app{UiTestState, UiTestEvent, init, render, on_event, state => ""}

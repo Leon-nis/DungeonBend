@@ -1,3 +1,7 @@
+type Image {
+  image__module{}
+}
+
 # Internal DOM image renderer for Midum.
 
 import HTML as HTML

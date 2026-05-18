@@ -1,3 +1,7 @@
+type Card {
+  card__module{}
+}
+
 # Internal DOM card renderer for Midum.
 #
 # This module maps concrete card{...} values to the current DOM renderer and
@@ -6,24 +10,6 @@
 import HTML as HTML
 import Nat/is_zero as is_zero_nat
 import Nat/show as show_nat
-
-def primary(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
-  card(Event, body, cfg, "bc-card-primary")
-
-def secondary(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
-  card(Event, body, cfg, "bc-card-secondary")
-
-def neutral(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
-  card(Event, body, cfg, "bc-card-neutral")
-
-def success(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
-  card(Event, body, cfg, "bc-card-success")
-
-def warning(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
-  card(Event, body, cfg, "bc-card-warning")
-
-def danger(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
-  card(Event, body, cfg, "bc-card-danger")
 
 def padding_class(padding: Midum/Card/Padding) -> String:
   match padding:
@@ -81,38 +67,14 @@ def css_nat(value: Nat) -> String:
 
 def has_nine_slice(source_left: Nat, source_right: Nat, source_top: Nat, source_bottom: Nat) -> Bool:
   left_zero = is_zero_nat(source_left)
-  has_nine_slice_0(left_zero, source_right, source_top, source_bottom)
-
-def has_nine_slice_0(left_zero: Bool, right: Nat, top: Nat, bottom: Nat) -> Bool:
-  match left_zero:
-    case false{}:
-      true{}
-    case true{}:
-      right_zero = is_zero_nat(right)
-      has_nine_slice_1(right_zero, top, bottom)
-
-def has_nine_slice_1(right_zero: Bool, top: Nat, bottom: Nat) -> Bool:
-  match right_zero:
-    case false{}:
-      true{}
-    case true{}:
-      top_zero = is_zero_nat(top)
-      has_nine_slice_2(top_zero, bottom)
-
-def has_nine_slice_2(top_zero: Bool, bottom: Nat) -> Bool:
-  match top_zero:
-    case false{}:
-      true{}
-    case true{}:
-      bottom_zero = is_zero_nat(bottom)
-      has_nine_slice_3(bottom_zero)
-
-def has_nine_slice_3(bottom_zero: Bool) -> Bool:
-  match bottom_zero:
-    case false{}:
-      true{}
-    case true{}:
+  right_zero = is_zero_nat(source_right)
+  top_zero = is_zero_nat(source_top)
+  bottom_zero = is_zero_nat(source_bottom)
+  match left_zero right_zero top_zero bottom_zero:
+    case true{} true{} true{} true{}:
       false{}
+    case _ _ _ _:
+      true{}
 
 def render_nine_slice(
   Event: Type,
@@ -182,6 +144,24 @@ def card(Event: Type, body: HTML(Event), cfg: Midum/Card/Config, role_class: Str
   match cfg:
     case card{padding, radius, background, border, gradient, surface}:
       render_resolved(Event, body, role_class, padding, radius, background, border, gradient, surface)
+
+def primary(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
+  card(Event, body, cfg, "bc-card-primary")
+
+def secondary(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
+  card(Event, body, cfg, "bc-card-secondary")
+
+def neutral(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
+  card(Event, body, cfg, "bc-card-neutral")
+
+def success(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
+  card(Event, body, cfg, "bc-card-success")
+
+def warning(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
+  card(Event, body, cfg, "bc-card-warning")
+
+def danger(Event: Type, body: HTML(Event), cfg: Midum/Card/Config) -> HTML(Event):
+  card(Event, body, cfg, "bc-card-danger")
 
 def base_css() -> String:
   "

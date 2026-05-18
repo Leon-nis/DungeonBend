@@ -1,3 +1,7 @@
+type Theme {
+  theme__module{}
+}
+
 # Internal DOM theme renderer for Midum.
 #
 # Palette owns the color catalog, while style owns the visual finish.
@@ -28,38 +32,14 @@ def root_class(palette: Midum/Theme/Palette, style: Midum/Theme/Style) -> String
 
 def base_css() -> String:
   "
-  @font-face {
-    font-family: \"Midum Inter\";
-    src: url(\"/assets/fonts/Inter-Variable.ttf\") format(\"truetype\");
-    font-style: normal;
-    font-weight: 100 900;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: \"Midum Poppins\";
-    src: url(\"/assets/fonts/Poppins-Bold.ttf\") format(\"truetype\");
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-  }
-
-  @font-face {
-    font-family: \"Midum Poppins\";
-    src: url(\"/assets/fonts/Poppins-ExtraBold.ttf\") format(\"truetype\");
-    font-style: normal;
-    font-weight: 800;
-    font-display: swap;
-  }
-
   html, body {
     margin: 0;
     background: #ffffff;
   }
 
   :root {
-    --bc-font-ui: \"Midum Inter\", Inter, system-ui, sans-serif;
-    --bc-font-display: \"Midum Poppins\", Poppins, \"Midum Inter\", Inter, system-ui, sans-serif;
+    --bc-font-ui: Inter, system-ui, sans-serif;
+    --bc-font-display: Poppins, Inter, system-ui, sans-serif;
   }
 
   .bc-font-ui {

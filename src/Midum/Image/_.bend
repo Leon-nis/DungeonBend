@@ -1,3 +1,8 @@
+type Image {
+  image__module{}
+}
+
+import Midum/Internal/DOM/Image as M__Midum_Internal_DOM_Image
 # Public image API for Midum.
 #
 # Images stay renderer-neutral. The current renderer lives under
@@ -5,7 +10,6 @@
 
 import HTML as HTML
 import List/length as length
-import Midum/Internal/DOM/Image/render as dom_render
 import Nat/add as nat_add
 import Nat/compare as compare_nat
 import Nat/div as div_nat
@@ -174,7 +178,7 @@ def step(animation: Midum/Image/Animation, delta_ms: Nat, state: Midum/Image/Sta
       step_checked(count, ms, playback, delta_ms, state)
 
 def view(Event: Type, src: String, alt: String, overrides: List(Midum/Image/Override)) -> HTML(Event):
-  dom_render(Event, src, alt, config(overrides))
+  Midum/Internal/DOM/Image/render(Event, src, alt, config(overrides))
 
 def animated(Event: Type, state: Midum/Image/State, animation: Midum/Image/Animation, alt: String, overrides: List(Midum/Image/Override)) -> HTML(Event):
-  dom_render(Event, current_src(animation, state), alt, config(overrides))
+  Midum/Internal/DOM/Image/render(Event, current_src(animation, state), alt, config(overrides))
