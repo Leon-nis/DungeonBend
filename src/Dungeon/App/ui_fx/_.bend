@@ -182,7 +182,7 @@ def _impact_from_monster_hp(target_pos: Nat/V2, prev_hp: U32, next_hp: U32, curr
 
 def _impact_from_monster_next(target_pos: Nat/V2, prev_hp: U32, next_tile: Dungeon/Tile, current_impact: Dungeon/Impact) -> Dungeon/Impact:
   match next_tile:
-    case monster{next_ref, next_hp}:
+    case monster{next_ref, next_hp, spawn_level}:
       _impact_from_monster_hp(target_pos, prev_hp, next_hp, current_impact)
     case gold{amount}:
       _impact_kill(target_pos, current_impact)
@@ -191,7 +191,7 @@ def _impact_from_monster_next(target_pos: Nat/V2, prev_hp: U32, next_tile: Dunge
 
 def _impact_from_target_tile(target_pos: Nat/V2, prev_tile: Dungeon/Tile, next_tile: Dungeon/Tile, current_impact: Dungeon/Impact) -> Dungeon/Impact:
   match prev_tile:
-    case monster{ref, prev_hp}:
+    case monster{ref, prev_hp, spawn_level}:
       _impact_from_monster_next(target_pos, prev_hp, next_tile, current_impact)
     case _:
       no_impact{}

@@ -8,7 +8,7 @@ import Dungeon/rules as M__Dungeon_rules
 def _spawn_tile(config_value: Dungeon/Config, entry: Dungeon/DeckEntry, level: U32) -> Dungeon/Tile:
   match config_value entry:
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} monster_entry{ref, count}:
-      monster{ref, Dungeon/Deck/counts_pick/_monster_hp(monsters, ref, level)}
+      monster{ref, Dungeon/Deck/counts_pick/_monster_hp(monsters, ref, level), level}
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} sword_entry{ref, count}:
       sword{ref, Dungeon/Deck/counts_pick/_sword_damage(swords, ref)}
     case config{heroes, monsters, swords, potions, deck, booster_packs, starting_dungeon_level} potion_entry{ref, count}:

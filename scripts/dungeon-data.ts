@@ -21,7 +21,9 @@ export type RawMonster = {
   id: string;
   name: string;
   sprite: string;
-  gold_drop: number;
+  gold_by_level?: number[];
+  gold_drop_by_level?: number[];
+  gold_drop?: number;
   hp_by_level: number[];
 };
 
@@ -357,6 +359,20 @@ function requireArray<T>(errors: string[], value: T[] | unknown, label: string):
   return value as T[];
 }
 
+function rawMonsterGoldLevels(monster: RawMonster | null | undefined): number[] {
+  if (Array.isArray(monster?.gold_by_level) && monster.gold_by_level.length > 0) {
+    return monster.gold_by_level.slice();
+  }
+  if (Array.isArray(monster?.gold_drop_by_level) && monster.gold_drop_by_level.length > 0) {
+    return monster.gold_drop_by_level.slice();
+  }
+  if (Number.isFinite(Number(monster?.gold_drop))) {
+    const hpLevels = Array.isArray(monster?.hp_by_level) ? monster.hp_by_level.length : 1;
+    return Array.from({ length: Math.max(1, hpLevels) }, () => Math.floor(Number(monster?.gold_drop)));
+  }
+  return [];
+}
+
 function requireContent(data: GameData, key: string, label = `content.en["${key}"]`): string {
   const value = data.content?.en?.[key];
   if (typeof value !== "string" || value.trim() === "") {
@@ -469,7 +485,15 @@ export function getGameDataErrors(data: GameData): string[] {
     pushCardId(monster?.id, "monster", `monsters[${index}].id`);
     addStringError(errors, monster?.name, `monsters[${index}].name`);
     addStringError(errors, monster?.sprite, `monsters[${index}].sprite`);
-    addPositiveIntError(errors, monster?.gold_drop, `monsters[${index}].gold_drop`);
+    if (monster?.gold_by_level !== undefined && !Array.isArray(monster.gold_by_level)) {
+      errors.push(`monsters[${index}].gold_by_level must be a list`);
+    }
+    if (monster?.gold_drop_by_level !== undefined && !Array.isArray(monster.gold_drop_by_level)) {
+      errors.push(`monsters[${index}].gold_drop_by_level must be a list`);
+    }
+    if (monster?.gold_drop !== undefined) {
+      addPositiveIntError(errors, monster.gold_drop, `monsters[${index}].gold_drop`);
+    }
     const hpByLevel = requireArray<number>(errors, monster?.hp_by_level, `monsters[${index}].hp_by_level`);
     if (hpByLevel.length === 0) {
       errors.push(`monsters[${index}].hp_by_level must have at least one entry`);
@@ -481,6 +505,15 @@ export function getGameDataErrors(data: GameData): string[] {
     }
     hpByLevel.forEach((value, levelIndex) => {
       addPositiveIntError(errors, value, `monsters[${index}].hp_by_level[${levelIndex}]`);
+    });
+    const goldByLevel = rawMonsterGoldLevels(monster);
+    if (goldByLevel.length === 0) {
+      errors.push(`monsters[${index}].gold_by_level must have at least one entry`);
+    } else if (goldByLevel.length !== hpByLevel.length) {
+      errors.push(`monsters[${index}].gold_by_level must contain ${hpByLevel.length} levels`);
+    }
+    goldByLevel.forEach((value, levelIndex) => {
+      addPositiveIntError(errors, value, `monsters[${index}].gold_by_level[${levelIndex}]`);
     });
   });
 
@@ -885,13 +918,25 @@ export function renderConfigModule(data: GameData): string {
     const monsterId = validateString(monster.id, `monsters[${index}].id`);
     const monsterName = requireContent(data, monsterNameKey(monsterId));
     validateString(monster.sprite, `monsters[${index}].sprite`);
-    validatePositiveInt(monster.gold_drop, `monsters[${index}].gold_drop`);
+    const goldLevels = rawMonsterGoldLevels(monster);
+    if (goldLevels.length === 0) {
+      fail(`monsters[${index}].gold_by_level must have at least one entry`);
+    }
     const hpLevels = monster.hp_by_level.map((value, levelIndex) =>
       String(validatePositiveInt(value, `monsters[${index}].hp_by_level[${levelIndex}]`))
     );
+    if (goldLevels.length !== hpLevels.length) {
+      fail(`monsters[${index}].gold_by_level must contain ${hpLevels.length} levels`);
+    }
+    const renderedGoldLevels = renderTypedListHelpers(
+      `generated_monster_${index}_gold_levels`,
+      "U32",
+      goldLevels.map((value, levelIndex) => String(validatePositiveInt(value, `monsters[${index}].gold_by_level[${levelIndex}]`)))
+    );
     const renderedHpLevels = renderTypedListHelpers(`generated_monster_${index}_hp_levels`, "U32", hpLevels);
+    helperDefs.push(...renderedGoldLevels.defs);
     helperDefs.push(...renderedHpLevels.defs);
-    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${monster.gold_drop}, ${renderedHpLevels.expr}}`;
+    return `monster_def{${bendString(monsterName)}, ${bendString(monster.sprite)}, ${renderedGoldLevels.expr}, ${renderedHpLevels.expr}}`;
   });
 
   const swordDefs = data.weapons.map((weapon, index) => {

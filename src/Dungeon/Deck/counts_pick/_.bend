@@ -144,16 +144,27 @@ def hero_max_hp(base_hp: U32, upgrades: List(Dungeon/Upgrade), hero_level: U32) 
     case _:
       _from_upgrade(nth_upgrade(upgrades, hero_level - 1), base_hp)
 
-def monster_gold(monsters: List(Dungeon/MonsterDef), idx: U32) -> U32:
+def _nth_u32(xs: List(U32), idx: U32, fallback: U32) -> U32:
+  match xs:
+    case []:
+      fallback
+    case head<>rest:
+      match idx:
+        case 0:
+          head
+        case _:
+          _nth_u32(rest, idx - 1, head)
+
+def monster_gold(monsters: List(Dungeon/MonsterDef), idx: U32, spawn_level: U32) -> U32:
   match monsters:
     case []:
       0
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       match idx:
         case 0:
-          gold_drop
+          _nth_u32(gold_levels, spawn_level - 1, 0)
         case _:
-          monster_gold(rest, idx - 1)
+          monster_gold(rest, idx - 1, spawn_level)
 
 def _remove_hero_entry(count: U32, rest: List(Dungeon/DeckEntry)) -> List(Dungeon/DeckEntry):
   match count:
@@ -207,22 +218,11 @@ def _pick_entry(entries: List(Dungeon/DeckEntry), idx: U32) -> Dungeon/_PickResu
         case _:
           _pick_hit(entry, rest)
 
-def _nth_u32(xs: List(U32), idx: U32, fallback: U32) -> U32:
-  match xs:
-    case []:
-      fallback
-    case head<>rest:
-      match idx:
-        case 0:
-          head
-        case _:
-          _nth_u32(rest, idx - 1, head)
-
 def _monster_hp(monsters: List(Dungeon/MonsterDef), idx: U32, level: U32) -> U32:
   match monsters:
     case []:
       1
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       match idx:
         case 0:
           _nth_u32(hp_levels, level - 1, 1)

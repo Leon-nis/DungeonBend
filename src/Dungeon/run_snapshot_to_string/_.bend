@@ -38,8 +38,8 @@ def _tile_string(tile_value: Dungeon/Tile) -> String:
   match tile_value:
     case none{}:
       "0"
-    case monster{ref, hp}:
-      String/join(["1", U32/show(ref), U32/show(hp)], "~")
+    case monster{ref, hp, spawn_level}:
+      String/join(["1", U32/show(ref), U32/show(hp), U32/show(spawn_level)], "~")
     case sword{ref, dmg}:
       String/join(["2", U32/show(ref), U32/show(dmg)], "~")
     case potion{ref, heal}:

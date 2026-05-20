@@ -112,7 +112,7 @@ def _parse_monster_bonus(monsters: List(Dungeon/MonsterDef), counts: List(String
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       _monster_bonus_entry(
         _count_from_head(counts),
         idx,

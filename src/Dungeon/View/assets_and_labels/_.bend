@@ -56,7 +56,7 @@ def _monster_name_from_list(monsters: List(Dungeon/MonsterDef), ref: U32) -> Str
   match monsters:
     case []:
       Dungeon/Content/fallback_monster_name()
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           name
@@ -75,7 +75,7 @@ def _monster_sprite_from_list(monsters: List(Dungeon/MonsterDef), ref: U32) -> S
   match monsters:
     case []:
       ""
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           sprite
@@ -170,7 +170,7 @@ def _tile_name(tile: Dungeon/Tile) -> String:
   match tile:
     case none{}:
       Dungeon/Content/card_empty()
-    case monster{ref, hp}:
+    case monster{ref, hp, spawn_level}:
       _monster_name(ref)
     case sword{ref, dmg}:
       _sword_name(ref)
@@ -183,7 +183,7 @@ def _tile_sprite(tile: Dungeon/Tile) -> String:
   match tile:
     case none{}:
       ""
-    case monster{ref, hp}:
+    case monster{ref, hp, spawn_level}:
       _monster_sprite(ref)
     case sword{ref, dmg}:
       _sword_sprite(ref)
@@ -196,7 +196,7 @@ def _tile_badge(tile: Dungeon/Tile) -> String:
   match tile:
     case none{}:
       ""
-    case monster{ref, hp}:
+    case monster{ref, hp, spawn_level}:
       Dungeon/Content/stat_hp() ++ " " ++ U32/show(hp)
     case sword{ref, dmg}:
       Dungeon/Content/stat_dmg() ++ " " ++ U32/show(dmg)
@@ -238,7 +238,7 @@ def _monster_hp_from_list(monsters: List(Dungeon/MonsterDef), ref: U32) -> U32:
   match monsters:
     case []:
       1
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           _first_hp(hp_levels)
@@ -294,7 +294,7 @@ def _potion_heal_value(ref: U32) -> U32:
 def _card_stat(card: Dungeon/CardRef) -> String:
   match card:
     case monster_card{ref}:
-      _tile_badge(monster{ref, _monster_hp_value(ref)})
+      _tile_badge(monster{ref, _monster_hp_value(ref), 1})
     case sword_card{ref}:
       _tile_badge(sword{ref, _sword_damage_value(ref)})
     case potion_card{ref}:
@@ -313,7 +313,7 @@ def _monster_hp_range_from_list(monsters: List(Dungeon/MonsterDef), ref: U32) ->
   match monsters:
     case []:
       "1 - 1"
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       match ref:
         case 0:
           U32/show(_first_hp(hp_levels)) ++ " - " ++ U32/show(_last_hp(hp_levels, 1))

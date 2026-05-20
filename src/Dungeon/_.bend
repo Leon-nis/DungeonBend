@@ -31,7 +31,7 @@ type HeroPresentation {
   }
 }
 type MonsterDef {
-  monster_def{name: String, sprite: String, gold_drop: U32, hp_levels: List(U32)}
+  monster_def{name: String, sprite: String, gold_levels: List(U32), hp_levels: List(U32)}
 }
 type SwordDef {
   sword_def{name: String, sprite: String, dmg: U32}
@@ -89,7 +89,7 @@ type Weapon {
 }
 type Tile {
   none{}
-  monster{ref: U32, hp: U32}
+  monster{ref: U32, hp: U32, spawn_level: U32}
   sword{ref: U32, dmg: U32}
   potion{ref: U32, heal: U32}
   gold{amount: U32}

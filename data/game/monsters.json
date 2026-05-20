@@ -3,7 +3,13 @@
     "id": "rat",
     "name": "Rat",
     "sprite": "assets/enemy-rat.png",
-    "gold_drop": 3,
+    "gold_by_level": [
+      3,
+      3,
+      3,
+      3,
+      3
+    ],
     "hp_by_level": [
       3,
       5,
@@ -16,7 +22,13 @@
     "id": "spider",
     "name": "Spider",
     "sprite": "assets/enemy-spider.png",
-    "gold_drop": 4,
+    "gold_by_level": [
+      4,
+      4,
+      4,
+      4,
+      4
+    ],
     "hp_by_level": [
       5,
       7,
@@ -29,7 +41,13 @@
     "id": "venom_spider",
     "name": "Venom Spider",
     "sprite": "assets/enemy-spider2.png",
-    "gold_drop": 5,
+    "gold_by_level": [
+      5,
+      5,
+      5,
+      5,
+      5
+    ],
     "hp_by_level": [
       7,
       9,
@@ -42,7 +60,13 @@
     "id": "orc",
     "name": "Orc",
     "sprite": "assets/enemy-orc.png",
-    "gold_drop": 6,
+    "gold_by_level": [
+      6,
+      6,
+      6,
+      6,
+      6
+    ],
     "hp_by_level": [
       9,
       11,

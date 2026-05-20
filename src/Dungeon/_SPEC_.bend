@@ -70,11 +70,12 @@ assert meta_holds_gold:
   meta{0, 0, 100, [], [], []} == meta{0, 0, 100, [], [], []} :: Dungeon/Meta
 
 # "Gold is earned during runs, mainly by defeating monsters and
-# collecting their drops." Dungeon/MonsterDef.gold_drop is the amount
-# awarded per kill. Concrete example: a 5-gold monster.
-assert monster_def_carries_gold_drop:
-  monster_def{"slime", "assets/slime.png", 5, [1]}
-    == monster_def{"slime", "assets/slime.png", 5, [1]}
+# collecting their drops." Dungeon/MonsterDef.gold_levels carries the
+# per-spawn-level gold rewards. Concrete example: a monster granting 5 gold
+# at level 1.
+assert monster_def_carries_gold_levels:
+  monster_def{"slime", "assets/slime.png", [5], [1]}
+    == monster_def{"slime", "assets/slime.png", [5], [1]}
     :: Dungeon/MonsterDef
 
 # "Gold is used to purchase booster packs and other progression-

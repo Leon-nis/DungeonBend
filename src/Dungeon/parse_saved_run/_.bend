@@ -152,11 +152,11 @@ def _parse_saved_none_tile(rest: List(String)) -> Maybe(Dungeon/Tile):
     case _:
       none{}
 
-def _parse_saved_monster_tile_values(ref_maybe: Maybe(U32), hp_maybe: Maybe(U32)) -> Maybe(Dungeon/Tile):
-  match ref_maybe hp_maybe:
-    case some{ref} some{hp}:
-      some{monster{ref, hp}}
-    case _ _:
+def _parse_saved_monster_tile_values(ref_maybe: Maybe(U32), hp_maybe: Maybe(U32), spawn_level_maybe: Maybe(U32)) -> Maybe(Dungeon/Tile):
+  match ref_maybe hp_maybe spawn_level_maybe:
+    case some{ref} some{hp} some{spawn_level}:
+      some{monster{ref, hp, spawn_level}}
+    case _ _ _:
       none{}
 
 def _parse_saved_monster_tile(rest: List(String)) -> Maybe(Dungeon/Tile):
@@ -166,7 +166,13 @@ def _parse_saved_monster_tile(rest: List(String)) -> Maybe(Dungeon/Tile):
         case hp_str<>rest2:
           match rest2:
             case []:
-              _parse_saved_monster_tile_values(String/to_u32(ref_str), String/to_u32(hp_str))
+              _parse_saved_monster_tile_values(String/to_u32(ref_str), String/to_u32(hp_str), some{1})
+            case spawn_level_str<>rest3:
+              match rest3:
+                case []:
+                  _parse_saved_monster_tile_values(String/to_u32(ref_str), String/to_u32(hp_str), String/to_u32(spawn_level_str))
+                case _:
+                  none{}
             case _:
               none{}
         case _:

@@ -1,0 +1,90 @@
+Gold / Graph-Scale runtime changes
+Date: 2026-05-18
+Branch: gold
+
+Objetivo
+- Preparar o DungeonBend para consumir os data-driven atuais do editor graph-scale.
+- Mover a lógica de gold drop para valores por nível.
+- Persistir spawn_level na instância do monstro no board para suportar gold drop e futuras mecânicas.
+
+Resumo das mudanças
+1. Schema de monstros no pipeline de dados
+- scripts/dungeon-data.ts agora aceita:
+  - gold_by_level
+  - gold_drop_by_level
+  - gold_drop (fallback legado)
+- A validação exige pelo menos um valor de gold por nível.
+- A validação exige que gold_by_level tenha o mesmo tamanho de hp_by_level.
+- O generated_config agora emite monster_def com curva de gold por nível.
+
+2. Dados atuais de monstros
+- data/game/monsters.json foi migrado de gold_drop fixo para gold_by_level.
+- Os valores atuais foram inicializados como flat por nível para preservar o comportamento antigo.
+
+3. Runtime de monstros
+- src/Dungeon/_.bend:
+  - MonsterDef mudou de:
+    monster_def{name, sprite, gold_drop, hp_levels}
+    para:
+    monster_def{name, sprite, gold_levels, hp_levels}
+  - Tile.monster mudou de:
+    monster{ref, hp}
+    para:
+    monster{ref, hp, spawn_level}
+
+4. Spawn de monstro
+- src/Dungeon/Deck/spawn_and_draw/_.bend agora grava o level do draw como spawn_level da instância.
+- O HP continua sendo resolvido a partir da curva hp_by_level.
+
+5. Gold drop por instância
+- src/Dungeon/Deck/counts_pick/_.bend:
+  - monster_gold agora recebe spawn_level.
+  - O valor de gold é resolvido por lookup em gold_levels usando spawn_level - 1.
+  - O helper nth usa fallback para o último valor da lista.
+
+6. Combate
+- src/Dungeon/Combat/resolve_and_apply/_.bend:
+  - resolve_monster agora recebe spawn_level.
+  - Ao matar o monstro, o gold drop é calculado usando o spawn_level real daquela instância.
+  - Quando o monstro sobrevive a um hit armado, o tile reconstruído preserva o mesmo spawn_level.
+
+7. Save / load
+- src/Dungeon/run_snapshot_to_string/_.bend serializa monster como:
+  1~ref~hp~spawn_level
+- src/Dungeon/parse_saved_run/_.bend aceita:
+  - formato novo com spawn_level
+  - formato antigo sem spawn_level, usando fallback spawn_level = 1
+
+8. Propagação de tipos
+- Ajustados os pattern matches de monster e monster_def em:
+  - src/Dungeon/Run/apply_to_tile/_.bend
+  - src/Dungeon/View/assets_and_labels/_.bend
+  - src/Dungeon/View/cards/_.bend
+  - src/Dungeon/App/ui_fx/_.bend
+  - src/Dungeon/meta_to_string/_.bend
+  - src/Dungeon/_parse_meta/_.bend
+  - src/Dungeon/_SPEC_.bend
+
+9. Config gerado
+- src/Dungeon/generated_config/_.bend foi regenerado para o novo formato de MonsterDef.
+
+Decisão de modelagem
+- spawn_level nao fica no MonsterDef.
+- spawn_level fica na instancia do monstro no tile, porque o mesmo monstro pode spawnar em niveis diferentes ao longo da run.
+- gold scale nao vai para o tile.
+- O tile carrega apenas o contexto da instancia; as curvas ficam centralizadas no MonsterDef.
+
+Compatibilidade com o editor
+- O editor graph-scale le gold assim:
+  1. gold_by_level
+  2. gold_drop_by_level
+  3. gold_drop
+- Esta branch foi preparada para o formato preferencial gold_by_level.
+- Presets e monster_links do editor continuam sendo metadata de autoria; nao entram no runtime do jogo.
+
+Validacao executada
+- Build completo executado com:
+  sh ./scripts/build.sh
+- Resultado:
+  - dist/ui-test/index.html gerado
+  - dist/index.html gerado

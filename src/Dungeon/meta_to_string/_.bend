@@ -28,7 +28,7 @@ def _monster_bonus_counts(monsters: List(Dungeon/MonsterDef), bonus_deck: List(D
   match monsters:
     case []:
       []
-    case monster_def{name, sprite, gold_drop, hp_levels}<>rest:
+    case monster_def{name, sprite, gold_levels, hp_levels}<>rest:
       U32/show(Dungeon/Deck/counts_pick/deck_count_for_card(bonus_deck, monster_card{idx}))<>_monster_bonus_counts(rest, bonus_deck, idx + 1)
 
 def _sword_bonus_counts(swords: List(Dungeon/SwordDef), bonus_deck: List(Dungeon/DeckEntry), idx: U32) -> List(String):
