@@ -1,9 +1,3 @@
-def generated_content() -> Unit:
-
-  unit{}
-
-
-
 def booster_starter_booster_name() -> String:
   "Starter Booster"
 

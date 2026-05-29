@@ -1,6 +1,3 @@
-def generated_rules() -> Unit:
-  unit{}
-
 def generated_initial_seed() -> U32:
   1
 
