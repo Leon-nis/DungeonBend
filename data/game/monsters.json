@@ -15,7 +15,7 @@
   {
     "id": "spider",
     "name": "Spider",
-    "sprite": "assets/enemy-spider.png",
+    "sprite": "assets/enemy-blackwidow.png",
     "gold_drop": 4,
     "hp_by_level": [
       5,
@@ -28,7 +28,7 @@
   {
     "id": "venom_spider",
     "name": "Venom Spider",
-    "sprite": "assets/enemy-spider2.png",
+    "sprite": "assets/enemy-slime-blue2.png",
     "gold_drop": 5,
     "hp_by_level": [
       7,
@@ -41,7 +41,7 @@
   {
     "id": "orc",
     "name": "Orc",
-    "sprite": "assets/enemy-orc.png",
+    "sprite": "assets/enemy-plant.png",
     "gold_drop": 6,
     "hp_by_level": [
       9,

@@ -1500,22 +1500,22 @@
     "monster_links": [
       {
         "monster_id": "rat",
-        "hpScalePresetId": "",
+        "hpScalePresetId": "statline_preset_2",
         "goldDropScalePresetId": ""
       },
       {
         "monster_id": "spider",
-        "hpScalePresetId": "",
+        "hpScalePresetId": "statline_preset_9",
         "goldDropScalePresetId": ""
       },
       {
         "monster_id": "venom_spider",
-        "hpScalePresetId": "",
+        "hpScalePresetId": "statline_preset_11",
         "goldDropScalePresetId": ""
       },
       {
         "monster_id": "orc",
-        "hpScalePresetId": "",
+        "hpScalePresetId": "statline_preset_10",
         "goldDropScalePresetId": ""
       }
     ],

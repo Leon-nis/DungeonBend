@@ -110,9 +110,9 @@ def generated_config_heroes_chunk_0() -> List(Dungeon/HeroDef):
 def generated_config_monsters_chunk_0() -> List(Dungeon/MonsterDef):
   [
     monster_def{"Rat", "assets/enemy-rat.png", generated_monster_0_gold_levels_chunk_0(), generated_monster_0_hp_levels_chunk_0()},
-    monster_def{"Spider", "assets/enemy-spider.png", generated_monster_1_gold_levels_chunk_0(), generated_monster_1_hp_levels_chunk_0()},
-    monster_def{"Venom Spider", "assets/enemy-spider2.png", generated_monster_2_gold_levels_chunk_0(), generated_monster_2_hp_levels_chunk_0()},
-    monster_def{"Orc", "assets/enemy-orc.png", generated_monster_3_gold_levels_chunk_0(), generated_monster_3_hp_levels_chunk_0()}
+    monster_def{"Spider", "assets/enemy-blackwidow.png", generated_monster_1_gold_levels_chunk_0(), generated_monster_1_hp_levels_chunk_0()},
+    monster_def{"Venom Spider", "assets/enemy-slime-blue2.png", generated_monster_2_gold_levels_chunk_0(), generated_monster_2_hp_levels_chunk_0()},
+    monster_def{"Orc", "assets/enemy-plant.png", generated_monster_3_gold_levels_chunk_0(), generated_monster_3_hp_levels_chunk_0()}
   ]
 
 def generated_config_swords_chunk_0() -> List(Dungeon/SwordDef):
