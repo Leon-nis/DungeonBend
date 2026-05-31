@@ -21,10 +21,48 @@ export type RawMonster = {
   id: string;
   name: string;
   sprite: string;
-  gold_by_level?: number[];
-  gold_drop_by_level?: number[];
-  gold_drop?: number;
-  hp_by_level: number[];
+  hpStatlinePresetId: string;
+};
+
+export type RawStatlineFlag = "hp_scale" | "gold_drop_scale" | "guide_scale";
+
+export type RawStatlineGenerationMode = "by_ratio" | "derived_percent_growth";
+
+export type RawStatlinePoint = {
+  x: number;
+  y: number;
+};
+
+export type RawGuideInterval = {
+  endX: number | null;
+  positiveWeights: number[];
+  negativeWeights: number[];
+};
+
+export type RawStatlinePreset = {
+  id: string;
+  name: string;
+  flag: RawStatlineFlag;
+  generationMode: RawStatlineGenerationMode;
+  startX: number;
+  startY: number;
+  numberOfPoints: number;
+  levelCap: number | null;
+  deltaY: number;
+  everyXLevels: number;
+  referencePresetId: string;
+  conversionPercent: number;
+  useConversion: boolean;
+  goldStartY: number;
+  goldScalePresetId: string;
+  guideIntervals: RawGuideInterval[];
+  points: RawStatlinePoint[];
+  snapYToInt: boolean;
+};
+
+export type RawStatlines = {
+  version: number;
+  presets: RawStatlinePreset[];
 };
 
 export type RawWeapon = {
@@ -93,6 +131,7 @@ export type GameData = {
   heroes: RawHero[];
   hero_upgrades: RawHeroUpgrade[];
   monsters: RawMonster[];
+  statlines: RawStatlines;
   weapons: RawWeapon[];
   potions: RawPotion[];
   decks: RawDecks;
@@ -117,6 +156,7 @@ const DATA_FILES = {
   heroes: "data/game/heroes.json",
   hero_upgrades: "data/game/hero_upgrades.json",
   monsters: "data/game/monsters.json",
+  statlines: "data/game/statlines.json",
   weapons: "data/game/weapons.json",
   potions: "data/game/potions.json",
   decks: "data/game/decks.json",
@@ -229,6 +269,7 @@ async function readGameDataFiles(cwd: string): Promise<GameData> {
     heroes: await readJson<RawHero[]>(cwd, DATA_FILES.heroes),
     hero_upgrades: await readJson<RawHeroUpgrade[]>(cwd, DATA_FILES.hero_upgrades),
     monsters: await readJson<RawMonster[]>(cwd, DATA_FILES.monsters),
+    statlines: await readJson<RawStatlines>(cwd, DATA_FILES.statlines),
     weapons: await readJson<RawWeapon[]>(cwd, DATA_FILES.weapons),
     potions: await readJson<RawPotion[]>(cwd, DATA_FILES.potions),
     decks: await readJson<RawDecks>(cwd, DATA_FILES.decks),
@@ -294,6 +335,7 @@ export async function writeGameData(cwd: string, data: GameData): Promise<void> 
     Bun.write(path.resolve(cwd, DATA_FILES.heroes), jsonBlock(data.heroes)),
     Bun.write(path.resolve(cwd, DATA_FILES.hero_upgrades), jsonBlock(data.hero_upgrades)),
     Bun.write(path.resolve(cwd, DATA_FILES.monsters), jsonBlock(data.monsters)),
+    Bun.write(path.resolve(cwd, DATA_FILES.statlines), jsonBlock(data.statlines)),
     Bun.write(path.resolve(cwd, DATA_FILES.weapons), jsonBlock(data.weapons)),
     Bun.write(path.resolve(cwd, DATA_FILES.potions), jsonBlock(data.potions)),
     Bun.write(path.resolve(cwd, DATA_FILES.decks), jsonBlock(data.decks)),
@@ -316,6 +358,10 @@ function isNonNegativeInt(value: unknown): value is number {
   return Number.isInteger(value) && Number(value) >= 0;
 }
 
+function isNonNegativeNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value >= 0;
+}
+
 function addStringError(errors: string[], value: unknown, label: string): void {
   if (typeof value !== "string" || value.trim() === "") {
     errors.push(`${label} must be a non-empty string`);
@@ -331,6 +377,12 @@ function addPositiveIntError(errors: string[], value: unknown, label: string): v
 function addNonNegativeIntError(errors: string[], value: unknown, label: string): void {
   if (!isNonNegativeInt(value)) {
     errors.push(`${label} must be a non-negative integer`);
+  }
+}
+
+function addNonNegativeNumberError(errors: string[], value: unknown, label: string): void {
+  if (!isNonNegativeNumber(value)) {
+    errors.push(`${label} must be a non-negative number`);
   }
 }
 
@@ -359,18 +411,135 @@ function requireArray<T>(errors: string[], value: T[] | unknown, label: string):
   return value as T[];
 }
 
-function rawMonsterGoldLevels(monster: RawMonster | null | undefined): number[] {
-  if (Array.isArray(monster?.gold_by_level) && monster.gold_by_level.length > 0) {
-    return monster.gold_by_level.slice();
+function isStatlineFlag(value: unknown): value is RawStatlineFlag {
+  return value === "hp_scale" || value === "gold_drop_scale" || value === "guide_scale";
+}
+
+function isGenerationMode(value: unknown): value is RawStatlineGenerationMode {
+  return value === "by_ratio" || value === "derived_percent_growth";
+}
+
+function sortAndDedupeStatlinePoints(points: RawStatlinePoint[]): RawStatlinePoint[] {
+  const seen = new Set<number>();
+  return points
+    .slice()
+    .sort((a, b) => a.x - b.x || a.y - b.y)
+    .filter((point) => {
+      if (seen.has(point.x)) {
+        return false;
+      }
+      seen.add(point.x);
+      return true;
+    });
+}
+
+function presetPoints(preset: RawStatlinePreset, label: string): RawStatlinePoint[] {
+  if (!Array.isArray(preset.points)) {
+    fail(`${label}.points must be a list`);
   }
-  if (Array.isArray(monster?.gold_drop_by_level) && monster.gold_drop_by_level.length > 0) {
-    return monster.gold_drop_by_level.slice();
+  return sortAndDedupeStatlinePoints(
+    preset.points.map((point, index) => ({
+      x: validatePositiveInt(point?.x, `${label}.points[${index}].x`),
+      y: validateNonNegativeNumber(point?.y, `${label}.points[${index}].y`),
+    }))
+  );
+}
+
+function valueAtX(points: RawStatlinePoint[], x: number, snapYToInt: boolean): number {
+  if (points.length === 0) {
+    return 0;
   }
-  if (Number.isFinite(Number(monster?.gold_drop))) {
-    const hpLevels = Array.isArray(monster?.hp_by_level) ? monster.hp_by_level.length : 1;
-    return Array.from({ length: Math.max(1, hpLevels) }, () => Math.floor(Number(monster?.gold_drop)));
+  const exact = points.find((point) => point.x === x);
+  if (exact) {
+    return snapYToInt ? Math.floor(exact.y) : exact.y;
   }
-  return [];
+  const before = points.filter((point) => point.x < x);
+  const after = points.filter((point) => point.x > x);
+  const lower = before.length > 0 ? before[before.length - 1]! : points[0]!;
+  const upper = after.length > 0 ? after[0]! : points[points.length - 1]!;
+  if (lower.x === upper.x) {
+    return snapYToInt ? Math.floor(lower.y) : lower.y;
+  }
+  const ratio = (x - lower.x) / (upper.x - lower.x);
+  const value = lower.y + ((upper.y - lower.y) * ratio);
+  return snapYToInt ? Math.floor(value) : value;
+}
+
+function applyLevelCapToPoints(points: RawStatlinePoint[], levelCap: number | null): RawStatlinePoint[] {
+  if (levelCap === null) {
+    return points.map((point) => ({ x: point.x, y: Math.floor(point.y) }));
+  }
+  const capX = Math.floor(levelCap);
+  const capY = Math.floor(valueAtX(points, capX, true));
+  return points.map((point) => ({
+    x: point.x,
+    y: point.x > capX ? capY : Math.floor(point.y),
+  }));
+}
+
+function bakePresetPoints(preset: RawStatlinePreset, label: string): RawStatlinePoint[] {
+  if (preset.flag === "gold_drop_scale") {
+    return [];
+  }
+  const points = presetPoints(preset, label);
+  if (points.length === 0) {
+    fail(`${label}.points must have at least one entry`);
+  }
+  if (preset.flag === "guide_scale") {
+    return points.map((point) => ({
+      x: point.x,
+      y: Math.floor(point.y),
+    }));
+  }
+  return applyLevelCapToPoints(points, preset.levelCap);
+}
+
+function statlinePresetsById(data: GameData): Map<string, RawStatlinePreset> {
+  return new Map(data.statlines.presets.map((preset) => [preset.id, preset]));
+}
+
+function hpPresetForMonster(data: GameData, monster: RawMonster, label: string): RawStatlinePreset {
+  const preset = statlinePresetsById(data).get(monster.hpStatlinePresetId);
+  if (!preset) {
+    fail(`${label}.hpStatlinePresetId references unknown preset "${monster.hpStatlinePresetId}"`);
+  }
+  if (preset.flag !== "hp_scale") {
+    fail(`${label}.hpStatlinePresetId must reference an hp_scale preset`);
+  }
+  return preset;
+}
+
+function hpLevelsForMonster(data: GameData, monster: RawMonster, label: string): number[] {
+  return bakePresetPoints(hpPresetForMonster(data, monster, label), `${label}.hpStatlinePreset`)
+    .map((point, index) => validatePositiveInt(point.y, `${label}.hp_levels[${index}]`));
+}
+
+function goldLevelsForMonster(data: GameData, monster: RawMonster, label: string): number[] {
+  const hpPreset = hpPresetForMonster(data, monster, label);
+  const hpPoints = bakePresetPoints(hpPreset, `${label}.hpStatlinePreset`);
+  const goldPresetId = validateString(hpPreset.goldScalePresetId, `${label}.hpStatlinePreset.goldScalePresetId`);
+  const goldPreset = statlinePresetsById(data).get(goldPresetId);
+  if (!goldPreset) {
+    fail(`${label}.hpStatlinePreset.goldScalePresetId references unknown preset "${goldPresetId}"`);
+  }
+  if (goldPreset.flag !== "gold_drop_scale") {
+    fail(`${label}.hpStatlinePreset.goldScalePresetId must reference a gold_drop_scale preset`);
+  }
+  const hpStartY = valueAtX(hpPoints, hpPreset.startX, true);
+  const goldPoints = hpPoints.map((hpPoint) => {
+    const ratioDelta = hpPoint.x < 2
+      ? 0
+      : Math.floor(((hpPoint.x - 2) * goldPreset.deltaY) / goldPreset.everyXLevels);
+    const conversionDelta = goldPreset.useConversion
+      ? Math.floor(((hpPoint.y - hpStartY) * goldPreset.conversionPercent) / 100)
+      : 0;
+    return {
+      x: hpPoint.x,
+      y: Math.max(0, Math.floor(hpPreset.goldStartY) + ratioDelta + conversionDelta),
+    };
+  });
+  return applyLevelCapToPoints(goldPoints, goldPreset.levelCap)
+    .map((point, index) => validatePositiveInt(point.y, `${label}.gold_levels[${index}]`));
 }
 
 function requireContent(data: GameData, key: string, label = `content.en["${key}"]`): string {
@@ -436,6 +605,7 @@ export function getGameDataErrors(data: GameData): string[] {
   const heroes = requireArray<RawHero>(errors, data.heroes, "heroes");
   const upgrades = requireArray<RawHeroUpgrade>(errors, data.hero_upgrades, "hero_upgrades");
   const monsters = requireArray<RawMonster>(errors, data.monsters, "monsters");
+  const statlinePresets = requireArray<RawStatlinePreset>(errors, data.statlines?.presets, "statlines.presets");
   const weapons = requireArray<RawWeapon>(errors, data.weapons, "weapons");
   const potions = requireArray<RawPotion>(errors, data.potions, "potions");
   const baseDeck = requireArray<RawDeckEntry>(errors, data.decks?.base_deck, "decks.base_deck");
@@ -449,6 +619,9 @@ export function getGameDataErrors(data: GameData): string[] {
   }
   if (monsters.length === 0) {
     errors.push("monsters must contain at least one monster");
+  }
+  if (statlinePresets.length === 0) {
+    errors.push("statlines.presets must contain at least one preset");
   }
   if (baseDeck.length === 0) {
     errors.push("decks.base_deck must contain at least one entry");
@@ -480,41 +653,110 @@ export function getGameDataErrors(data: GameData): string[] {
     cardIds.set(id, kind);
   };
 
-  let hpLevelCount: number | null = null;
+  if (!Number.isInteger(data.statlines?.version) || Number(data.statlines.version) < 0) {
+    errors.push("statlines.version must be a non-negative integer");
+  }
+
+  const statlinePresetIds = new Set<string>();
+  const statlinePresetsById = new Map<string, RawStatlinePreset>();
+  statlinePresets.forEach((preset, index) => {
+    const label = `statlines.presets[${index}]`;
+    uniqueId(errors, statlinePresetIds, preset?.id, `${label}.id`);
+    addStringError(errors, preset?.name, `${label}.name`);
+    if (!isStatlineFlag(preset?.flag)) {
+      errors.push(`${label}.flag must be "hp_scale", "gold_drop_scale", or "guide_scale"`);
+    }
+    if (!isGenerationMode(preset?.generationMode)) {
+      errors.push(`${label}.generationMode must be "by_ratio" or "derived_percent_growth"`);
+    }
+    addPositiveIntError(errors, preset?.startX, `${label}.startX`);
+    addNonNegativeNumberError(errors, preset?.startY, `${label}.startY`);
+    addNonNegativeNumberError(errors, preset?.deltaY, `${label}.deltaY`);
+    addPositiveIntError(errors, preset?.everyXLevels, `${label}.everyXLevels`);
+    addNonNegativeNumberError(errors, preset?.conversionPercent, `${label}.conversionPercent`);
+    addBooleanError(errors, preset?.useConversion, `${label}.useConversion`);
+    addNonNegativeNumberError(errors, preset?.goldStartY, `${label}.goldStartY`);
+    if (preset?.levelCap !== null && preset?.levelCap !== undefined) {
+      addPositiveIntError(errors, preset.levelCap, `${label}.levelCap`);
+    }
+    if (preset?.flag === "hp_scale" || preset?.flag === "guide_scale") {
+      if (preset.startX !== 1) {
+        errors.push(`${label}.startX must be 1 for ${preset.flag}`);
+      }
+      addPositiveIntError(errors, preset?.numberOfPoints, `${label}.numberOfPoints`);
+      const points = requireArray<RawStatlinePoint>(errors, preset?.points, `${label}.points`);
+      if (points.length === 0) {
+        errors.push(`${label}.points must have at least one entry`);
+      }
+      const pointXs = new Set<number>();
+      points.forEach((point, pointIndex) => {
+        addPositiveIntError(errors, point?.x, `${label}.points[${pointIndex}].x`);
+        addNonNegativeNumberError(errors, point?.y, `${label}.points[${pointIndex}].y`);
+        if (Number.isInteger(point?.x)) {
+          if (pointXs.has(point.x)) {
+            errors.push(`${label}.points has duplicate x "${point.x}"`);
+          }
+          pointXs.add(point.x);
+        }
+      });
+      const sorted = points
+        .filter((point) => Number.isInteger(point?.x) && Number.isInteger(point?.y))
+        .map((point) => ({ x: Number(point.x), y: Number(point.y) }))
+        .sort((a, b) => a.x - b.x || a.y - b.y);
+      if (sorted.length > 0) {
+        if (sorted[0]!.x !== preset.startX) {
+          errors.push(`${label}.points must start at x ${preset.startX}`);
+        }
+        for (let pointIndex = 1; pointIndex < sorted.length; pointIndex += 1) {
+          if (sorted[pointIndex]!.x !== sorted[pointIndex - 1]!.x + 1) {
+            errors.push(`${label}.points must use contiguous x values`);
+            break;
+          }
+        }
+      }
+      if (Number.isInteger(preset?.numberOfPoints) && preset.numberOfPoints !== points.length) {
+        errors.push(`${label}.numberOfPoints must match points length`);
+      }
+    } else if (preset?.flag === "gold_drop_scale") {
+      if (preset.startX !== 2) {
+        errors.push(`${label}.startX must be 2 for gold_drop_scale`);
+      }
+    }
+    if (typeof preset?.id === "string" && preset.id.trim() !== "") {
+      statlinePresetsById.set(preset.id, preset);
+    }
+  });
+
+  statlinePresets.forEach((preset, index) => {
+    const label = `statlines.presets[${index}]`;
+    if (preset?.flag !== "hp_scale") {
+      return;
+    }
+    if (typeof preset.goldScalePresetId !== "string" || preset.goldScalePresetId.trim() === "") {
+      errors.push(`${label}.goldScalePresetId must reference a gold_drop_scale preset`);
+      return;
+    }
+    const goldPreset = statlinePresetsById.get(preset.goldScalePresetId);
+    if (!goldPreset) {
+      errors.push(`${label}.goldScalePresetId references unknown preset "${preset.goldScalePresetId}"`);
+    } else if (goldPreset.flag !== "gold_drop_scale") {
+      errors.push(`${label}.goldScalePresetId must reference a gold_drop_scale preset`);
+    }
+  });
+
   monsters.forEach((monster, index) => {
     pushCardId(monster?.id, "monster", `monsters[${index}].id`);
     addStringError(errors, monster?.name, `monsters[${index}].name`);
     addStringError(errors, monster?.sprite, `monsters[${index}].sprite`);
-    if (monster?.gold_by_level !== undefined && !Array.isArray(monster.gold_by_level)) {
-      errors.push(`monsters[${index}].gold_by_level must be a list`);
+    addStringError(errors, monster?.hpStatlinePresetId, `monsters[${index}].hpStatlinePresetId`);
+    if (typeof monster?.hpStatlinePresetId === "string" && monster.hpStatlinePresetId.trim() !== "") {
+      const hpPreset = statlinePresetsById.get(monster.hpStatlinePresetId);
+      if (!hpPreset) {
+        errors.push(`monsters[${index}].hpStatlinePresetId references unknown preset "${monster.hpStatlinePresetId}"`);
+      } else if (hpPreset.flag !== "hp_scale") {
+        errors.push(`monsters[${index}].hpStatlinePresetId must reference an hp_scale preset`);
+      }
     }
-    if (monster?.gold_drop_by_level !== undefined && !Array.isArray(monster.gold_drop_by_level)) {
-      errors.push(`monsters[${index}].gold_drop_by_level must be a list`);
-    }
-    if (monster?.gold_drop !== undefined) {
-      addPositiveIntError(errors, monster.gold_drop, `monsters[${index}].gold_drop`);
-    }
-    const hpByLevel = requireArray<number>(errors, monster?.hp_by_level, `monsters[${index}].hp_by_level`);
-    if (hpByLevel.length === 0) {
-      errors.push(`monsters[${index}].hp_by_level must have at least one entry`);
-    }
-    if (hpLevelCount === null) {
-      hpLevelCount = hpByLevel.length;
-    } else if (hpByLevel.length !== hpLevelCount) {
-      errors.push(`monsters[${index}].hp_by_level must contain ${hpLevelCount} levels`);
-    }
-    hpByLevel.forEach((value, levelIndex) => {
-      addPositiveIntError(errors, value, `monsters[${index}].hp_by_level[${levelIndex}]`);
-    });
-    const goldByLevel = rawMonsterGoldLevels(monster);
-    if (goldByLevel.length === 0) {
-      errors.push(`monsters[${index}].gold_by_level must have at least one entry`);
-    } else if (goldByLevel.length !== hpByLevel.length) {
-      errors.push(`monsters[${index}].gold_by_level must contain ${hpByLevel.length} levels`);
-    }
-    goldByLevel.forEach((value, levelIndex) => {
-      addPositiveIntError(errors, value, `monsters[${index}].gold_by_level[${levelIndex}]`);
-    });
   });
 
   weapons.forEach((weapon, index) => {
@@ -731,6 +973,13 @@ function validateNonNegativeInt(value: number, label: string): number {
   return value;
 }
 
+function validateNonNegativeNumber(value: number, label: string): number {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0) {
+    fail(`${label} must be a non-negative number`);
+  }
+  return value;
+}
+
 function validateString(value: string, label: string): string {
   if (typeof value !== "string" || value.trim() === "") {
     fail(`${label} must be a non-empty string`);
@@ -918,20 +1167,19 @@ export function renderConfigModule(data: GameData): string {
     const monsterId = validateString(monster.id, `monsters[${index}].id`);
     const monsterName = requireContent(data, monsterNameKey(monsterId));
     validateString(monster.sprite, `monsters[${index}].sprite`);
-    const goldLevels = rawMonsterGoldLevels(monster);
-    if (goldLevels.length === 0) {
-      fail(`monsters[${index}].gold_by_level must have at least one entry`);
+    validateString(monster.hpStatlinePresetId, `monsters[${index}].hpStatlinePresetId`);
+    const hpLevels = hpLevelsForMonster(data, monster, `monsters[${index}]`).map(String);
+    const goldLevels = goldLevelsForMonster(data, monster, `monsters[${index}]`).map(String);
+    if (hpLevels.length === 0) {
+      fail(`monsters[${index}].hp_levels must have at least one entry`);
     }
-    const hpLevels = monster.hp_by_level.map((value, levelIndex) =>
-      String(validatePositiveInt(value, `monsters[${index}].hp_by_level[${levelIndex}]`))
-    );
     if (goldLevels.length !== hpLevels.length) {
-      fail(`monsters[${index}].gold_by_level must contain ${hpLevels.length} levels`);
+      fail(`monsters[${index}].gold_levels must contain ${hpLevels.length} levels`);
     }
     const renderedGoldLevels = renderTypedListHelpers(
       `generated_monster_${index}_gold_levels`,
       "U32",
-      goldLevels.map((value, levelIndex) => String(validatePositiveInt(value, `monsters[${index}].gold_by_level[${levelIndex}]`)))
+      goldLevels
     );
     const renderedHpLevels = renderTypedListHelpers(`generated_monster_${index}_hp_levels`, "U32", hpLevels);
     helperDefs.push(...renderedGoldLevels.defs);
