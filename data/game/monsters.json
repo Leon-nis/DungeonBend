@@ -3,48 +3,24 @@
     "id": "rat",
     "name": "Rat",
     "sprite": "assets/enemy-rat.png",
-    "hpStatlinePresetId": "statline_preset_10"
+    "hpStatlinePresetId": "statline_preset_2"
   },
   {
     "id": "spider",
     "name": "Black Widow",
     "sprite": "assets/enemy-spider2.png",
-    "hpStatlinePresetId": "statline_preset_2"
+    "hpStatlinePresetId": "statline_preset_9"
   },
   {
     "id": "venom_spider",
     "name": "Venom Spider",
     "sprite": "assets/enemy-spider.png",
-    "hpStatlinePresetId": "statline_preset_2"
+    "hpStatlinePresetId": "statline_preset_9"
   },
   {
     "id": "orc",
     "name": "Orc",
     "sprite": "assets/enemy-orc.png",
-    "hpStatlinePresetId": "statline_preset_12"
-  },
-  {
-    "id": "plant",
-    "name": "Angry Plant",
-    "sprite": "assets/enemy-plant.png",
-    "hpStatlinePresetId": "statline_preset_9"
-  },
-  {
-    "id": "bat",
-    "name": "Bat",
-    "sprite": "assets/enemy-bat.png",
     "hpStatlinePresetId": "statline_preset_10"
-  },
-  {
-    "id": "zombie_dog",
-    "name": "Zombie Dog",
-    "sprite": "assets/enemy-dog.png",
-    "hpStatlinePresetId": "statline_preset_15"
-  },
-  {
-    "id": "mimic",
-    "name": "Mimic",
-    "sprite": "assets/enemy-mimic.png",
-    "hpStatlinePresetId": "statline_preset_16"
   }
 ]

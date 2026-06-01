@@ -3,19 +3,21 @@
     "starter_booster": "green"
   },
   "disabled_pool_rows": [],
-  "statline_graph_view": {
-    "bounds": {
-      "xMin": 1,
-      "xMax": 15,
-      "yMin": 0,
-      "yMax": 30
-    },
-    "showGoldStatline": true,
-    "readoutXs": [
-      2,
-      3
-    ],
-    "showLevelCap": true,
-    "zoom": 1.3
+  "statline_presets": {
+    "version": 0,
+    "presets": [],
+    "monster_links": [],
+    "graph_view": {
+      "bounds": {
+        "xMin": 1,
+        "xMax": 30,
+        "yMin": 0,
+        "yMax": 50
+      },
+      "showGoldStatline": false,
+      "readoutXs": [],
+      "showLevelCap": true,
+      "zoom": 2
+    }
   }
 }

@@ -136,20 +136,20 @@
     },
     {
       "id": "statline_preset_2",
-      "name": "hp_small_monster_spider",
+      "name": "hp_small_monster_rat",
       "flag": "hp_scale",
       "generationMode": "by_ratio",
       "startX": 1,
-      "startY": 7,
+      "startY": 2,
       "numberOfPoints": 15,
-      "levelCap": 15,
+      "levelCap": 6,
       "deltaY": 2,
-      "everyXLevels": 3,
+      "everyXLevels": 1,
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
-      "goldStartY": 1,
-      "goldScalePresetId": "statline_preset_19",
+      "goldStartY": 0,
+      "goldScalePresetId": "statline_preset_5",
       "guideIntervals": [
         {
           "endX": 5,
@@ -206,35 +206,35 @@
       "points": [
         {
           "x": 1,
-          "y": 7
+          "y": 2
         },
         {
           "x": 2,
-          "y": 7
+          "y": 4
         },
         {
           "x": 3,
-          "y": 8
+          "y": 6
         },
         {
           "x": 4,
-          "y": 9
+          "y": 8
         },
         {
           "x": 5,
-          "y": 9
-        },
-        {
-          "x": 6,
           "y": 10
         },
         {
+          "x": 6,
+          "y": 12
+        },
+        {
           "x": 7,
-          "y": 11
+          "y": 12
         },
         {
           "x": 8,
-          "y": 11
+          "y": 12
         },
         {
           "x": 9,
@@ -242,27 +242,27 @@
         },
         {
           "x": 10,
-          "y": 13
+          "y": 12
         },
         {
           "x": 11,
-          "y": 13
+          "y": 12
         },
         {
           "x": 12,
-          "y": 14
+          "y": 12
         },
         {
           "x": 13,
-          "y": 15
+          "y": 12
         },
         {
           "x": 14,
-          "y": 15
+          "y": 12
         },
         {
           "x": 15,
-          "y": 16
+          "y": 12
         }
       ],
       "snapYToInt": true
@@ -701,11 +701,11 @@
     },
     {
       "id": "statline_preset_9",
-      "name": "hp_small_monster_plant",
+      "name": "hp_small_monster_spider",
       "flag": "hp_scale",
       "generationMode": "by_ratio",
       "startX": 1,
-      "startY": 4,
+      "startY": 5,
       "numberOfPoints": 15,
       "levelCap": 15,
       "deltaY": 1,
@@ -714,7 +714,7 @@
       "conversionPercent": 100,
       "useConversion": false,
       "goldStartY": 0,
-      "goldScalePresetId": "statline_preset_3",
+      "goldScalePresetId": "statline_preset_6",
       "guideIntervals": [
         {
           "endX": 5,
@@ -771,63 +771,63 @@
       "points": [
         {
           "x": 1,
-          "y": 4
-        },
-        {
-          "x": 2,
           "y": 5
         },
         {
-          "x": 3,
+          "x": 2,
           "y": 6
         },
         {
-          "x": 4,
+          "x": 3,
           "y": 7
         },
         {
-          "x": 5,
+          "x": 4,
           "y": 8
         },
         {
-          "x": 6,
+          "x": 5,
           "y": 9
         },
         {
-          "x": 7,
+          "x": 6,
           "y": 10
         },
         {
-          "x": 8,
+          "x": 7,
           "y": 11
         },
         {
-          "x": 9,
+          "x": 8,
           "y": 12
         },
         {
-          "x": 10,
+          "x": 9,
           "y": 13
         },
         {
-          "x": 11,
+          "x": 10,
           "y": 14
         },
         {
-          "x": 12,
+          "x": 11,
           "y": 15
         },
         {
-          "x": 13,
+          "x": 12,
           "y": 16
         },
         {
-          "x": 14,
+          "x": 13,
           "y": 17
         },
         {
-          "x": 15,
+          "x": 14,
           "y": 18
+        },
+        {
+          "x": 15,
+          "y": 19
         }
       ],
       "snapYToInt": true
@@ -838,7 +838,7 @@
       "flag": "hp_scale",
       "generationMode": "by_ratio",
       "startX": 1,
-      "startY": 3,
+      "startY": 2,
       "numberOfPoints": 15,
       "levelCap": 10,
       "deltaY": 3,
@@ -904,63 +904,63 @@
       "points": [
         {
           "x": 1,
-          "y": 3
+          "y": 2
         },
         {
           "x": 2,
-          "y": 4
+          "y": 3
         },
         {
           "x": 3,
-          "y": 6
+          "y": 5
         },
         {
           "x": 4,
-          "y": 7
+          "y": 6
         },
         {
           "x": 5,
-          "y": 9
+          "y": 8
         },
         {
           "x": 6,
-          "y": 10
+          "y": 9
         },
         {
           "x": 7,
-          "y": 12
+          "y": 11
         },
         {
           "x": 8,
-          "y": 13
+          "y": 12
         },
         {
           "x": 9,
-          "y": 15
+          "y": 14
         },
         {
           "x": 10,
-          "y": 16
+          "y": 15
         },
         {
           "x": 11,
-          "y": 18
+          "y": 15
         },
         {
           "x": 12,
-          "y": 19
+          "y": 15
         },
         {
           "x": 13,
-          "y": 21
+          "y": 15
         },
         {
           "x": 14,
-          "y": 22
+          "y": 15
         },
         {
           "x": 15,
-          "y": 24
+          "y": 15
         }
       ],
       "snapYToInt": true
@@ -971,16 +971,16 @@
       "flag": "hp_scale",
       "generationMode": "by_ratio",
       "startX": 1,
-      "startY": 4,
+      "startY": 3,
       "numberOfPoints": 15,
-      "levelCap": 4,
+      "levelCap": 3,
       "deltaY": 3,
       "everyXLevels": 1,
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
       "goldStartY": 0,
-      "goldScalePresetId": "statline_preset_18",
+      "goldScalePresetId": "statline_preset_5",
       "guideIntervals": [
         {
           "endX": 5,
@@ -1037,63 +1037,63 @@
       "points": [
         {
           "x": 1,
-          "y": 4
+          "y": 3
         },
         {
           "x": 2,
-          "y": 7
+          "y": 6
         },
         {
           "x": 3,
-          "y": 10
+          "y": 9
         },
         {
           "x": 4,
-          "y": 13
+          "y": 9
         },
         {
           "x": 5,
-          "y": 16
+          "y": 9
         },
         {
           "x": 6,
-          "y": 19
+          "y": 9
         },
         {
           "x": 7,
-          "y": 22
+          "y": 9
         },
         {
           "x": 8,
-          "y": 25
+          "y": 9
         },
         {
           "x": 9,
-          "y": 28
+          "y": 9
         },
         {
           "x": 10,
-          "y": 31
+          "y": 9
         },
         {
           "x": 11,
-          "y": 34
+          "y": 9
         },
         {
           "x": 12,
-          "y": 37
+          "y": 9
         },
         {
           "x": 13,
-          "y": 40
+          "y": 9
         },
         {
           "x": 14,
-          "y": 43
+          "y": 9
         },
         {
           "x": 15,
-          "y": 46
+          "y": 9
         }
       ],
       "snapYToInt": true
@@ -1104,7 +1104,7 @@
       "flag": "hp_scale",
       "generationMode": "by_ratio",
       "startX": 1,
-      "startY": 10,
+      "startY": 11,
       "numberOfPoints": 15,
       "levelCap": 5,
       "deltaY": 2,
@@ -1112,8 +1112,8 @@
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
-      "goldStartY": 5,
-      "goldScalePresetId": "statline_preset_17",
+      "goldStartY": 6,
+      "goldScalePresetId": "statline_preset_4",
       "guideIntervals": [
         {
           "endX": 5,
@@ -1170,63 +1170,63 @@
       "points": [
         {
           "x": 1,
-          "y": 10
+          "y": 11
         },
         {
           "x": 2,
-          "y": 12
+          "y": 13
         },
         {
           "x": 3,
-          "y": 14
+          "y": 15
         },
         {
           "x": 4,
-          "y": 16
+          "y": 17
         },
         {
           "x": 5,
-          "y": 18
+          "y": 19
         },
         {
           "x": 6,
-          "y": 20
+          "y": 21
         },
         {
           "x": 7,
-          "y": 22
+          "y": 23
         },
         {
           "x": 8,
-          "y": 24
+          "y": 25
         },
         {
           "x": 9,
-          "y": 26
+          "y": 27
         },
         {
           "x": 10,
-          "y": 28
+          "y": 29
         },
         {
           "x": 11,
-          "y": 30
+          "y": 31
         },
         {
           "x": 12,
-          "y": 32
+          "y": 33
         },
         {
           "x": 13,
-          "y": 34
+          "y": 35
         },
         {
           "x": 14,
-          "y": 36
+          "y": 37
         },
         {
           "x": 15,
-          "y": 38
+          "y": 39
         }
       ],
       "snapYToInt": true
@@ -1511,7 +1511,7 @@
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
-      "goldStartY": 2,
+      "goldStartY": 3,
       "goldScalePresetId": "statline_preset_6",
       "guideIntervals": [
         {
@@ -1628,427 +1628,6 @@
           "y": 29
         }
       ],
-      "snapYToInt": true
-    },
-    {
-      "id": "statline_preset_16",
-      "name": "hp_medium_monster_zombie",
-      "flag": "hp_scale",
-      "generationMode": "by_ratio",
-      "startX": 1,
-      "startY": 14,
-      "numberOfPoints": 15,
-      "levelCap": 15,
-      "deltaY": 2,
-      "everyXLevels": 5,
-      "referencePresetId": "",
-      "conversionPercent": 100,
-      "useConversion": false,
-      "goldStartY": 4,
-      "goldScalePresetId": "statline_preset_8",
-      "guideIntervals": [
-        {
-          "endX": 5,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ]
-        },
-        {
-          "endX": 10,
-          "positiveWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ]
-        },
-        {
-          "endX": null,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            2,
-            3,
-            4,
-            4
-          ]
-        }
-      ],
-      "points": [
-        {
-          "x": 1,
-          "y": 14
-        },
-        {
-          "x": 2,
-          "y": 14
-        },
-        {
-          "x": 3,
-          "y": 14
-        },
-        {
-          "x": 4,
-          "y": 15
-        },
-        {
-          "x": 5,
-          "y": 15
-        },
-        {
-          "x": 6,
-          "y": 16
-        },
-        {
-          "x": 7,
-          "y": 16
-        },
-        {
-          "x": 8,
-          "y": 16
-        },
-        {
-          "x": 9,
-          "y": 17
-        },
-        {
-          "x": 10,
-          "y": 17
-        },
-        {
-          "x": 11,
-          "y": 18
-        },
-        {
-          "x": 12,
-          "y": 18
-        },
-        {
-          "x": 13,
-          "y": 18
-        },
-        {
-          "x": 14,
-          "y": 19
-        },
-        {
-          "x": 15,
-          "y": 19
-        }
-      ],
-      "snapYToInt": true
-    },
-    {
-      "id": "statline_preset_17",
-      "name": "gd_20_scalling",
-      "flag": "gold_drop_scale",
-      "generationMode": "by_ratio",
-      "startX": 2,
-      "startY": 0,
-      "numberOfPoints": 0,
-      "levelCap": null,
-      "deltaY": 0,
-      "everyXLevels": 1,
-      "referencePresetId": "",
-      "conversionPercent": 20,
-      "useConversion": true,
-      "goldStartY": 0,
-      "goldScalePresetId": "",
-      "guideIntervals": [
-        {
-          "endX": 5,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ]
-        },
-        {
-          "endX": 10,
-          "positiveWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ]
-        },
-        {
-          "endX": null,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            2,
-            3,
-            4,
-            4
-          ]
-        }
-      ],
-      "points": [],
-      "snapYToInt": true
-    },
-    {
-      "id": "statline_preset_18",
-      "name": "gd_40_scalling",
-      "flag": "gold_drop_scale",
-      "generationMode": "by_ratio",
-      "startX": 2,
-      "startY": 0,
-      "numberOfPoints": 0,
-      "levelCap": null,
-      "deltaY": 0,
-      "everyXLevels": 1,
-      "referencePresetId": "",
-      "conversionPercent": 40,
-      "useConversion": true,
-      "goldStartY": 0,
-      "goldScalePresetId": "",
-      "guideIntervals": [
-        {
-          "endX": 5,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ]
-        },
-        {
-          "endX": 10,
-          "positiveWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ]
-        },
-        {
-          "endX": null,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            2,
-            3,
-            4,
-            4
-          ]
-        }
-      ],
-      "points": [],
-      "snapYToInt": true
-    },
-    {
-      "id": "statline_preset_19",
-      "name": "gd_60_scalling ",
-      "flag": "gold_drop_scale",
-      "generationMode": "by_ratio",
-      "startX": 2,
-      "startY": 0,
-      "numberOfPoints": 0,
-      "levelCap": null,
-      "deltaY": 0,
-      "everyXLevels": 1,
-      "referencePresetId": "",
-      "conversionPercent": 60,
-      "useConversion": true,
-      "goldStartY": 0,
-      "goldScalePresetId": "",
-      "guideIntervals": [
-        {
-          "endX": 5,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ]
-        },
-        {
-          "endX": 10,
-          "positiveWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ]
-        },
-        {
-          "endX": null,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            2,
-            3,
-            4,
-            4
-          ]
-        }
-      ],
-      "points": [],
-      "snapYToInt": true
-    },
-    {
-      "id": "statline_preset_20",
-      "name": "gd_80_scalling",
-      "flag": "gold_drop_scale",
-      "generationMode": "by_ratio",
-      "startX": 2,
-      "startY": 0,
-      "numberOfPoints": 0,
-      "levelCap": null,
-      "deltaY": 0,
-      "everyXLevels": 1,
-      "referencePresetId": "",
-      "conversionPercent": 80,
-      "useConversion": true,
-      "goldStartY": 0,
-      "goldScalePresetId": "",
-      "guideIntervals": [
-        {
-          "endX": 5,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ]
-        },
-        {
-          "endX": 10,
-          "positiveWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ],
-          "negativeWeights": [
-            1,
-            1,
-            1,
-            2,
-            2
-          ]
-        },
-        {
-          "endX": null,
-          "positiveWeights": [
-            1,
-            1,
-            2,
-            3,
-            3
-          ],
-          "negativeWeights": [
-            1,
-            2,
-            3,
-            4,
-            4
-          ]
-        }
-      ],
-      "points": [],
       "snapYToInt": true
     }
   ]
