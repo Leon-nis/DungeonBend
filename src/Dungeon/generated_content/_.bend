@@ -46,8 +46,17 @@ def hero_gato_de_botas_ultimate_title() -> String:
 def item_gold_name() -> String:
   "Gold"
 
+def monster_bat_name() -> String:
+  "Bat"
+
+def monster_mimic_name() -> String:
+  "Mimic"
+
 def monster_orc_name() -> String:
   "Orc"
+
+def monster_plant_name() -> String:
+  "Angry Plant"
 
 def monster_rat_name() -> String:
   "Rat"
@@ -57,6 +66,9 @@ def monster_spider_name() -> String:
 
 def monster_venom_spider_name() -> String:
   "Venom Spider"
+
+def monster_zombie_dog_name() -> String:
+  "Zombie Dog"
 
 def potion_potion_1_name() -> String:
   "Health Potion"

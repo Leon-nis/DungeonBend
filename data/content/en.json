@@ -72,5 +72,9 @@
   "ui.gameOver.resumeDungeon": "Resume dungeon",
   "ui.gameOver.mainMenu": "Main menu",
   "potion.potion_2.name": "Big Health Potion",
-  "potion.potion_3.name": "Giant Health Potion"
+  "potion.potion_3.name": "Giant Health Potion",
+  "monster.plant.name": "Angry Plant",
+  "monster.bat.name": "Bat",
+  "monster.mimic.name": "Mimic",
+  "monster.zombie_dog.name": "Zombie Dog"
 }
