@@ -148,7 +148,7 @@
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
-      "goldStartY": 1,
+      "goldStartY": 0,
       "goldScalePresetId": "statline_preset_5",
       "guideIntervals": [
         {
@@ -713,8 +713,8 @@
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
-      "goldStartY": 1,
-      "goldScalePresetId": "statline_preset_7",
+      "goldStartY": 0,
+      "goldScalePresetId": "statline_preset_6",
       "guideIntervals": [
         {
           "endX": 5,
@@ -846,7 +846,7 @@
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
-      "goldStartY": 1,
+      "goldStartY": 0,
       "goldScalePresetId": "statline_preset_3",
       "guideIntervals": [
         {
@@ -979,7 +979,7 @@
       "referencePresetId": "",
       "conversionPercent": 100,
       "useConversion": false,
-      "goldStartY": 1,
+      "goldStartY": 0,
       "goldScalePresetId": "statline_preset_5",
       "guideIntervals": [
         {
@@ -1094,6 +1094,538 @@
         {
           "x": 15,
           "y": 9
+        }
+      ],
+      "snapYToInt": true
+    },
+    {
+      "id": "statline_preset_12",
+      "name": "hp_medium_monster_orc",
+      "flag": "hp_scale",
+      "generationMode": "by_ratio",
+      "startX": 1,
+      "startY": 11,
+      "numberOfPoints": 15,
+      "levelCap": 5,
+      "deltaY": 2,
+      "everyXLevels": 1,
+      "referencePresetId": "",
+      "conversionPercent": 100,
+      "useConversion": false,
+      "goldStartY": 6,
+      "goldScalePresetId": "statline_preset_4",
+      "guideIntervals": [
+        {
+          "endX": 5,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "endX": 10,
+          "positiveWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ]
+        },
+        {
+          "endX": null,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            2,
+            3,
+            4,
+            4
+          ]
+        }
+      ],
+      "points": [
+        {
+          "x": 1,
+          "y": 11
+        },
+        {
+          "x": 2,
+          "y": 13
+        },
+        {
+          "x": 3,
+          "y": 15
+        },
+        {
+          "x": 4,
+          "y": 17
+        },
+        {
+          "x": 5,
+          "y": 19
+        },
+        {
+          "x": 6,
+          "y": 21
+        },
+        {
+          "x": 7,
+          "y": 23
+        },
+        {
+          "x": 8,
+          "y": 25
+        },
+        {
+          "x": 9,
+          "y": 27
+        },
+        {
+          "x": 10,
+          "y": 29
+        },
+        {
+          "x": 11,
+          "y": 31
+        },
+        {
+          "x": 12,
+          "y": 33
+        },
+        {
+          "x": 13,
+          "y": 35
+        },
+        {
+          "x": 14,
+          "y": 37
+        },
+        {
+          "x": 15,
+          "y": 39
+        }
+      ],
+      "snapYToInt": true
+    },
+    {
+      "id": "statline_preset_13",
+      "name": "guide_medium_monsters",
+      "flag": "guide_scale",
+      "generationMode": "by_ratio",
+      "startX": 1,
+      "startY": 0,
+      "numberOfPoints": 15,
+      "levelCap": null,
+      "deltaY": 1,
+      "everyXLevels": 1,
+      "referencePresetId": "",
+      "conversionPercent": 100,
+      "useConversion": false,
+      "goldStartY": 0,
+      "goldScalePresetId": "",
+      "guideIntervals": [
+        {
+          "endX": 5,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "endX": 10,
+          "positiveWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ]
+        },
+        {
+          "endX": null,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            2,
+            3,
+            4,
+            4
+          ]
+        }
+      ],
+      "points": [
+        {
+          "x": 1,
+          "y": 9
+        },
+        {
+          "x": 2,
+          "y": 10
+        },
+        {
+          "x": 3,
+          "y": 11
+        },
+        {
+          "x": 4,
+          "y": 12
+        },
+        {
+          "x": 5,
+          "y": 13
+        },
+        {
+          "x": 6,
+          "y": 14
+        },
+        {
+          "x": 7,
+          "y": 15
+        },
+        {
+          "x": 8,
+          "y": 16
+        },
+        {
+          "x": 9,
+          "y": 17
+        },
+        {
+          "x": 10,
+          "y": 18
+        },
+        {
+          "x": 11,
+          "y": 19
+        },
+        {
+          "x": 12,
+          "y": 20
+        },
+        {
+          "x": 13,
+          "y": 21
+        },
+        {
+          "x": 14,
+          "y": 22
+        },
+        {
+          "x": 15,
+          "y": 23
+        }
+      ],
+      "snapYToInt": true
+    },
+    {
+      "id": "statline_preset_14",
+      "name": "guide_big_monsters",
+      "flag": "guide_scale",
+      "generationMode": "by_ratio",
+      "startX": 1,
+      "startY": 0,
+      "numberOfPoints": 15,
+      "levelCap": null,
+      "deltaY": 1,
+      "everyXLevels": 1,
+      "referencePresetId": "",
+      "conversionPercent": 100,
+      "useConversion": false,
+      "goldStartY": 0,
+      "goldScalePresetId": "",
+      "guideIntervals": [
+        {
+          "endX": 5,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "endX": 10,
+          "positiveWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ]
+        },
+        {
+          "endX": null,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            2,
+            3,
+            4,
+            4
+          ]
+        }
+      ],
+      "points": [
+        {
+          "x": 1,
+          "y": 12
+        },
+        {
+          "x": 2,
+          "y": 14
+        },
+        {
+          "x": 3,
+          "y": 16
+        },
+        {
+          "x": 4,
+          "y": 18
+        },
+        {
+          "x": 5,
+          "y": 20
+        },
+        {
+          "x": 6,
+          "y": 20
+        },
+        {
+          "x": 7,
+          "y": 20
+        },
+        {
+          "x": 8,
+          "y": 20
+        },
+        {
+          "x": 9,
+          "y": 20
+        },
+        {
+          "x": 10,
+          "y": 20
+        },
+        {
+          "x": 11,
+          "y": 22
+        },
+        {
+          "x": 12,
+          "y": 24
+        },
+        {
+          "x": 13,
+          "y": 26
+        },
+        {
+          "x": 14,
+          "y": 28
+        },
+        {
+          "x": 15,
+          "y": 30
+        }
+      ],
+      "snapYToInt": true
+    },
+    {
+      "id": "statline_preset_15",
+      "name": "hp_medium_monster_dog",
+      "flag": "hp_scale",
+      "generationMode": "by_ratio",
+      "startX": 1,
+      "startY": 8,
+      "numberOfPoints": 15,
+      "levelCap": 10,
+      "deltaY": 3,
+      "everyXLevels": 2,
+      "referencePresetId": "",
+      "conversionPercent": 100,
+      "useConversion": false,
+      "goldStartY": 3,
+      "goldScalePresetId": "statline_preset_6",
+      "guideIntervals": [
+        {
+          "endX": 5,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ]
+        },
+        {
+          "endX": 10,
+          "positiveWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ],
+          "negativeWeights": [
+            1,
+            1,
+            1,
+            2,
+            2
+          ]
+        },
+        {
+          "endX": null,
+          "positiveWeights": [
+            1,
+            1,
+            2,
+            3,
+            3
+          ],
+          "negativeWeights": [
+            1,
+            2,
+            3,
+            4,
+            4
+          ]
+        }
+      ],
+      "points": [
+        {
+          "x": 1,
+          "y": 8
+        },
+        {
+          "x": 2,
+          "y": 9
+        },
+        {
+          "x": 3,
+          "y": 11
+        },
+        {
+          "x": 4,
+          "y": 12
+        },
+        {
+          "x": 5,
+          "y": 14
+        },
+        {
+          "x": 6,
+          "y": 15
+        },
+        {
+          "x": 7,
+          "y": 17
+        },
+        {
+          "x": 8,
+          "y": 18
+        },
+        {
+          "x": 9,
+          "y": 20
+        },
+        {
+          "x": 10,
+          "y": 21
+        },
+        {
+          "x": 11,
+          "y": 23
+        },
+        {
+          "x": 12,
+          "y": 24
+        },
+        {
+          "x": 13,
+          "y": 26
+        },
+        {
+          "x": 14,
+          "y": 27
+        },
+        {
+          "x": 15,
+          "y": 29
         }
       ],
       "snapYToInt": true

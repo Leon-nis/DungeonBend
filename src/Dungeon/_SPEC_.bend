@@ -78,6 +78,13 @@ assert monster_def_carries_gold_levels:
     == monster_def{"slime", "assets/slime.png", [5], [1]}
     :: Dungeon/MonsterDef
 
+# Some monsters can intentionally drop no gold at early spawn levels.
+# Zero is still valid because gold rewards are stored as U32 values.
+assert monster_def_allows_zero_gold_levels:
+  monster_def{"rat", "assets/rat.png", [0, 1], [2, 4]}
+    == monster_def{"rat", "assets/rat.png", [0, 1], [2, 4]}
+    :: Dungeon/MonsterDef
+
 # "Gold is used to purchase booster packs and other progression-
 # related elements." Dungeon/PackDef.price is the gold cost.
 assert pack_def_carries_price:
