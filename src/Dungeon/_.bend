@@ -347,6 +347,7 @@ type DungeonEvent {
   pause_dungeon{}
   resume_dungeon{}
   abandon_dungeon{}
+  reset_save{}
   ignore{}
   loaded{meta: Meta, saved_scene: SavedScene, next_seed: U32}
   no_save{}

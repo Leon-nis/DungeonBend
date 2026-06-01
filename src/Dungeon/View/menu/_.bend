@@ -77,6 +77,11 @@ def _menu_deck_button() -> HTML(Dungeon/DungeonEvent):
     {Dungeon/View/action_button/secondary_full(Dungeon/DungeonEvent, open_deck_list{}, "EDIT DECKS", 1)}
   </div>
 
+def _menu_reset_save_button() -> HTML(Dungeon/DungeonEvent):
+  <div class="menu-club-btn-wrap menu-club-btn-wrap--full">
+    {Dungeon/View/action_button/secondary_full(Dungeon/DungeonEvent, reset_save{}, "RESET SAVE", 1)}
+  </div>
+
 def _menu_actions_layout(meta_state: Dungeon/Meta) -> HTML(Dungeon/DungeonEvent):
   Midum/Layout/frame(
     Dungeon/DungeonEvent,
@@ -90,6 +95,9 @@ def _menu_actions_layout(meta_state: Dungeon/Meta) -> HTML(Dungeon/DungeonEvent)
         </div>
         <div class="menu-actions__slot">
           {_menu_start_button()}
+        </div>
+        <div class="menu-actions__slot">
+          {_menu_reset_save_button()}
         </div>
       </div>
     </section>,
