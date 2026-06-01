@@ -36,6 +36,11 @@
     },
     {
       "pack_id": "starter_booster",
+      "card_id": "sword_4",
+      "weight": 1
+    },
+    {
+      "pack_id": "starter_booster",
       "card_id": "potion_1",
       "weight": 3
     },
