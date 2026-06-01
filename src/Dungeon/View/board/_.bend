@@ -223,6 +223,9 @@ def _pause_resume_button() -> HTML(Dungeon/DungeonEvent):
 def _resume_menu_button() -> HTML(Dungeon/DungeonEvent):
   Midum/Button/secondary(Dungeon/DungeonEvent, abandon_dungeon{}, medium{}, Dungeon/Content/ui_game_over_main_menu(), [width_full{}])
 
+def _reset_save_button() -> HTML(Dungeon/DungeonEvent):
+  Midum/Button/secondary(Dungeon/DungeonEvent, reset_save{}, medium{}, "RESET SAVE", [width_full{}])
+
 def _pause_modal(scene_value: Dungeon/Scene) -> HTML(Dungeon/DungeonEvent):
   <div class={Dungeon/View/selectors/game_over_modal_class(scene_value)}>
     {Midum/Card/neutral(
@@ -234,6 +237,9 @@ def _pause_modal(scene_value: Dungeon/Scene) -> HTML(Dungeon/DungeonEvent):
         <section class="game-over-card__actions">
           <div class="menu-secondary-action game-over-card__secondary">
             {_resume_menu_button()}
+          </div>
+          <div class="menu-secondary-action game-over-card__secondary">
+            {_reset_save_button()}
           </div>
           <div class="menu-start-action game-over-card__primary">
             {_pause_resume_button()}
@@ -258,6 +264,9 @@ def _resume_prompt_modal(scene_value: Dungeon/Scene) -> HTML(Dungeon/DungeonEven
         <section class="game-over-card__actions">
           <div class="menu-secondary-action game-over-card__secondary">
             {_resume_menu_button()}
+          </div>
+          <div class="menu-secondary-action game-over-card__secondary">
+            {_reset_save_button()}
           </div>
           <div class="menu-start-action game-over-card__primary">
             {_resume_dungeon_button()}

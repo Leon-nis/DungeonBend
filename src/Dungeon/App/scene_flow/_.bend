@@ -2,6 +2,7 @@ def scene_flow() -> Unit:
   unit{}
 
 import Dungeon/default_ui as default_ui
+import Dungeon/initial_game as initial_game
 import Dungeon/App/update_setup as update_setup
 import Dungeon/App/update_character_select as update_character_select
 import Dungeon/App/update_boosters as update_boosters
@@ -68,6 +69,8 @@ def _next_state(evt: Dungeon/DungeonEvent, state: Dungeon/DungeonState) -> Dunge
   match evt:
     case loaded{loaded_meta, saved_scene, loaded_next_seed}:
       _apply_loaded_meta(loaded_meta, saved_scene, loaded_next_seed, state)
+    case reset_save{}:
+      dungeon{initial_game(), default_ui()}
     case no_save{}:
       state
     case _:
