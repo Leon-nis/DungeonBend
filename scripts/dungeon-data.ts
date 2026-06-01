@@ -539,7 +539,7 @@ function goldLevelsForMonster(data: GameData, monster: RawMonster, label: string
     };
   });
   return applyLevelCapToPoints(goldPoints, goldPreset.levelCap)
-    .map((point, index) => validatePositiveInt(point.y, `${label}.gold_levels[${index}]`));
+    .map((point, index) => validateNonNegativeInt(point.y, `${label}.gold_levels[${index}]`));
 }
 
 function requireContent(data: GameData, key: string, label = `content.en["${key}"]`): string {

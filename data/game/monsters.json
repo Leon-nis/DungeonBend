@@ -7,20 +7,20 @@
   },
   {
     "id": "spider",
-    "name": "Spider",
-    "sprite": "assets/enemy-blackwidow.png",
+    "name": "Black Widow",
+    "sprite": "assets/enemy-spider2.png",
     "hpStatlinePresetId": "statline_preset_9"
   },
   {
     "id": "venom_spider",
     "name": "Venom Spider",
-    "sprite": "assets/enemy-slime-blue2.png",
-    "hpStatlinePresetId": "statline_preset_11"
+    "sprite": "assets/enemy-spider.png",
+    "hpStatlinePresetId": "statline_preset_9"
   },
   {
     "id": "orc",
     "name": "Orc",
-    "sprite": "assets/enemy-plant.png",
+    "sprite": "assets/enemy-orc.png",
     "hpStatlinePresetId": "statline_preset_10"
   }
 ]
