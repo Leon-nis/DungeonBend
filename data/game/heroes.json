@@ -3,7 +3,7 @@
     "id": "adventurer",
     "name": "Adventurer",
     "sprite": "assets/player-boy.png",
-    "base_max_hp": 12,
+    "base_max_hp": 15,
     "unlock_cost": 0,
     "starts_unlocked": true
   },

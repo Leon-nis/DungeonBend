@@ -230,11 +230,14 @@ def ui_upgrade_upgrade_prefix() -> String:
   "Upgrade - "
 
 def weapon_sword_1_name() -> String:
-  "Sword A"
+  "Cleaver"
 
 def weapon_sword_2_name() -> String:
-  "Sword S"
+  "Machete Sword"
 
 def weapon_sword_3_name() -> String:
-  "Sword S+"
+  "Vampire Sword"
+
+def weapon_weapon_4_name() -> String:
+  "Giant Cleaver"
 
