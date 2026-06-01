@@ -1,20 +1,20 @@
 {
   "base_deck": [
     {
-      "card_id": "rat",
-      "count": 6
+      "card_id": "bat",
+      "count": 7
+    },
+    {
+      "card_id": "plant",
+      "count": 3
     },
     {
       "card_id": "spider",
       "count": 3
     },
     {
-      "card_id": "venom_spider",
-      "count": 3
-    },
-    {
-      "card_id": "orc",
-      "count": 3
+      "card_id": "zombie_dog",
+      "count": 1
     },
     {
       "card_id": "sword_1",
@@ -26,7 +26,7 @@
     },
     {
       "card_id": "potion_1",
-      "count": 1
+      "count": 3
     },
     {
       "card_id": "potion_2",

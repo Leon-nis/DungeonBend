@@ -11,9 +11,9 @@
   "monster.spider.name": "Black Widow",
   "monster.venom_spider.name": "Venom Spider",
   "monster.orc.name": "Orc",
-  "weapon.sword_1.name": "Sword A",
-  "weapon.sword_2.name": "Sword S",
-  "weapon.sword_3.name": "Sword S+",
+  "weapon.sword_1.name": "Cleaver",
+  "weapon.sword_2.name": "Machete Sword",
+  "weapon.sword_3.name": "Vampire Sword",
   "potion.potion_1.name": "Health Potion",
   "booster.starter_booster.name": "Starter Booster",
   "fallback.monster.name": "Monster",
@@ -72,5 +72,10 @@
   "ui.gameOver.resumeDungeon": "Resume dungeon",
   "ui.gameOver.mainMenu": "Main menu",
   "potion.potion_2.name": "Big Health Potion",
-  "potion.potion_3.name": "Giant Health Potion"
+  "potion.potion_3.name": "Giant Health Potion",
+  "monster.plant.name": "Angry Plant",
+  "monster.bat.name": "Bat",
+  "monster.mimic.name": "Mimic",
+  "monster.zombie_dog.name": "Zombie Dog",
+  "weapon.weapon_4.name": "Giant Cleaver"
 }

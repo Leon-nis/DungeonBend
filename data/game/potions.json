@@ -2,19 +2,19 @@
   {
     "id": "potion_1",
     "name": "Health Potion",
-    "sprite": "assets/item-potion.png",
+    "sprite": "assets/item-hp1.png",
     "heal": 3
   },
   {
     "id": "potion_2",
     "name": "Big Health Potion",
-    "sprite": "assets/item-potion.png",
+    "sprite": "assets/item-hp2.png",
     "heal": 7
   },
   {
     "id": "potion_3",
     "name": "Giant Health Potion",
-    "sprite": "assets/item-potion.png",
+    "sprite": "assets/item-hp3.png",
     "heal": 12
   }
 ]
