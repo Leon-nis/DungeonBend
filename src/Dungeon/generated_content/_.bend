@@ -53,7 +53,7 @@ def monster_rat_name() -> String:
   "Rat"
 
 def monster_spider_name() -> String:
-  "Spider"
+  "Black Widow"
 
 def monster_venom_spider_name() -> String:
   "Venom Spider"
