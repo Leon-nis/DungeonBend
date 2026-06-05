@@ -1,26 +1,20 @@
 [
   {
-    "id": "sword_1",
-    "name": "Cleaver",
-    "sprite": "assets/item_small_cleaver.png",
-    "dmg": 4
-  },
-  {
-    "id": "sword_2",
-    "name": "Machete Sword",
-    "sprite": "assets/item-machete.png",
-    "dmg": 9
-  },
-  {
-    "id": "sword_3",
-    "name": "Vampire Sword",
-    "sprite": "assets/item-vampire_sword.png",
+    "id": "weapon_1",
+    "name": "Sword A",
+    "sprite": "assets/item-sword.png",
     "dmg": 5
   },
   {
-    "id": "weapon_4",
-    "name": "Giant Cleaver",
-    "sprite": "assets/item-big-cleaver.png",
-    "dmg": 16
+    "id": "weapon_2",
+    "name": "Sword S",
+    "sprite": "assets/item-sword.png",
+    "dmg": 7
+  },
+  {
+    "id": "weapon_3",
+    "name": "Sword S+",
+    "sprite": "assets/item-sword.png",
+    "dmg": 9
   }
 ]
