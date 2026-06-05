@@ -9,7 +9,7 @@
     "id": "spider",
     "name": "Black Widow",
     "sprite": "assets/enemy-spider2.png",
-    "hpStatlinePresetId": "statline_preset_2"
+    "hpStatlinePresetId": "statline_preset_9"
   },
   {
     "id": "venom_spider",
@@ -21,7 +21,7 @@
     "id": "orc",
     "name": "Orc",
     "sprite": "assets/enemy-orc.png",
-    "hpStatlinePresetId": "statline_preset_12"
+    "hpStatlinePresetId": "statline_preset_10"
   },
   {
     "id": "plant",

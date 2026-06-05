@@ -11,7 +11,7 @@
   "pool": [
     {
       "pack_id": "starter_booster",
-      "card_id": "zombie_dog",
+      "card_id": "spider",
       "weight": 4
     },
     {
@@ -21,17 +21,17 @@
     },
     {
       "pack_id": "starter_booster",
-      "card_id": "sword_1",
+      "card_id": "weapon_1",
       "weight": 3
     },
     {
       "pack_id": "starter_booster",
-      "card_id": "sword_2",
+      "card_id": "weapon_2",
       "weight": 2
     },
     {
       "pack_id": "starter_booster",
-      "card_id": "sword_3",
+      "card_id": "weapon_3",
       "weight": 1
     },
     {
